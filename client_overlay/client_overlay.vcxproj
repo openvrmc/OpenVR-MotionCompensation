@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -14,10 +14,11 @@
     <ProjectGuid>{33E075DB-922D-3252-976E-46B5721DC3DE}</ProjectGuid>
     <RootNamespace>OpenVR-InputEmulatorOverlay</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <PlatformToolSet>v140</PlatformToolSet>
+    <PlatformToolSet>v141</PlatformToolSet>
     <OutputDirectory>bin\win64\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
@@ -26,7 +27,7 @@
     <PrimaryOutput>OpenVR-InputEmulatorOverlay</PrimaryOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <PlatformToolSet>v140</PlatformToolSet>
+    <PlatformToolSet>v141</PlatformToolSet>
     <OutputDirectory>bin\win64\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
