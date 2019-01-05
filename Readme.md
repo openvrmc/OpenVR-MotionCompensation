@@ -337,10 +337,6 @@ client_commandline.exe setdeviceposition 0 -1 -1 -1
 ```
 
 ## Initial Setup
-### ~~Download the LeapMotion SDK~~ (Only needed by the now defunct project driver_leapmotion)
-1. Goto https://developer.leapmotion.com/get-started
-1. Click "Download Orion Beta"
-1. Unzip the "LeapSDK" folder in the zip file into `OpenVR-InputEmulator/third-party/LeapSDK`
 
 ### Boost
 1. Goto https://sourceforge.net/projects/boost/files/boost-binaries/1.63.0/
