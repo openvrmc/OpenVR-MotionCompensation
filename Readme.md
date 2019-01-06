@@ -338,10 +338,13 @@ client_commandline.exe setdeviceposition 0 -1 -1 -1
 
 ## Initial Setup
 
-### Boost
+### Boost (manually)
 1. Goto https://sourceforge.net/projects/boost/files/boost-binaries/1.63.0/
 1. Download Boost 1.63 Binaries (boost_1_63_0-msvc-14.0-64.exe)
 1. Install Boost into `OpenVR-InputEmulator/third-party/boost_1_63_0`
+
+### Boost (vcpkg)
+1. `vcpkg install boost:x64-windows`
   
 ### Qt
 1. Goto https://download.qt.io/official_releases/qt/5.7/5.7.0/
