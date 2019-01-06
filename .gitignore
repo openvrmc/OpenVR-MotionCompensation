@@ -342,3 +342,5 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+*.rc
+/client_cli_zscaler/client_cli_zscaler.vcxproj.filters
