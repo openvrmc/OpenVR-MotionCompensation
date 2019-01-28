@@ -1,7 +1,13 @@
 // client_cli_zscaler.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+
+
 #include "pch.h"
+
+#include <windows.h>
+#include <WinUser.h>
+
 #include <iostream>
 #include <algorithm>
 
@@ -16,7 +22,7 @@
 
 vr::IVRSystem* vr_pointer = NULL;
 
-float calculate_offset(float original);
+float calculate_offset(float base_height, float original);
 
 int main()
 {
@@ -24,6 +30,7 @@ int main()
 
 	vr::EVRInitError peError;
 	vr::TrackedDevicePose_t pTrackedDevicePose;
+	float base_height = 0.0;
 
 	vr_pointer = vr::VR_Init(&peError, vr::EVRApplicationType::VRApplication_Background );
 
@@ -34,6 +41,11 @@ int main()
 			vr::VR_GetVRInitErrorAsEnglishDescription(peError));
 		exit(EXIT_FAILURE);
 	}
+
+	// detect original player height, user should be wearing the headset at this time.
+
+	vr_pointer->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, (float) 0.0, &pTrackedDevicePose, 1);
+	base_height = getHeight(&pTrackedDevicePose);
 
 	// init emulator 
 	vrinputemulator::DeviceOffsets device_offsets;
@@ -52,7 +64,24 @@ int main()
 
 	// loop 
 
+	auto indexL = vr_pointer->GetTrackedDeviceIndexForControllerRole(vr::ETrackedControllerRole::TrackedControllerRole_LeftHand);
+	auto indexR = vr_pointer->GetTrackedDeviceIndexForControllerRole(vr::ETrackedControllerRole::TrackedControllerRole_RightHand);
+
 	while (true) {
+
+		bool is_exit = false;
+		MSG uMsg;
+		if (PeekMessage(&uMsg, NULL, 0, 0, PM_REMOVE) > 0) //Or use an if statement
+		{
+			is_exit = uMsg.message == WM_QUIT || uMsg.message == WM_CLOSE;
+			std::cout << uMsg.message;
+		}
+		if (is_exit)
+		{
+			std::cout << "received exit signal";
+			break;
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
 		vr_pointer->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, (float) 0.0, &pTrackedDevicePose, 1);
@@ -61,7 +90,8 @@ int main()
 		float oldOffset = device_offsets.worldFromDriverTranslationOffset.v[1];
 
 		float oldHeight = getHeight(&pTrackedDevicePose) - oldOffset;
-		float newOffset = calculate_offset(oldHeight);
+
+		float newOffset = calculate_offset(base_height, oldHeight); /////////// calculate new offset here
 
 		inputEmulator.setWorldFromDriverTranslationOffset
 		(0 // HMD
@@ -87,33 +117,45 @@ int main()
 
 		std::cout << oldHeight << " + " << newOffset << "\r" ;
 	}
+	std::cout << '/n' << "left mainloop";
+
 
 	// exit
+	inputEmulator.enableDeviceOffsets(0, false);
+	inputEmulator.enableDeviceOffsets(indexR, false);
+	inputEmulator.enableDeviceOffsets(indexL, false);
+	inputEmulator.disconnect();
 
 	vr::VR_Shutdown();
+
+	std::cout << '/n' << "done";
+
+	return 0;
 }
 
 // H for Height in meter
-#define H_STANDING (float) 1.75
-#define H_SEATED   (float) 1.35
-#define H_FLOOR    (float) 0.00
-#define H_DUCK_START (float) 1.30
-#define H_DUCK_END   (float) 0.95
+#define H_STANDING (float) 1.75 // target height of player experience
+// #define H_SEATED   (float) 1.35 // replaced by base_height param
+//#define H_FLOOR    (float) 0.00
+// #define H_DUCK_START (float) 1.30
+// #define H_DUCK_END   (float) 0.95
 
 // low value
 //#define H_DUCKED   0.80
 
-float calculate_offset(float original)
+float calculate_offset(float base_height, float original)
 {
-	const float diff = H_STANDING - H_SEATED;
+	const float diff = H_STANDING - base_height /*H_SEATED*/;
+	float duck_start = base_height - 0.05; 
+	float duck_end = base_height - 0.40; 
 	// bottom up
-	if (original < H_DUCK_END)
+	if (original < duck_end)
 	{
 		return 0.0;
 	}
-	else if (original < H_DUCK_START)
+	else if (original < duck_start)
 	{
-		return map_numeric(original, H_DUCK_END, H_DUCK_START, H_DUCK_END, H_DUCK_START + diff) - original;
+		return map_numeric(original, duck_end, duck_start, duck_end, duck_start + diff) - original;
 	}
 	else
 	{
