@@ -1,6 +1,11 @@
 ![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.63-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
 
-# OpenVR-InputEmulator
+# DO NOT USE THIS OR EXPECT ANYTHING
+I haven't coded in C++ for twenty years.  I am investigating limiting the functional/api surface area to support motion compensation only.  Feel free to contact me if you want to help out - in the issues section.
+
+---
+
+# [Former docs] OpenVR-InputEmulator
 
 An OpenVR driver that allows to create virtual controllers, emulate controller input, enable motion compensation, manipulate poses of existing controllers and remap buttons. Includes a dashboard to configure some settings directly in VR, a command line client for more advanced settings, and a client-side library to support development of third-party applications.
 
