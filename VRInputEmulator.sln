@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_vrinputemulator", "lib_vrinputemulator\lib_vrinputemulator.vcxproj", "{05AC9994-2B63-4DE5-ABF3-95CE346F3A64}"
 EndProject
@@ -13,8 +13,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_commandline", "client_commandline\client_commandline.vcxproj", "{C4680CF3-74B7-4A1C-9762-1124E7B10634}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_overlay", "client_overlay\client_overlay.vcxproj", "{33E075DB-922D-3252-976E-46B5721DC3DE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_cli_zscaler", "client_cli_zscaler\client_cli_zscaler.vcxproj", "{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,14 +52,6 @@ Global
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Release|x64.ActiveCfg = Release|x64
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Release|x64.Build.0 = Release|x64
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Release|x86.ActiveCfg = Release|x64
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Debug|x64.ActiveCfg = Debug|x64
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Debug|x64.Build.0 = Debug|x64
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Debug|x86.ActiveCfg = Debug|Win32
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Debug|x86.Build.0 = Debug|Win32
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Release|x64.ActiveCfg = Release|x64
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Release|x64.Build.0 = Release|x64
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Release|x86.ActiveCfg = Release|Win32
-		{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
