@@ -10,8 +10,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_vrinputemulator", "d
 		{05AC9994-2B63-4DE5-ABF3-95CE346F3A64} = {05AC9994-2B63-4DE5-ABF3-95CE346F3A64}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_commandline", "client_commandline\client_commandline.vcxproj", "{C4680CF3-74B7-4A1C-9762-1124E7B10634}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_overlay", "client_overlay\client_overlay.vcxproj", "{33E075DB-922D-3252-976E-46B5721DC3DE}"
 EndProject
 Global
@@ -38,14 +36,6 @@ Global
 		{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}.Release|x64.Build.0 = Release|x64
 		{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}.Release|x86.ActiveCfg = Release|Win32
 		{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}.Release|x86.Build.0 = Release|Win32
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Debug|x64.ActiveCfg = Debug|x64
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Debug|x64.Build.0 = Debug|x64
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Debug|x86.ActiveCfg = Debug|Win32
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Debug|x86.Build.0 = Debug|Win32
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Release|x64.ActiveCfg = Release|x64
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Release|x64.Build.0 = Release|x64
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Release|x86.ActiveCfg = Release|Win32
-		{C4680CF3-74B7-4A1C-9762-1124E7B10634}.Release|x86.Build.0 = Release|Win32
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Debug|x64.ActiveCfg = Debug|x64
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Debug|x64.Build.0 = Debug|x64
 		{33E075DB-922D-3252-976E-46B5721DC3DE}.Debug|x86.ActiveCfg = Debug|x64

@@ -7,9 +7,8 @@ I haven't coded in C++ for twenty years.  I am investigating limiting the functi
 
 # [Former docs] OpenVR-InputEmulator
 
-An OpenVR driver that allows to create virtual controllers, emulate controller input, enable motion compensation, manipulate poses of existing controllers and remap buttons. Includes a dashboard to configure some settings directly in VR, a command line client for more advanced settings, and a client-side library to support development of third-party applications.
-
-![Example Screenshot](docs/screenshots/InVRScreenshot.png)
+An OpenVR driver that allows to enable motion compensatio. 
+Includes a dashboard to configure some settings directly in VR.
 
 The OpenVR driver hooks into the lighthouse driver and allows to modify any pose updates or button/axis events coming from the Vive controllers before they reach the OpenVR runtime. 
 Due to the nature of this hack the driver may break when Valve decides to update the driver-side OpenVR API.
