@@ -1,7 +1,8 @@
 ![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.63-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
 
 # DO NOT USE THIS OR EXPECT ANYTHING AS A USER
-I haven't coded in C++ for twenty years.  I am investigating limiting the functional/api surface area to support motion compensation only.  Feel free to contact me if you want to help out, or if you are experienced, potentially be paid to help out - https://github.com/rosskevin/OpenVR-MotionCompensation/issues/1.
+I haven't coded in C++ for twenty years.  I am investigating limiting the functional/api surface area to support motion compensation only. 
+Feel free to contact me if you want to help out, or if you are experienced, potentially be paid to help out - https://github.com/rosskevin/OpenVR-MotionCompensation/issues/1.
 
 ---
 
