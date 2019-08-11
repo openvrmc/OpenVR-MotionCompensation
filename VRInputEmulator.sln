@@ -10,11 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_vrinputemulator", "d
 		{05AC9994-2B63-4DE5-ABF3-95CE346F3A64} = {05AC9994-2B63-4DE5-ABF3-95CE346F3A64}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_commandline", "client_commandline\client_commandline.vcxproj", "{C4680CF3-74B7-4A1C-9762-1124E7B10634}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_overlay", "client_overlay\client_overlay.vcxproj", "{33E075DB-922D-3252-976E-46B5721DC3DE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_cli_zscaler", "client_cli_zscaler\client_cli_zscaler.vcxproj", "{9A178EAD-E66D-4A4F-B8CC-A3AD44C50734}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

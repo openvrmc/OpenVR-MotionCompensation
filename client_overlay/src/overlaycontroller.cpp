@@ -208,12 +208,12 @@ void OverlayController::Init(QQmlEngine* qmlEngine) {
 		throw std::runtime_error(std::string("Failed to initialize OpenVR: ") + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError)));
 	}
 
-	m_runtimePathUrl = QUrl::fromLocalFile(vr::VR_RuntimePath());
+	static char rchBuffer[1024];
+	uint32_t unRequiredSize;
+	std::cout << vr::VR_GetRuntimePath(rchBuffer, sizeof(rchBuffer), &unRequiredSize);
+	m_runtimePathUrl = QUrl::fromLocalFile(rchBuffer);
 	LOG(INFO) << "VR Runtime Path: " << m_runtimePathUrl.toLocalFile();
 
-	LOG(INFO) << "sizeof(DigitalBinding) = " << sizeof(vrinputemulator::DigitalBinding);
-	LOG(INFO) << "sizeof(DigitalInputRemapping) = " << sizeof(vrinputemulator::DigitalInputRemapping);
-	LOG(INFO) << "sizeof(AnalogInputRemapping) = " << sizeof(vrinputemulator::AnalogInputRemapping);
 	LOG(INFO) << "sizeof(ipc::Request) = " << sizeof(vrinputemulator::ipc::Request);
 	LOG(INFO) << "sizeof(ipc::Request::msg) = " << sizeof(vrinputemulator::ipc::Request::msg);
 	LOG(INFO) << "sizeof(ipc::Reply) = " << sizeof(vrinputemulator::ipc::Reply);
@@ -305,8 +305,6 @@ void OverlayController::Init(QQmlEngine* qmlEngine) {
 
 	// Init controllers
 	deviceManipulationTabController.initStage1();
-	digitalInputRemappingController.initStage1();
-	analogInputRemappingController.initStage1();
 
 	// Set qml context
 	qmlEngine->rootContext()->setContextProperty("applicationVersion", getVersionString());
@@ -320,16 +318,6 @@ void OverlayController::Init(QQmlEngine* qmlEngine) {
 	});
 	qmlRegisterSingletonType<DeviceManipulationTabController>("matzman666.inputemulator", 1, 0, "DeviceManipulationTabController", [](QQmlEngine*, QJSEngine*) {
 		QObject* obj = &getInstance()->deviceManipulationTabController;
-		QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
-		return obj;
-	});
-	qmlRegisterSingletonType<DigitalInputRemappingController>("matzman666.inputemulator", 1, 0, "DigitalInputRemappingController", [](QQmlEngine*, QJSEngine*) {
-		QObject* obj = &getInstance()->digitalInputRemappingController;
-		QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
-		return obj;
-	});
-	qmlRegisterSingletonType<DigitalInputRemappingController>("matzman666.inputemulator", 1, 0, "AnalogInputRemappingController", [](QQmlEngine*, QJSEngine*) {
-		QObject* obj = &getInstance()->analogInputRemappingController;
 		QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
 		return obj;
 	});
@@ -367,7 +355,7 @@ void OverlayController::SetWidget(QQuickItem* quickItem, const std::string& name
 		}
 		vr::VROverlay()->SetOverlayWidthInMeters(m_ulOverlayHandle, 2.5f);
 		vr::VROverlay()->SetOverlayInputMethod(m_ulOverlayHandle, vr::VROverlayInputMethod_Mouse);
-		vr::VROverlay()->SetOverlayFlag(m_ulOverlayHandle, vr::VROverlayFlags_SendVRScrollEvents, true);
+		vr::VROverlay()->SetOverlayFlag(m_ulOverlayHandle, vr::VROverlayFlags_SendVRSmoothScrollEvents, true);
 		std::string thumbIconPath = QApplication::applicationDirPath().toStdString() + "\\res\\thumbicon.png";
 		if (QFile::exists(QString::fromStdString(thumbIconPath))) {
 			vr::VROverlay()->SetOverlayFromFile(m_ulOverlayThumbnailHandle, thumbIconPath.c_str());
@@ -416,8 +404,6 @@ void OverlayController::SetWidget(QQuickItem* quickItem, const std::string& name
 	}
 
 	deviceManipulationTabController.initStage2(this, m_pWindow.get());
-	digitalInputRemappingController.initStage2(this, m_pWindow.get());
-	analogInputRemappingController.initStage2(this, m_pWindow.get());
 }
 
 
@@ -503,7 +489,7 @@ void OverlayController::OnTimeoutPumpEvents() {
 			}
 			break;
 
-			case vr::VREvent_Scroll: {
+			case vr::VREvent_ScrollSmooth: {
 				// Wheel speed is defined as 1/8 of a degree
 				QWheelEvent wheelEvent(m_ptLastMouse, m_pWindow->mapToGlobal(m_ptLastMouse), QPoint(),
 					QPoint(vrEvent.data.scroll.xdelta * 360.0f * 8.0f, vrEvent.data.scroll.ydelta * 360.0f * 8.0f),
@@ -547,8 +533,6 @@ void OverlayController::OnTimeoutPumpEvents() {
 
 			default:
 				deviceManipulationTabController.handleEvent(vrEvent);
-				digitalInputRemappingController.handleEvent(vrEvent);
-				analogInputRemappingController.handleEvent(vrEvent);
 				break;
 		}
 	}
@@ -556,8 +540,6 @@ void OverlayController::OnTimeoutPumpEvents() {
 	vr::TrackedDevicePose_t devicePoses[vr::k_unMaxTrackedDeviceCount];
 	vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0.0f, devicePoses, vr::k_unMaxTrackedDeviceCount);
 	deviceManipulationTabController.eventLoopTick(devicePoses);
-	digitalInputRemappingController.eventLoopTick(devicePoses);
-	analogInputRemappingController.eventLoopTick(devicePoses);
 
 	if (m_ulOverlayThumbnailHandle != vr::k_ulOverlayHandleInvalid) {
 		while (vr::VROverlay()->PollNextOverlayEvent(m_ulOverlayThumbnailHandle, &vrEvent, sizeof(vrEvent))) {
@@ -616,191 +598,6 @@ void OverlayController::playFocusChangedSound() {
 	if (!noSound) {
 		focusChangedSoundEffect.play();
 	}
-}
-
-
-QString OverlayController::digitalBindingToString(const vrinputemulator::DigitalBinding& binding, bool printOptController) {
-	QString status;
-	switch (binding.type) {
-	case vrinputemulator::DigitalBindingType::NoRemapping:
-		status = "No Remapping";
-		break;
-	case vrinputemulator::DigitalBindingType::Disabled:
-		status = "Disabled";
-		break;
-	case vrinputemulator::DigitalBindingType::OpenVR:
-		status = openvrButtonToString(binding.data.openvr.controllerId, binding.data.openvr.buttonId);
-		if (printOptController && binding.data.openvr.controllerId != vr::k_unTrackedDeviceIndexInvalid) {
-			status.append(" [R:").append(QString::number(binding.data.openvr.controllerId)).append("]");
-		}
-		if (binding.toggleEnabled) {
-			status.append(" [T]");
-		}
-		if (binding.autoTriggerEnabled) {
-			status.append(" [A]");
-		}
-		break;
-	case vrinputemulator::DigitalBindingType::Keyboard:
-		if (binding.data.keyboard.shiftPressed) {
-			status.append("SHIFT + ");
-		}
-		if (binding.data.keyboard.altPressed) {
-			status.append("ALT + ");
-		}
-		if (binding.data.keyboard.ctrlPressed) {
-			status.append("CTRL + ");
-		}
-		for (auto& k : _keyboardVirtualCodes) {
-			if (k.second == binding.data.keyboard.keyCode) {
-				status.append(QString::fromStdString(k.first));
-				break;
-			}
-		}
-		if (binding.toggleEnabled) {
-			status.append(" [T]");
-		}
-		if (binding.autoTriggerEnabled) {
-			status.append(" [A]");
-		}
-		break;
-	case vrinputemulator::DigitalBindingType::SuspendRedirectMode:
-		status = "Suspend Redirect Mode";
-		break;
-	case vrinputemulator::DigitalBindingType::ToggleTouchpadEmulationFix:
-		status = "Toggle Touchpad Emulation";
-		break;
-	default:
-		status = "<Unknown>";
-		break;
-	}
-	return status;
-}
-
-
-QString OverlayController::analogBindingToString(const vrinputemulator::AnalogBinding& binding, bool printOptController) {
-	QString status;
-	switch (binding.type) {
-	case vrinputemulator::AnalogBindingType::NoRemapping:
-		status = "No Remapping";
-		break;
-	case vrinputemulator::AnalogBindingType::Disabled:
-		status = "Disabled";
-		break;
-	case vrinputemulator::AnalogBindingType::OpenVR:
-		status = openvrAxisToString(binding.data.openvr.controllerId, binding.data.openvr.axisId);
-		if (printOptController && binding.data.openvr.controllerId != vr::k_unTrackedDeviceIndexInvalid) {
-			status.append(" [R:").append(QString::number(binding.data.openvr.controllerId)).append("]");
-		}
-		if (binding.invertXAxis || binding.invertYAxis) {
-			status.append(" [I]");
-		}
-		if (binding.swapAxes) {
-			status.append(" [S]");
-		}
-		break;
-	default:
-		status = "<Unknown>";
-		break;
-	}
-	if (binding.touchpadEmulationMode > 0 || binding.buttonPressDeadzoneFix) {
-		status.append(";Touchpad Emulation");
-	}
-	return status;
-}
-
-
-QString OverlayController::openvrButtonToString(unsigned deviceId, unsigned buttonId) {
-	QString name;
-	auto nameIt = _openVRButtonNames.find(buttonId);
-	if (nameIt != _openVRButtonNames.end()) {
-		name = nameIt->second;
-	} else {
-		name.append("Button_").append(QString::number(buttonId));
-	}
-	if (deviceId != vr::k_unTrackedDeviceIndexInvalid && buttonId >= vr::k_EButton_Axis0 && buttonId <= vr::k_EButton_Axis4) {
-		name.append(" (");
-		vr::ETrackedPropertyError pError;
-		auto axisType = vr::VRSystem()->GetInt32TrackedDeviceProperty(deviceId, (vr::ETrackedDeviceProperty)((int)vr::Prop_Axis0Type_Int32 + (buttonId - (int)vr::k_EButton_Axis0)), &pError);
-		if (pError == vr::TrackedProp_Success) {
-			switch (axisType) {
-			case vr::k_eControllerAxis_Trigger:
-				name.append("Trigger)");
-				break;
-			case vr::k_eControllerAxis_TrackPad:
-				name.append("TrackPad)");
-				break;
-			case vr::k_eControllerAxis_Joystick:
-				name.append("Joystick)");
-				break;
-			default:
-				name.append("<unknown>)");
-				break;
-			}
-		} else {
-			LOG(ERROR) << "Could not get axis type for device id " << deviceId;
-		}
-	}
-	return name;
-}
-
-
-QString OverlayController::openvrAxisToString(unsigned deviceId, unsigned axisId) {
-	QString name("Axis");
-	name.append(QString::number(axisId));
-	if (deviceId != vr::k_unTrackedDeviceIndexInvalid) {
-	vr::ETrackedPropertyError pError;
-	auto axisType = vr::VRSystem()->GetInt32TrackedDeviceProperty(deviceId, (vr::ETrackedDeviceProperty)((int)vr::Prop_Axis0Type_Int32 + axisId), &pError);
-		if (pError == vr::TrackedProp_Success && axisType != vr::k_eControllerAxis_None) {
-			switch (axisType) {
-			case vr::k_eControllerAxis_Trigger:
-				name.append(" (Trigger)");
-				break;
-			case vr::k_eControllerAxis_TrackPad:
-				name.append(" (TrackPad)");
-				break;
-			case vr::k_eControllerAxis_Joystick:
-				name.append(" (Joystick)");
-				break;
-			default:
-				LOG(INFO) << "AxisType: " << axisType;
-				name.append("<unknown>)");
-				break;
-			}
-		}
-	}
-	return name;
-}
-
-
-unsigned OverlayController::keyboardVirtualCodeCount() {
-	return (unsigned)_keyboardVirtualCodes.size();
-}
-
-QString OverlayController::keyboardVirtualCodeNameFromIndex(unsigned index) {
-	if (index < _keyboardVirtualCodes.size()) {
-		return QString::fromStdString(_keyboardVirtualCodes[index].first);
-	} else {
-		return QString();
-	}
-}
-
-unsigned OverlayController::keyboardVirtualCodeIdFromIndex(unsigned index) {
-	if (index < _keyboardVirtualCodes.size()) {
-		return (unsigned)_keyboardVirtualCodes[index].second;
-	} else {
-		return 0;
-	}
-}
-
-unsigned OverlayController::keyboardVirtualCodeIndexFromId(unsigned id) {
-	unsigned index = 0;
-	for (unsigned i = 0; i < _keyboardVirtualCodes.size(); i++) {
-		if (id == _keyboardVirtualCodes[i].second) {
-			index = i;
-			break;
-		}
-	}
-	return index;
 }
 
 } // namespace inputemulator

@@ -25,8 +25,6 @@
 #include "logging.h"
 
 #include "tabcontrollers/DeviceManipulationTabController.h"
-#include "tabcontrollers/DigitalInputRemappingController.h"
-#include "tabcontrollers/AnalogInputRemappingController.h"
 
 
 
@@ -77,8 +75,6 @@ private:
 
 public: // I know it's an ugly hack to make them public to enable external access, but I am too lazy to implement getters.
 	DeviceManipulationTabController deviceManipulationTabController;
-	DigitalInputRemappingController digitalInputRemappingController;
-	AnalogInputRemappingController analogInputRemappingController;
 
 private:
     OverlayController(bool desktopMode, bool noSound) : QObject(), desktopMode(desktopMode), noSound(noSound) {}
@@ -109,17 +105,6 @@ public:
 	const vr::VROverlayHandle_t& overlayHandle();
 	const vr::VROverlayHandle_t& overlayThumbnailHandle();
 	bool getOverlayTexture(vr::Texture_t& texture);
-
-
-	QString digitalBindingToString(const vrinputemulator::DigitalBinding& binding, bool printOptController);
-	QString analogBindingToString(const vrinputemulator::AnalogBinding& binding, bool printOptController);
-	QString openvrButtonToString(unsigned deviceId, unsigned buttonId);
-	QString openvrAxisToString(unsigned deviceId, unsigned axisId);
-
-	Q_INVOKABLE unsigned keyboardVirtualCodeCount();
-	Q_INVOKABLE QString keyboardVirtualCodeNameFromIndex(unsigned index);
-	Q_INVOKABLE unsigned keyboardVirtualCodeIdFromIndex(unsigned index);
-	Q_INVOKABLE unsigned keyboardVirtualCodeIndexFromId(unsigned id);
 
 public slots:
 	void renderOverlay();
