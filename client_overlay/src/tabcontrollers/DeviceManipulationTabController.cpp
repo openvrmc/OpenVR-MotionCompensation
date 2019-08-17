@@ -377,12 +377,6 @@ bool DeviceManipulationTabController::setDeviceMode(unsigned index, unsigned mod
 			parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[index]->openvrId);
 			break;
 		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
 			if (motionCompensationVelAccMode == vrinputemulator::MotionCompensationVelAccMode::KalmanFilter) {
 				parent->vrInputEmulator().setMotionCompensationKalmanProcessNoise(motionCompensationKalmanProcessNoise);
 				parent->vrInputEmulator().setMotionCompensationKalmanObservationNoise(motionCompensationKalmanObservationNoise);

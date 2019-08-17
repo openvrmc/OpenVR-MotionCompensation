@@ -25,7 +25,7 @@ struct DeviceInfo {
 	vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 	uint32_t openvrId = 0;
 	int deviceStatus = 0; // 0 .. Normal, 1 .. Disconnected/Suspended
-	int deviceMode = 0; // 0 .. Default, 1 .. Fake Disconnected, 2 .. Redirect Source, 3 .. Redirect Target, 4 .. Motion Compensation
+	int deviceMode = 0; // 0 .. Default, 1 .. Motion Compensation
 	uint32_t refDeviceId = 0;
 	uint32_t renderModelIndex = 0;
 	vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
