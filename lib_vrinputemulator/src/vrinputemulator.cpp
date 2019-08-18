@@ -324,6 +324,7 @@ void VRInputEmulator::setDeviceMotionCompensationMode(uint32_t deviceId, MotionC
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -343,6 +344,7 @@ void VRInputEmulator::setDeviceMotionCompensationMode(uint32_t deviceId, MotionC
 			}
 		} else {
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 		}
 	} else {
 		throw vrinputemulator_connectionerror("No active connection.");
@@ -370,6 +372,7 @@ void VRInputEmulator::setMotionVelAccCompensationMode(MotionCompensationVelAccMo
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -389,6 +392,7 @@ void VRInputEmulator::setMotionVelAccCompensationMode(MotionCompensationVelAccMo
 			}
 		} else {
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 		}
 	} else {
 		throw vrinputemulator_connectionerror("No active connection.");
@@ -415,6 +419,7 @@ void VRInputEmulator::setMotionCompensationKalmanProcessNoise(double variance, b
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -434,6 +439,7 @@ void VRInputEmulator::setMotionCompensationKalmanProcessNoise(double variance, b
 			}
 		} else {
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 		}
 	} else {
 		throw vrinputemulator_connectionerror("No active connection.");
@@ -460,6 +466,7 @@ void VRInputEmulator::setMotionCompensationKalmanObservationNoise(double varianc
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -479,6 +486,7 @@ void VRInputEmulator::setMotionCompensationKalmanObservationNoise(double varianc
 			}
 		} else {
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 		}
 	} else {
 		throw vrinputemulator_connectionerror("No active connection.");
@@ -506,6 +514,7 @@ void VRInputEmulator::setMotionCompensationMovingAverageWindow(unsigned window, 
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
@@ -525,6 +534,7 @@ void VRInputEmulator::setMotionCompensationMovingAverageWindow(unsigned window, 
 			}
 		} else {
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 		}
 	} else {
 		throw vrinputemulator_connectionerror("No active connection.");

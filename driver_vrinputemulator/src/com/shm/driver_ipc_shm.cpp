@@ -140,6 +140,7 @@ void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver 
 										info->setDefaultMode();
 										resp.status = ipc::ReplyStatus::Ok;
 									}
+									LOG(INFO) << "Setting driver into default mode";
 								}
 								if (resp.status != ipc::ReplyStatus::Ok) {
 									LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
@@ -163,6 +164,7 @@ void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver 
 									} else {
 										auto serverDriver = ServerDriver::getInstance();
 										if (serverDriver) {
+											LOG(INFO) << "Setting driver into motion compensation mode";
 											serverDriver->motionCompensation().setMotionCompensationVelAccMode(message.msg.dm_MotionCompensationMode.velAccCompensationMode);
 											info->setMotionCompensationMode();
 											_this->_setMotionCompensationMessageId = message.msg.dm_MotionCompensationMode.messageId;
@@ -188,6 +190,7 @@ void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver 
 								resp.messageId = message.msg.dm_SetMotionCompensationProperties.messageId;
 								auto serverDriver = ServerDriver::getInstance();
 								if (serverDriver) {
+									LOG(INFO) << "Setting driver motion compensation properties";
 									if (message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid) {
 										serverDriver->motionCompensation().setMotionCompensationVelAccMode(message.msg.dm_SetMotionCompensationProperties.velAccCompensationMode);
 									}

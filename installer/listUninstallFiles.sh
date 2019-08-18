@@ -3,8 +3,8 @@
 # Execute this script in the root folder of the install dir
 # Dont't forget to set OUTPUTFILE to a path that is writeable
 
-OUTPUTFILE=../../installed_files.txt
-INSTALLDIR=.
+OUTPUTFILE=./installed_files.txt
+INSTALLDIR="/c/Program Files/OpenVR-InputEmulator/"
 
 # Get command line arguments
 if [ $# -eq 1 ]; then

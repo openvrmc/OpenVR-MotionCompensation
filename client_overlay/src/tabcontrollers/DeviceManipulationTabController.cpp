@@ -44,13 +44,13 @@ void DeviceManipulationTabController::initStage2(OverlayController * parent, QQu
 						LOG(ERROR) << "Could not get serial of device " << id;
 					}
 
-					try {
+					/*try {
 						vrinputemulator::DeviceInfo info2;
 						parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
 						info->deviceMode = info2.deviceMode;
 					} catch (std::exception& e) {
 						LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-					}
+					}*/
 
 					deviceInfos.push_back(info);
 					LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
@@ -100,13 +100,13 @@ void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* dev
 							LOG(ERROR) << "Could not get serial of device " << id;
 						}
 
-						try {
+						/*try {
 							vrinputemulator::DeviceInfo info2;
 							parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
 							info->deviceMode = info2.deviceMode;
 						} catch (std::exception& e) {
 							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-						}
+						}*/
 
 						deviceInfos.push_back(info);
 						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
@@ -317,6 +317,7 @@ void DeviceManipulationTabController::setMotionCompensationVelAccMode(unsigned m
 	vrinputemulator::MotionCompensationVelAccMode newMode = (vrinputemulator::MotionCompensationVelAccMode)mode;
 	if (motionCompensationVelAccMode != newMode) {
 		motionCompensationVelAccMode = newMode;
+		LOG(INFO) << "Sending motion compensation vel/acc mode to driver";
 		parent->vrInputEmulator().setMotionVelAccCompensationMode(newMode);
 		saveDeviceManipulationSettings();
 		if (notify) {
@@ -328,6 +329,7 @@ void DeviceManipulationTabController::setMotionCompensationVelAccMode(unsigned m
 void DeviceManipulationTabController::setMotionCompensationKalmanProcessNoise(double variance, bool notify) {
 	if (motionCompensationKalmanProcessNoise != variance) {
 		motionCompensationKalmanProcessNoise = variance;
+		LOG(INFO) << "Sending motion compensation kalman mode to driver";
 		parent->vrInputEmulator().setMotionCompensationKalmanProcessNoise(motionCompensationKalmanProcessNoise);
 		saveDeviceManipulationSettings();
 		if (notify) {
@@ -339,6 +341,7 @@ void DeviceManipulationTabController::setMotionCompensationKalmanProcessNoise(do
 void DeviceManipulationTabController::setMotionCompensationKalmanObservationNoise(double variance, bool notify) {
 	if (motionCompensationKalmanObservationNoise != variance) {
 		motionCompensationKalmanObservationNoise = variance;
+		LOG(INFO) << "Sending motion compensation kalman noise to driver";
 		parent->vrInputEmulator().setMotionCompensationKalmanObservationNoise(motionCompensationKalmanObservationNoise);
 		saveDeviceManipulationSettings();
 		if (notify) {
@@ -350,6 +353,7 @@ void DeviceManipulationTabController::setMotionCompensationKalmanObservationNois
 void DeviceManipulationTabController::setMotionCompensationMovingAverageWindow(unsigned window, bool notify) {
 	if (motionCompensationMovingAverageWindow != window) {
 		motionCompensationMovingAverageWindow = window;
+		LOG(INFO) << "Sending motion compensation moving average mode to driver";
 		parent->vrInputEmulator().setMotionCompensationMovingAverageWindow(motionCompensationMovingAverageWindow);
 		saveDeviceManipulationSettings();
 		if (notify) {
@@ -380,8 +384,10 @@ bool DeviceManipulationTabController::setDeviceMode(unsigned index, unsigned mod
 			if (motionCompensationVelAccMode == vrinputemulator::MotionCompensationVelAccMode::KalmanFilter) {
 				parent->vrInputEmulator().setMotionCompensationKalmanProcessNoise(motionCompensationKalmanProcessNoise);
 				parent->vrInputEmulator().setMotionCompensationKalmanObservationNoise(motionCompensationKalmanObservationNoise);
+				LOG(INFO) << "Set kalman mc mode";
 			} else if (motionCompensationVelAccMode == vrinputemulator::MotionCompensationVelAccMode::LinearApproximation) {
 				parent->vrInputEmulator().setMotionCompensationMovingAverageWindow(motionCompensationMovingAverageWindow);
+				LOG(INFO) << "Set moving avg mc mode";
 			}
 			parent->vrInputEmulator().setDeviceMotionCompensationMode(deviceInfos[index]->openvrId, motionCompensationVelAccMode);
 			break;
@@ -432,7 +438,7 @@ QString DeviceManipulationTabController::getDeviceModeErrorString() {
 
 
 bool DeviceManipulationTabController::updateDeviceInfo(unsigned index) {
-	bool retval = false;
+	/*bool retval = false;
 	if (index < deviceInfos.size()) {
 		try {
 			vrinputemulator::DeviceInfo info;
@@ -445,7 +451,8 @@ bool DeviceManipulationTabController::updateDeviceInfo(unsigned index) {
 			LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 		}
 	}
-	return retval;
+	return retval;*/
+	return true;
 }
 
 void DeviceManipulationTabController::setDeviceRenderModel(unsigned deviceIndex, unsigned renderModelIndex) {

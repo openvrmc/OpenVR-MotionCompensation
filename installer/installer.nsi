@@ -6,6 +6,7 @@
 ;--------------------------------
 ;General
 
+	!define OPENVR_BASEDIR "..\openvr\"
 	!define OVERLAY_BASEDIR "..\client_overlay\bin\win64"
 	!define DRIVER_BASEDIR "..\driver_vrinputemulator"
 
@@ -111,6 +112,7 @@ Section "Install" SecInstall
 	File "${OVERLAY_BASEDIR}\*.conf"
 	File /r "${OVERLAY_BASEDIR}\res"
 	File /r "${OVERLAY_BASEDIR}\qtdata"
+	File "${OPENVR_BASEDIR}\bin\win64\*.dll"
 
 	; Install redistributable
 	ExecWait '"$INSTDIR\vcredist_x64.exe" /install /quiet'
