@@ -3,6 +3,16 @@
 /Release/*
 /Debug/*
 /.vs/*
+
+#client overlay dependencies
+/client_overlay/bin/win64/qtdata/*
+/client_overlay/bin/win64/*.dll
+/client_overlay/bin/win64/*.exe
+
+# driver bin
+/driver_vrinputemulator/bin/*
+
+# installer files
 /installer/OpenVR-InputEmulator.exe
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -30,7 +40,6 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
 [Oo]bj/
 [Ll]og/
 
