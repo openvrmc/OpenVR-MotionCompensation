@@ -13,9 +13,11 @@
 #include <boost/interprocess/ipc/message_queue.hpp>
 
 
-namespace vr {
+namespace vr
+{
 	// Copied from openvr_driver.h
-	struct DriverPose_t {
+	struct DriverPose_t
+	{
 		/* Time offset of this pose, in seconds from the actual time of the pose,
 		* relative to the time of the PoseUpdated() call made by the driver.
 		*/
@@ -84,92 +86,107 @@ namespace vr {
 
 #include <ipc_protocol.h>
 
+namespace vrinputemulator
+{
 
-namespace vrinputemulator {
-
-class vrinputemulator_exception : public std::runtime_error {
-public:
-	const int errorcode = 0;
-	using std::runtime_error::runtime_error;
-	vrinputemulator_exception(const std::string& msg, int code) : std::runtime_error(msg), errorcode(code) {}
-};
-
-class vrinputemulator_connectionerror : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_invalidversion : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_invalidid : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_invalidtype : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_notfound : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_alreadyinuse : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-class vrinputemulator_toomanydevices : public vrinputemulator_exception {
-	using vrinputemulator_exception::vrinputemulator_exception;
-};
-
-
-class VRInputEmulator {
-public:
-	VRInputEmulator(const std::string& driverQueue = "driver_vrinputemulator.server_queue", const std::string& clientQueue = "driver_vrinputemulator.client_queue.");
-	~VRInputEmulator();
-	
-	void connect();
-	bool isConnected() const;
-	void disconnect();
-
-	void ping(bool modal = true, bool enableReply = false);
-
-	void openvrVendorSpecificEvent(uint32_t deviceId, vr::EVREventType eventType, const vr::VREvent_Data_t& eventData, double timeOffset = 0.0);
-
-	void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);
-	void setDeviceNormalMode(uint32_t deviceId, bool modal = true);
-
-	void setDeviceMotionCompensationMode(uint32_t deviceId, MotionCompensationVelAccMode velAccMode = MotionCompensationVelAccMode::Disabled, bool modal = true);
-	void setMotionVelAccCompensationMode(MotionCompensationVelAccMode velAccMode, bool modal = true);
-	void setMotionCompensationKalmanProcessNoise(double variance, bool modal = true);
-	void setMotionCompensationKalmanObservationNoise(double variance, bool modal = true);
-	void setMotionCompensationMovingAverageWindow(unsigned window, bool modal = true);
-
-private:
-	std::recursive_mutex _mutex;
-	uint32_t m_clientId = 0;
-
-	bool _ipcThreadRunning = false;
-	volatile bool _ipcThreadStop = false;
-	std::thread _ipcThread;
-	static void _ipcThreadFunc(VRInputEmulator* _this);
-
-	std::random_device _ipcRandomDevice;
-	std::uniform_int_distribution<uint32_t> _ipcRandomDist;
-	struct _ipcPromiseMapEntry {
-		_ipcPromiseMapEntry() : isValid(false) {}
-		_ipcPromiseMapEntry(std::promise<ipc::Reply>&& _promise, bool isValid = true) 
-				: promise(std::move(_promise)), isValid(isValid) {}
-		bool isValid;
-		std::promise<ipc::Reply> promise;
+	class vrinputemulator_exception : public std::runtime_error
+	{
+	public:
+		const int errorcode = 0;
+		using std::runtime_error::runtime_error;
+		vrinputemulator_exception(const std::string& msg, int code) : std::runtime_error(msg), errorcode(code)
+		{
+		}
 	};
-	std::map<uint32_t, _ipcPromiseMapEntry> _ipcPromiseMap;
-	std::string _ipcServerQueueName;
-	std::string _ipcClientQueueName;
-	boost::interprocess::message_queue* _ipcServerQueue = nullptr;
-	boost::interprocess::message_queue* _ipcClientQueue = nullptr;
 
-};
+	class vrinputemulator_connectionerror : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_invalidversion : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_invalidid : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_invalidtype : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_notfound : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_alreadyinuse : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+	class vrinputemulator_toomanydevices : public vrinputemulator_exception
+	{
+		using vrinputemulator_exception::vrinputemulator_exception;
+	};
+
+
+	class VRInputEmulator
+	{
+	public:
+		VRInputEmulator(const std::string& driverQueue = "driver_vrinputemulator.server_queue", const std::string& clientQueue = "driver_vrinputemulator.client_queue.");
+		~VRInputEmulator();
+
+		void connect();
+		bool isConnected() const;
+		void disconnect();
+
+		void ping(bool modal = true, bool enableReply = false);
+
+		void openvrVendorSpecificEvent(uint32_t deviceId, vr::EVREventType eventType, const vr::VREvent_Data_t& eventData, double timeOffset = 0.0);
+
+		void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);
+		void setDeviceNormalMode(uint32_t deviceId, bool modal = true);
+
+		void setDeviceMotionCompensationMode(uint32_t deviceId, MotionCompensationVelAccMode velAccMode = MotionCompensationVelAccMode::Disabled, bool modal = true);
+		void setMotionVelAccCompensationMode(MotionCompensationVelAccMode velAccMode, bool modal = true);
+		void setMotionCompensationKalmanProcessNoise(double variance, bool modal = true);
+		void setMotionCompensationKalmanObservationNoise(double variance, bool modal = true);
+		void setMotionCompensationMovingAverageWindow(unsigned window, bool modal = true);
+
+	private:
+		std::recursive_mutex _mutex;
+		uint32_t m_clientId = 0;
+
+		bool _ipcThreadRunning = false;
+		volatile bool _ipcThreadStop = false;
+		std::thread _ipcThread;
+		static void _ipcThreadFunc(VRInputEmulator* _this);
+
+		std::random_device _ipcRandomDevice;
+		std::uniform_int_distribution<uint32_t> _ipcRandomDist;
+		struct _ipcPromiseMapEntry
+		{
+			_ipcPromiseMapEntry() : isValid(false)
+			{
+			}
+			_ipcPromiseMapEntry(std::promise<ipc::Reply>&& _promise, bool isValid = true)
+				: promise(std::move(_promise)), isValid(isValid)
+			{
+			}
+			bool isValid;
+			std::promise<ipc::Reply> promise;
+		};
+		std::map<uint32_t, _ipcPromiseMapEntry> _ipcPromiseMap;
+		std::string _ipcServerQueueName;
+		std::string _ipcClientQueueName;
+		boost::interprocess::message_queue* _ipcServerQueue = nullptr;
+		boost::interprocess::message_queue* _ipcClientQueue = nullptr;
+
+	};
 
 } // end namespace vrinputemulator
-

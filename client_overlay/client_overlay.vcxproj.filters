@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\win64\res\qml\MotionCompensationPage.qml" />
+    <None Include="client_overlay.vcxproj.user" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
