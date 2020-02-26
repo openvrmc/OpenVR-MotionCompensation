@@ -27,148 +27,203 @@ const char* logConfigDefault =
 
 INITIALIZE_EASYLOGGINGPP
 
-void myQtMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+void myQtMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
 	QByteArray localMsg = msg.toLocal8Bit();
-	switch (type) {
-		case QtDebugMsg:
-			LOG(DEBUG) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
-			break;
-		case QtInfoMsg:
-			LOG(INFO) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
-			break;
-		case QtWarningMsg:
-			LOG(WARNING) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
-			break;
-		case QtCriticalMsg:
-			LOG(ERROR) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
-			break;
-		case QtFatalMsg:
-			LOG(FATAL) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
-			break;
+	switch (type)
+	{
+	case QtDebugMsg:
+		LOG(DEBUG) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		break;
+	case QtInfoMsg:
+		LOG(INFO) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		break;
+	case QtWarningMsg:
+		LOG(WARNING) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		break;
+	case QtCriticalMsg:
+		LOG(ERROR) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		break;
+	case QtFatalMsg:
+		LOG(FATAL) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		break;
 	}
 }
 
-void installManifest(bool cleaninstall = false) {
+void installManifest(bool cleaninstall = false)
+{
 	auto manifestQPath = QDir::cleanPath(QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("manifest.vrmanifest"));
-	if (QFile::exists(manifestQPath)) {
+	if (QFile::exists(manifestQPath))
+	{
 		bool alreadyInstalled = false;
-		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey)) {
-			if (cleaninstall) {
+		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey))
+		{
+			if (cleaninstall)
+			{
 				char buffer[1024];
 				auto appError = vr::VRApplicationError_None;
 				vr::VRApplications()->GetApplicationPropertyString(inputemulator::OverlayController::applicationKey, vr::VRApplicationProperty_WorkingDirectory_String, buffer, 1024, &appError);
-				if (appError == vr::VRApplicationError_None) {
+				if (appError == vr::VRApplicationError_None)
+				{
 					auto oldManifestQPath = QDir::cleanPath(QDir(buffer).absoluteFilePath("manifest.vrmanifest"));
-					if (oldManifestQPath.compare(manifestQPath, Qt::CaseInsensitive) != 0) {
+					if (oldManifestQPath.compare(manifestQPath, Qt::CaseInsensitive) != 0)
+					{
 						vr::VRApplications()->RemoveApplicationManifest(QDir::toNativeSeparators(oldManifestQPath).toStdString().c_str());
-					} else {
+					}
+					else
+					{
 						alreadyInstalled = true;
 					}
 				}
-			} else {
+			}
+			else
+			{
 				alreadyInstalled = true;
 			}
 		}
 		auto apperror = vr::VRApplications()->AddApplicationManifest(QDir::toNativeSeparators(manifestQPath).toStdString().c_str());
-		if (apperror != vr::VRApplicationError_None) {
+		if (apperror != vr::VRApplicationError_None)
+		{
 			throw std::runtime_error(std::string("Could not add application manifest: ") + std::string(vr::VRApplications()->GetApplicationsErrorNameFromEnum(apperror)));
-		} else if (!alreadyInstalled || cleaninstall) {
+		}
+		else if (!alreadyInstalled || cleaninstall)
+		{
 			auto apperror = vr::VRApplications()->SetApplicationAutoLaunch(inputemulator::OverlayController::applicationKey, true);
-			if (apperror != vr::VRApplicationError_None) {
+			if (apperror != vr::VRApplicationError_None)
+			{
 				throw std::runtime_error(std::string("Could not set auto start: ") + std::string(vr::VRApplications()->GetApplicationsErrorNameFromEnum(apperror)));
 			}
 		}
-	} else {
+	}
+	else
+	{
 		throw std::runtime_error(std::string("Could not find application manifest: ") + manifestQPath.toStdString());
 	}
 }
 
-void removeManifest() {
+void removeManifest()
+{
 	auto manifestQPath = QDir::cleanPath(QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("manifest.vrmanifest"));
-	if (QFile::exists(manifestQPath)) {
-		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey)) {
+	if (QFile::exists(manifestQPath))
+	{
+		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey))
+		{
 			vr::VRApplications()->RemoveApplicationManifest(QDir::toNativeSeparators(manifestQPath).toStdString().c_str());
 		}
-	} else {
+	}
+	else
+	{
 		throw std::runtime_error(std::string("Could not find application manifest: ") + manifestQPath.toStdString());
 	}
 }
 
+int main(int argc, char* argv[])
+{
 
-int main(int argc, char *argv[]) {
-	
 	bool desktopMode = false;
 	bool noSound = false;
 	bool noManifest = false;
 
 	// Parse command line arguments
-	for (int i = 1; i < argc; i++) {
-		if (std::string(argv[i]).compare("-desktop") == 0) {
+	for (int i = 1; i < argc; i++)
+	{
+		if (std::string(argv[i]).compare("-desktop") == 0)
+		{
 			desktopMode = true;
-		} else if (std::string(argv[i]).compare("-nosound") == 0) {
+		}
+		else if (std::string(argv[i]).compare("-nosound") == 0)
+		{
 			noSound = true;
-		} else if (std::string(argv[i]).compare("-nomanifest") == 0) {
+		}
+		else if (std::string(argv[i]).compare("-nomanifest") == 0)
+		{
 			noManifest = true;
-		} else if (std::string(argv[i]).compare("-installmanifest") == 0) {
-			std::this_thread::sleep_for(std::chrono::seconds(1)); // When we don't wait here we get might an ipc error during installation
+		}
+		else if (std::string(argv[i]).compare("-installmanifest") == 0)
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(1)); // When we don't wait here we get an ipc error during installation
 			int exitcode = 0;
 			QCoreApplication coreApp(argc, argv);
 			auto initError = vr::VRInitError_None;
 			vr::VR_Init(&initError, vr::VRApplication_Utility);
-			if (initError == vr::VRInitError_None) {
-				try {
+			if (initError == vr::VRInitError_None)
+			{
+				try
+				{
 					installManifest(true);
-				} catch (std::exception& e) {
+				}
+				catch (std::exception & e)
+				{
 					exitcode = -1;
 					std::cerr << e.what() << std::endl;
 				}
-			} else {
+			}
+			else
+			{
 				exitcode = -2;
 				std::cerr << std::string("Failed to initialize OpenVR: " + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError))) << std::endl;
 			}
 			vr::VR_Shutdown();
 			exit(exitcode);
-		} else if (std::string(argv[i]).compare("-removemanifest") == 0) {
+		}
+		else if (std::string(argv[i]).compare("-removemanifest") == 0)
+		{
 			int exitcode = 0;
 			QCoreApplication coreApp(argc, argv);
 			auto initError = vr::VRInitError_None;
 			vr::VR_Init(&initError, vr::VRApplication_Utility);
-			if (initError == vr::VRInitError_None) {
-				try {
+			if (initError == vr::VRInitError_None)
+			{
+				try
+				{
 					removeManifest();
-				} catch (std::exception& e) {
+				}
+				catch (std::exception & e)
+				{
 					exitcode = -1;
 					std::cerr << e.what() << std::endl;
 				}
-			} else {
+			}
+			else
+			{
 				exitcode = -2;
 				std::cerr << std::string("Failed to initialize OpenVR: " + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError))) << std::endl;
 			}
 			vr::VR_Shutdown();
 			exit(exitcode);
-		} else if (std::string(argv[i]).compare("-openvrpath") == 0) {
+		}
+		else if (std::string(argv[i]).compare("-openvrpath") == 0)
+		{
 			int exitcode = 0;
 			auto initError = vr::VRInitError_None;
 			vr::VR_Init(&initError, vr::VRApplication_Utility);
-			if (initError == vr::VRInitError_None) {
+			if (initError == vr::VRInitError_None)
+			{
 				static char rchBuffer[1024];
 				uint32_t unRequiredSize;
 				vr::VR_GetRuntimePath(rchBuffer, sizeof(rchBuffer), &unRequiredSize);
 				std::cout << rchBuffer;
-			} else {
+			}
+			else
+			{
 				exitcode = -2;
 				std::cerr << std::string("Failed to initialize OpenVR: " + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError))) << std::endl;
 			}
 			vr::VR_Shutdown();
 			exit(exitcode);
-		} else if (std::string(argv[i]).compare("-postinstallationstep") == 0) {
+		}
+		else if (std::string(argv[i]).compare("-postinstallationstep") == 0)
+		{
 			std::this_thread::sleep_for(std::chrono::seconds(1)); // When we don't wait here we get an ipc error during installation
 			int exitcode = 0;
 			auto initError = vr::VRInitError_None;
 			vr::VR_Init(&initError, vr::VRApplication_Utility);
-			if (initError == vr::VRInitError_None) {
+			if (initError == vr::VRInitError_None)
+			{
 				vr::VRSettings()->SetBool(vr::k_pch_SteamVR_Section, vr::k_pch_SteamVR_ActivateMultipleDrivers_Bool, true);
-			} else {
+			}
+			else
+			{
 				exitcode = -2;
 				std::cerr << std::string("Failed to initialize OpenVR: " + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError))) << std::endl;
 			}
@@ -177,7 +232,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	try {
+	try
+	{
 		QApplication a(argc, argv);
 		a.setOrganizationName("matzman666");
 		a.setApplicationName("OpenVRInputEmulator");
@@ -192,30 +248,40 @@ int main(int argc, char *argv[]) {
 		el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
 		auto logconfigfile = QFileInfo(logConfigFileName).absoluteFilePath();
 		el::Configurations conf;
-		if (QFile::exists(logconfigfile)) {
+		if (QFile::exists(logconfigfile))
+		{
 			conf.parseFromFile(logconfigfile.toStdString());
-		} else {
+		}
+		else
+		{
 			conf.parseFromText(logConfigDefault);
 		}
-		if (!conf.get(el::Level::Global, el::ConfigurationType::Filename)) {
+		if (!conf.get(el::Level::Global, el::ConfigurationType::Filename))
+		{
 			logFilePath = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("VRInputEmulator.log");
 			conf.set(el::Level::Global, el::ConfigurationType::Filename, QDir::toNativeSeparators(logFilePath).toStdString());
 		}
 		conf.setRemainingToDefault();
 		el::Loggers::reconfigureAllLoggers(conf);
+
+		LOG(INFO) << "|========================================================================================|";
 		LOG(INFO) << "Application started";
 		LOG(INFO) << "Log Config: " << QDir::toNativeSeparators(logconfigfile).toStdString();
-		if (!logFilePath.isEmpty()) {
+		if (!logFilePath.isEmpty())
+		{
 			LOG(INFO) << "Log File: " << logFilePath;
 		}
-		
-		if (desktopMode) {
+
+		if (desktopMode)
+		{
 			LOG(INFO) << "Desktop mode enabled.";
 		}
-		if (noSound) {
+		if (noSound)
+		{
 			LOG(INFO) << "Sound effects disabled.";
 		}
-		if (noManifest) {
+		if (noManifest)
+		{
 			LOG(INFO) << "vrmanifest disabled.";
 		}
 
@@ -230,21 +296,27 @@ int main(int argc, char *argv[]) {
 
 		QQmlComponent component(&qmlEngine, QUrl::fromLocalFile(a.applicationDirPath() + "/res/qml/mainwidget.qml"));
 		auto errors = component.errors();
-		for (auto& e : errors) {
+		for (auto& e : errors)
+		{
 			LOG(ERROR) << "QML Error: " << e.toString().toStdString() << std::endl;
 		}
 		auto quickObj = component.create();
 		controller->SetWidget(qobject_cast<QQuickItem*>(quickObj), inputemulator::OverlayController::applicationName, inputemulator::OverlayController::applicationKey);
 
-		if (!desktopMode && !noManifest) {
-			try {
+		if (!desktopMode && !noManifest)
+		{
+			try
+			{
 				installManifest();
-			} catch (std::exception& e) {
+			}
+			catch (std::exception & e)
+			{
 				LOG(ERROR) << e.what();
 			}
 		}
 
-		if (desktopMode) {
+		if (desktopMode)
+		{
 			auto m_pWindow = new QQuickWindow();
 			qobject_cast<QQuickItem*>(quickObj)->setParentItem(m_pWindow->contentItem());
 			m_pWindow->setGeometry(0, 0, qobject_cast<QQuickItem*>(quickObj)->width(), qobject_cast<QQuickItem*>(quickObj)->height());
@@ -253,7 +325,9 @@ int main(int argc, char *argv[]) {
 
 		return a.exec();
 
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception & e)
+	{
 		LOG(FATAL) << e.what();
 		return -1;
 	}

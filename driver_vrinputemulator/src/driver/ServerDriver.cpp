@@ -349,6 +349,5 @@ namespace vrinputemulator
 			return std::pair<std::shared_ptr<void>, uint32_t>({ std::shared_ptr<void>(), 0 });
 		}
 
-
 	} // end namespace driver
 } // end namespace vrinputemulator
