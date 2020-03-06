@@ -14,10 +14,6 @@ Rectangle {
         stackView: mainView
     }
 
-    property DeviceOffsetsPage deviceOffsetsPage:  DeviceOffsetsPage {
-        stackView: mainView
-    }
-
     property MotionCompensationPage motionCompensationPage:  MotionCompensationPage {
         stackView: mainView
     }
@@ -25,23 +21,6 @@ Rectangle {
     property DeviceRenderModelPage deviceRenderModelPage:  DeviceRenderModelPage {
         stackView: mainView
     }
-
-    property DeviceInputRemappingPage deviceInputRemappingPage:  DeviceInputRemappingPage {
-        stackView: mainView
-    }
-
-    property DeviceDigitalInputRemappingPage deviceDigitalInputRemappingPage:  DeviceDigitalInputRemappingPage {
-        stackView: mainView
-    }
-
-    property DeviceDigitalBindingPage deviceDigitalBindingPage:  DeviceDigitalBindingPage {
-        stackView: mainView
-    }
-
-    property DeviceAnalogInputRemappingPage deviceAnalogInputRemappingPage:  DeviceAnalogInputRemappingPage {
-        stackView: mainView
-    }
-
 
     StackView {
         id: mainView
