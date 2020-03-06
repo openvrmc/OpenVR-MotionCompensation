@@ -42,7 +42,9 @@ namespace inputemulator
 						info->deviceClass = deviceClass;
 						char buffer[vr::k_unMaxPropertyStringSize];
 						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
+						
 						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
+
 						if (pError == vr::TrackedProp_Success)
 						{
 							info->serial = std::string(buffer);
@@ -56,7 +58,7 @@ namespace inputemulator
 						/*try {
 							vrinputemulator::DeviceInfo info2;
 							parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
-							info->deviceMode = info2.deviceMode;
+							info->getDeviceMode = info2.getDeviceMode;
 						} catch (std::exception& e) {
 							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 						}*/
@@ -74,12 +76,13 @@ namespace inputemulator
 			LOG(ERROR) << "Could not get device infos: " << e.what();
 		}
 	}
-	
+
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
 	{
 		if (settingsUpdateCounter >= 50)
 		{
 			settingsUpdateCounter = 0;
+
 			if (parent->isDashboardVisible() || parent->isDesktopMode())
 			{
 				unsigned i = 0;
@@ -87,17 +90,21 @@ namespace inputemulator
 				{
 					bool hasDeviceInfoChanged = updateDeviceInfo(i);
 					unsigned status = devicePoses[info->openvrId].bDeviceIsConnected ? 0 : 1;
+
 					if (info->deviceMode == 0 && info->deviceStatus != status)
 					{
 						info->deviceStatus = status;
 						hasDeviceInfoChanged = true;
 					}
+
 					if (hasDeviceInfoChanged)
 					{
 						emit deviceInfoChanged(i);
 					}
+
 					++i;
 				}
+
 				bool newDeviceAdded = false;
 				for (uint32_t id = maxValidDeviceId + 1; id < vr::k_unMaxTrackedDeviceCount; ++id)
 				{
@@ -125,7 +132,7 @@ namespace inputemulator
 							/*try {
 								vrinputemulator::DeviceInfo info2;
 								parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
-								info->deviceMode = info2.deviceMode;
+								info->getDeviceMode = info2.getDeviceMode;
 							} catch (std::exception& e) {
 								LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 							}*/
@@ -151,10 +158,10 @@ namespace inputemulator
 
 	void DeviceManipulationTabController::handleEvent(const vr::VREvent_t&)
 	{
-/*switch (vrEvent.eventType) {
-	default:
-		break;
-}*/
+		/*switch (vrEvent.eventType) {
+			default:
+				break;
+		}*/
 	}
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()
@@ -224,7 +231,7 @@ namespace inputemulator
 
 	unsigned DeviceManipulationTabController::getMotionCompensationVelAccMode()
 	{
-		return (unsigned)motionCompensationVelAccMode;
+		return (unsigned)motionCompensationMode;
 	}
 
 	double DeviceManipulationTabController::getMotionCompensationKalmanProcessNoise()
@@ -242,26 +249,11 @@ namespace inputemulator
 		return motionCompensationMovingAverageWindow;
 	}
 
-
-	#define DEVICEMANIPULATIONSETTINGS_GETTRANSLATIONVECTOR(name) { \
-	double valueX = settings->value(#name ## "_x", 0.0).toDouble(); \
-	double valueY = settings->value(#name ## "_y", 0.0).toDouble(); \
-	double valueZ = settings->value(#name ## "_z", 0.0).toDouble(); \
-	entry.name = { valueX, valueY, valueZ }; \
-}
-
-	#define DEVICEMANIPULATIONSETTINGS_GETROTATIONVECTOR(name) { \
-	double valueY = settings->value(#name ## "_yaw", 0.0).toDouble(); \
-	double valueP = settings->value(#name ## "_pitch", 0.0).toDouble(); \
-	double valueR = settings->value(#name ## "_roll", 0.0).toDouble(); \
-	entry.name = { valueY, valueP, valueR }; \
-}
-
 	void DeviceManipulationTabController::reloadDeviceManipulationSettings()
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		motionCompensationVelAccMode = (vrinputemulator::MotionCompensationVelAccMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
+		motionCompensationMode = (vrinputemulator::MotionCompensationMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
 		motionCompensationKalmanProcessNoise = settings->value("motionCompensationKalmanProcessNoise", 0.1).toDouble();
 		motionCompensationKalmanObservationNoise = settings->value("motionCompensationKalmanObservationNoise", 0.1).toDouble();
 		motionCompensationMovingAverageWindow = settings->value("motionCompensationMovingAverageWindow", 3).toUInt();
@@ -289,7 +281,7 @@ namespace inputemulator
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		settings->setValue("motionCompensationVelAccMode", (unsigned)motionCompensationVelAccMode);
+		settings->setValue("motionCompensationVelAccMode", (unsigned)motionCompensationMode);
 		settings->setValue("motionCompensationKalmanProcessNoise", motionCompensationKalmanProcessNoise);
 		settings->setValue("motionCompensationKalmanObservationNoise", motionCompensationKalmanObservationNoise);
 		settings->setValue("motionCompensationMovingAverageWindow", motionCompensationMovingAverageWindow);
@@ -337,6 +329,7 @@ namespace inputemulator
 		{
 			return;
 		}
+
 		auto device = deviceInfos[deviceIndex];
 		DeviceManipulationProfile* profile = nullptr;
 		for (auto& p : deviceManipulationProfiles)
@@ -347,12 +340,14 @@ namespace inputemulator
 				break;
 			}
 		}
+
 		if (!profile)
 		{
 			auto i = deviceManipulationProfiles.size();
 			deviceManipulationProfiles.emplace_back();
 			profile = &deviceManipulationProfiles[i];
 		}
+
 		profile->profileName = name.toStdString();
 		saveDeviceManipulationProfiles();
 		OverlayController::appSettings()->sync();
@@ -385,114 +380,52 @@ namespace inputemulator
 		}
 	}
 
-	void DeviceManipulationTabController::setMotionCompensationVelAccMode(unsigned mode, bool notify)
+	// Enables or disables the motion compensation for the selected device
+	bool DeviceManipulationTabController::setMotionCompensationMode(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify*/)
 	{
-		vrinputemulator::MotionCompensationVelAccMode newMode = (vrinputemulator::MotionCompensationVelAccMode)mode;
-		if (motionCompensationVelAccMode != newMode)
+		// A few checks if the user input is valid
+		if (MCindex < 0)
 		{
-			motionCompensationVelAccMode = newMode;
-			LOG(INFO) << "Sending motion compensation vel/acc mode to driver";
-			parent->vrInputEmulator().setMotionVelAccCompensationMode(newMode);
-			saveDeviceManipulationSettings();
-			if (notify)
-			{
-				emit motionCompensationVelAccModeChanged(mode);
-			}
+			m_deviceModeErrorString = "Please select a device";
+			return false;
 		}
-	}
 
-	void DeviceManipulationTabController::setMotionCompensationKalmanProcessNoise(double variance, bool notify)
-	{
-		if (motionCompensationKalmanProcessNoise != variance)
+		if (RTindex < 0)
 		{
-			motionCompensationKalmanProcessNoise = variance;
-			LOG(INFO) << "Sending motion compensation kalman mode to driver";
-			parent->vrInputEmulator().setMotionCompensationKalmanProcessNoise(motionCompensationKalmanProcessNoise);
-			saveDeviceManipulationSettings();
-			if (notify)
-			{
-				emit motionCompensationKalmanProcessNoiseChanged(motionCompensationKalmanProcessNoise);
-			}
+			m_deviceModeErrorString = "Please select a reference tracker";
+			return false;
 		}
-	}
 
-	void DeviceManipulationTabController::setMotionCompensationKalmanObservationNoise(double variance, bool notify)
-	{
-		if (motionCompensationKalmanObservationNoise != variance)
+		if (MCindex == RTindex)
 		{
-			motionCompensationKalmanObservationNoise = variance;
-			LOG(INFO) << "Sending motion compensation kalman noise to driver";
-			parent->vrInputEmulator().setMotionCompensationKalmanObservationNoise(motionCompensationKalmanObservationNoise);
-			saveDeviceManipulationSettings();
-			if (notify)
-			{
-				emit motionCompensationKalmanObservationNoiseChanged(motionCompensationKalmanObservationNoise);
-			}
+			m_deviceModeErrorString = "\"Device\" and \"Reference Tracker\" cannot be the same!";
+			return false;
 		}
-	}
 
-	void DeviceManipulationTabController::setMotionCompensationMovingAverageWindow(unsigned window, bool notify)
-	{
-		if (motionCompensationMovingAverageWindow != window)
-		{
-			motionCompensationMovingAverageWindow = window;
-			LOG(INFO) << "Sending motion compensation moving average mode to driver";
-			parent->vrInputEmulator().setMotionCompensationMovingAverageWindow(motionCompensationMovingAverageWindow);
-			saveDeviceManipulationSettings();
-			if (notify)
-			{
-				emit motionCompensationMovingAverageWindowChanged(motionCompensationMovingAverageWindow);
-			}
-		}
-	}
+		// ToDo:
+		// - Check if index is already a reference tracker
+		// - Check if RTindex is already a motion compensated device
+		// - Check that the compensated device is a HMD
+		// - Check that the reference tracker is not a HMD
 
-	unsigned DeviceManipulationTabController::getRenderModelCount()
-	{
-		return (unsigned)vr::VRRenderModels()->GetRenderModelCount();
-	}
-
-	QString DeviceManipulationTabController::getRenderModelName(unsigned index)
-	{
-		char buffer[vr::k_unMaxPropertyStringSize];
-		vr::VRRenderModels()->GetRenderModelName(index, buffer, vr::k_unMaxPropertyStringSize);
-		return buffer;
-	}
-
-	// 0 .. normal, 1 .. disable, 2 .. redirect mode, 3 .. swap mode, 4 ... motion compensation
-	bool DeviceManipulationTabController::setDeviceMode(unsigned index, unsigned mode, unsigned targedIndex, bool notify)
-	{
-		bool retval = true;
 		try
 		{
-			switch (mode)
+			//Send new settings to the driver.dll
+			if (EnableMotionCompensation)
 			{
-			case 0:
-				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[index]->openvrId);
-				break;
-			case 1:
-				if (motionCompensationVelAccMode == vrinputemulator::MotionCompensationVelAccMode::KalmanFilter)
-				{
-					parent->vrInputEmulator().setMotionCompensationKalmanProcessNoise(motionCompensationKalmanProcessNoise);
-					parent->vrInputEmulator().setMotionCompensationKalmanObservationNoise(motionCompensationKalmanObservationNoise);
-					LOG(INFO) << "Set kalman mc mode";
-				}
-				else if (motionCompensationVelAccMode == vrinputemulator::MotionCompensationVelAccMode::LinearApproximation)
-				{
-					parent->vrInputEmulator().setMotionCompensationMovingAverageWindow(motionCompensationMovingAverageWindow);
-					LOG(INFO) << "Set moving avg mc mode";
-				}
-				parent->vrInputEmulator().setDeviceMotionCompensationMode(deviceInfos[index]->openvrId, motionCompensationVelAccMode);
-				break;
-			default:
-				retval = false;
-				m_deviceModeErrorString = "Unknown Device Mode";
-				LOG(ERROR) << "Unkown device mode";
-				break;
+				LOG(TRACE) << "Sending Motion Compensation Mode";
+				motionCompensationMode = vrinputemulator::MotionCompensationMode::ReferenceTracker;
+				parent->vrInputEmulator().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
+			}
+			else
+			{
+				LOG(TRACE) << "Sending Normal Mode";
+				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[MCindex]->openvrId);
+				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[RTindex]->openvrId);
 			}
 		}
 		catch (vrinputemulator::vrinputemulator_exception & e)
 		{
-			retval = false;
 			switch (e.errorcode)
 			{
 			case (int)vrinputemulator::ipc::ReplyStatus::Ok:
@@ -521,19 +454,74 @@ namespace inputemulator
 			} break;
 			}
 			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
+
+			return false;
 		}
 		catch (std::exception & e)
 		{
-			retval = false;
 			m_deviceModeErrorString = "Unknown exception";
 			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
+
+			return false;
 		}
-		if (notify)
+
+		/*if (notify)
 		{
 			updateDeviceInfo(index);
 			emit deviceInfoChanged(index);
+		}*/
+
+		return true;
+	}
+
+	bool DeviceManipulationTabController::setLPFBeta(double value)
+	{
+		// A few checks if the user input is valid
+		if (value <= 0.0)
+		{
+			m_deviceModeErrorString = "Value cannot be lower than 0.0001";
+			return false;
 		}
-		return retval;
+		if (value > 1.0)
+		{
+			m_deviceModeErrorString = "Value cannot be higher than 1.0000";
+			return false;
+		}
+
+		try
+		{
+			LOG(TRACE) << "Sending new LPF Beta value:" << value;
+			parent->vrInputEmulator().setLPFBeta(value);
+		}
+		catch (vrinputemulator::vrinputemulator_exception & e)
+		{
+			switch (e.errorcode)
+			{
+				case (int)vrinputemulator::ipc::ReplyStatus::Ok:
+				{
+					m_deviceModeErrorString = "Not an error";
+					break;
+				} 
+				default:
+				{
+					m_deviceModeErrorString = "Unknown error";
+					break;
+				} 
+
+				LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
+
+				return false;
+			}
+		}
+		catch (std::exception & e)
+		{
+			m_deviceModeErrorString = "Unknown exception";
+			LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
+
+			return false;
+		}
+
+		return true;
 	}
 
 	QString DeviceManipulationTabController::getDeviceModeErrorString()
@@ -543,75 +531,26 @@ namespace inputemulator
 
 	bool DeviceManipulationTabController::updateDeviceInfo(unsigned index)
 	{
-/*bool retval = false;
-if (index < deviceInfos.size()) {
-	try {
-		vrinputemulator::DeviceInfo info;
-		parent->vrInputEmulator().getDeviceInfo(deviceInfos[index]->openvrId, info);
-		if (deviceInfos[index]->deviceMode != info.deviceMode) {
-			deviceInfos[index]->deviceMode = info.deviceMode;
-			retval = true;
-		}
-	} catch (std::exception& e) {
-		LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-	}
-}
-return retval;*/
-		return true;
-	}
+		/*bool retval = false;
 
-	void DeviceManipulationTabController::setDeviceRenderModel(unsigned deviceIndex, unsigned renderModelIndex)
-	{
-		if (deviceIndex < deviceInfos.size())
+		if (index < deviceInfos.size())
 		{
-			if (renderModelIndex == 0)
+			try
 			{
-				if (deviceInfos[deviceIndex]->renderModelOverlay != vr::k_ulOverlayHandleInvalid)
+				vrinputemulator::DeviceInfo info;
+
+				parent->vrInputEmulator().getDeviceInfo(deviceInfos[index]->openvrId, info);
+				if (deviceInfos[index]->getDeviceMode != info.getDeviceMode)
 				{
-					vr::VROverlay()->DestroyOverlay(deviceInfos[deviceIndex]->renderModelOverlay);
-					deviceInfos[deviceIndex]->renderModelOverlay = vr::k_ulOverlayHandleInvalid;
+					deviceInfos[index]->getDeviceMode = info.getDeviceMode;
+					retval = true;
 				}
-			}
-			else
+			} catch (std::exception& e)
 			{
-				vr::VROverlayHandle_t overlayHandle = deviceInfos[deviceIndex]->renderModelOverlay;
-				if (overlayHandle == vr::k_ulOverlayHandleInvalid)
-				{
-					std::string overlayName = std::string("RenderModelOverlay_") + std::string(deviceInfos[deviceIndex]->serial);
-					auto oerror = vr::VROverlay()->CreateOverlay(overlayName.c_str(), overlayName.c_str(), &overlayHandle);
-					if (oerror == vr::VROverlayError_None)
-					{
-						overlayHandle = deviceInfos[deviceIndex]->renderModelOverlay = overlayHandle;
-					}
-					else
-					{
-						LOG(ERROR) << "Could not create render model overlay: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(oerror);
-					}
-				}
-				if (overlayHandle != vr::k_ulOverlayHandleInvalid)
-				{
-					std::string texturePath = QApplication::applicationDirPath().toStdString() + "\\res\\transparent.png";
-					if (QFile::exists(QString::fromStdString(texturePath)))
-					{
-						vr::VROverlay()->SetOverlayFromFile(overlayHandle, texturePath.c_str());
-						char buffer[vr::k_unMaxPropertyStringSize];
-						vr::VRRenderModels()->GetRenderModelName(renderModelIndex - 1, buffer, vr::k_unMaxPropertyStringSize);
-						vr::VROverlay()->SetOverlayRenderModel(overlayHandle, buffer, nullptr);
-						vr::HmdMatrix34_t trans = {
-							1.0f, 0.0f, 0.0f, 0.0f,
-							0.0f, 1.0f, 0.0f, 0.0f,
-							0.0f, 0.0f, 1.0f, 0.0f
-						};
-						vr::VROverlay()->SetOverlayTransformTrackedDeviceRelative(overlayHandle, deviceInfos[deviceIndex]->openvrId, &trans);
-						vr::VROverlay()->ShowOverlay(overlayHandle);
-					}
-					else
-					{
-						LOG(ERROR) << "Could not find texture \"" << texturePath << "\"";
-					}
-				}
+				LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 			}
 		}
+		return retval;*/
+		return false;
 	}
-
 } // namespace inputemulator

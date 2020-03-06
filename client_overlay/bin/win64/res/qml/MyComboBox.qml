@@ -64,7 +64,7 @@ ComboBox {
 
     onActivated: {
 		if (activeFocus) {
-			MyResources.playActivationSound()
+			//MyResources.playActivationSound()
 		}
     }
 

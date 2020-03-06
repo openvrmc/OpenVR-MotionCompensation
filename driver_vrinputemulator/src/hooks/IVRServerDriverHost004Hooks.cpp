@@ -52,6 +52,7 @@ namespace vrinputemulator
 			}
 			LOG(TRACE) << "IVRServerDriverHost004Hooks::_trackedDeviceAdded(" << _this << ", " << pchDeviceSerialNumber << ", " << eDeviceClass << ", " << pDriver << ")";
 			serverDriver->hooksTrackedDeviceAdded(_this, 4, pchDeviceSerialNumber, eDeviceClass, pDriver);
+
 			auto retval = trackedDeviceAddedHook.origFunc(_this, pchDeviceSerialNumber, eDeviceClass, pDriver);
 			return retval;
 		}

@@ -24,6 +24,6 @@ Button {
     }
 
     onClicked: {
-		MyResources.playActivationSound()
+		//MyResources.playActivationSound()
     }
 }

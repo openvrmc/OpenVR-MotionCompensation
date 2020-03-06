@@ -164,7 +164,7 @@ namespace vrinputemulator
 	{
 		if (_ipcServerQueue)
 		{
-// Send disconnect message (so the server can free resources)
+			// Send disconnect message (so the server can free resources)
 			ipc::Request message(ipc::RequestType::IPC_ClientDisconnect);
 			auto messageId = _ipcRandomDist(_ipcRandomDevice);
 			message.msg.ipc_ClientDisconnect.clientId = m_clientId;
@@ -253,8 +253,7 @@ namespace vrinputemulator
 			throw vrinputemulator_connectionerror("No active connection.");
 		}
 	}
-
-
+	
 	void VRInputEmulator::openvrVendorSpecificEvent(uint32_t deviceId, vr::EVREventType eventType, const vr::VREvent_Data_t& eventData, double timeOffset)
 	{
 		if (_ipcServerQueue)
@@ -335,19 +334,26 @@ namespace vrinputemulator
 			message.msg.ovr_GenericDeviceIdMessage.deviceId = deviceId;
 			if (modal)
 			{
+				//Create random message ID
 				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
+
+				//Allocate memory for the reply
 				std::promise<ipc::Reply> respPromise;
 				auto respFuture = respPromise.get_future();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 				}
+
+				//Send message
 				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
 				auto resp = respFuture.get();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.erase(messageId);
 				}
+
+				//If there was an error, notify the user
 				std::stringstream ss;
 				ss << "Error while setting normal mode: ";
 				if (resp.status == ipc::ReplyStatus::InvalidId)
@@ -377,36 +383,46 @@ namespace vrinputemulator
 		}
 	}
 
-	void VRInputEmulator::setDeviceMotionCompensationMode(uint32_t deviceId, MotionCompensationVelAccMode velAccMode, bool modal)
+	void VRInputEmulator::setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode, bool modal)
 	{
-		bool retval = false;
 		if (_ipcServerQueue)
 		{
+			//Create message
 			ipc::Request message(ipc::RequestType::DeviceManipulation_MotionCompensationMode);
 			memset(&message.msg, 0, sizeof(message.msg));
 			message.msg.dm_MotionCompensationMode.clientId = m_clientId;
 			message.msg.dm_MotionCompensationMode.messageId = 0;
-			message.msg.dm_MotionCompensationMode.deviceId = deviceId;
-			message.msg.dm_MotionCompensationMode.velAccCompensationMode = velAccMode;
+			message.msg.dm_MotionCompensationMode.MCdeviceId = MCdeviceId;
+			message.msg.dm_MotionCompensationMode.RTdeviceId = RTdeviceId;
+			message.msg.dm_MotionCompensationMode.CompensationMode = Mode;
+
 			if (modal)
 			{
+				//Create random message ID
 				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
 				message.msg.dm_MotionCompensationMode.messageId = messageId;
+
+				//Allocate memory for the reply
 				std::promise<ipc::Reply> respPromise;
 				auto respFuture = respPromise.get_future();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 				}
+
+				//Send message
 				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
+
 				auto resp = respFuture.get();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.erase(messageId);
 				}
+
+				//If there was an error, notify the user
 				std::stringstream ss;
 				ss << "Error while setting motion compensation mode: ";
+
 				if (resp.status == ipc::ReplyStatus::InvalidId)
 				{
 					ss << "Invalid device id";
@@ -426,7 +442,6 @@ namespace vrinputemulator
 			else
 			{
 				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
 			}
 		}
 		else
@@ -435,49 +450,46 @@ namespace vrinputemulator
 		}
 	}
 
-
-	void VRInputEmulator::setMotionVelAccCompensationMode(MotionCompensationVelAccMode velAccMode, bool modal)
+	void VRInputEmulator::setLPFBeta(double value, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
+			//Create message
 			ipc::Request message(ipc::RequestType::DeviceManipulation_SetMotionCompensationProperties);
 			memset(&message.msg, 0, sizeof(message.msg));
 			message.msg.dm_SetMotionCompensationProperties.clientId = m_clientId;
 			message.msg.dm_SetMotionCompensationProperties.messageId = 0;
-			message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid = true;
-			message.msg.dm_SetMotionCompensationProperties.velAccCompensationMode = velAccMode;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoiseValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoiseValid = false;
+			message.msg.dm_SetMotionCompensationProperties.LPFBeta = value;
+
 			if (modal)
 			{
+				//Create random message ID
 				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
 				message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
+
+				//Allocate memory for the reply
 				std::promise<ipc::Reply> respPromise;
 				auto respFuture = respPromise.get_future();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 				}
+
+				//Send message
 				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
 				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
+
 				auto resp = respFuture.get();
 				{
 					std::lock_guard<std::recursive_mutex> lock(_mutex);
 					_ipcPromiseMap.erase(messageId);
 				}
+
+				//If there was an error, notify the user
 				std::stringstream ss;
-				ss << "Error while setting motion compensation properties: ";
-				if (resp.status == ipc::ReplyStatus::InvalidId)
-				{
-					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str(), (int)resp.status);
-				}
-				else if (resp.status == ipc::ReplyStatus::NotFound)
-				{
-					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str(), (int)resp.status);
-				}
-				else if (resp.status != ipc::ReplyStatus::Ok)
+				ss << "Error while setting motion compensation mode: ";
+
+				if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
 					throw vrinputemulator_exception(ss.str(), (int)resp.status);
@@ -494,184 +506,4 @@ namespace vrinputemulator
 			throw vrinputemulator_connectionerror("No active connection.");
 		}
 	}
-
-	void VRInputEmulator::setMotionCompensationKalmanProcessNoise(double variance, bool modal)
-	{
-		if (_ipcServerQueue)
-		{
-			ipc::Request message(ipc::RequestType::DeviceManipulation_SetMotionCompensationProperties);
-			memset(&message.msg, 0, sizeof(message.msg));
-			message.msg.dm_SetMotionCompensationProperties.clientId = m_clientId;
-			message.msg.dm_SetMotionCompensationProperties.messageId = 0;
-			message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoiseValid = true;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoise = variance;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoiseValid = false;
-			if (modal)
-			{
-				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
-				message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
-				std::promise<ipc::Reply> respPromise;
-				auto respFuture = respPromise.get_future();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
-				}
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-				auto resp = respFuture.get();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.erase(messageId);
-				}
-				std::stringstream ss;
-				ss << "Error while setting motion compensation properties: ";
-				if (resp.status == ipc::ReplyStatus::InvalidId)
-				{
-					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str(), (int)resp.status);
-				}
-				else if (resp.status == ipc::ReplyStatus::NotFound)
-				{
-					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str(), (int)resp.status);
-				}
-				else if (resp.status != ipc::ReplyStatus::Ok)
-				{
-					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str(), (int)resp.status);
-				}
-			}
-			else
-			{
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-			}
-		}
-		else
-		{
-			throw vrinputemulator_connectionerror("No active connection.");
-		}
-	}
-
-	void VRInputEmulator::setMotionCompensationKalmanObservationNoise(double variance, bool modal)
-	{
-		if (_ipcServerQueue)
-		{
-			ipc::Request message(ipc::RequestType::DeviceManipulation_SetMotionCompensationProperties);
-			memset(&message.msg, 0, sizeof(message.msg));
-			message.msg.dm_SetMotionCompensationProperties.clientId = m_clientId;
-			message.msg.dm_SetMotionCompensationProperties.messageId = 0;
-			message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoiseValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoiseValid = true;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoise = variance;
-			if (modal)
-			{
-				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
-				message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
-				std::promise<ipc::Reply> respPromise;
-				auto respFuture = respPromise.get_future();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
-				}
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-				auto resp = respFuture.get();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.erase(messageId);
-				}
-				std::stringstream ss;
-				ss << "Error while setting motion compensation properties: ";
-				if (resp.status == ipc::ReplyStatus::InvalidId)
-				{
-					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str(), (int)resp.status);
-				}
-				else if (resp.status == ipc::ReplyStatus::NotFound)
-				{
-					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str(), (int)resp.status);
-				}
-				else if (resp.status != ipc::ReplyStatus::Ok)
-				{
-					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str(), (int)resp.status);
-				}
-			}
-			else
-			{
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-			}
-		}
-		else
-		{
-			throw vrinputemulator_connectionerror("No active connection.");
-		}
-	}
-
-	void VRInputEmulator::setMotionCompensationMovingAverageWindow(unsigned window, bool modal)
-	{
-		if (_ipcServerQueue)
-		{
-			ipc::Request message(ipc::RequestType::DeviceManipulation_SetMotionCompensationProperties);
-			memset(&message.msg, 0, sizeof(message.msg));
-			message.msg.dm_SetMotionCompensationProperties.clientId = m_clientId;
-			message.msg.dm_SetMotionCompensationProperties.messageId = 0;
-			message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoiseValid = false;
-			message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoiseValid = false;
-			message.msg.dm_SetMotionCompensationProperties.movingAverageWindowValid = true;
-			message.msg.dm_SetMotionCompensationProperties.movingAverageWindow = window;
-			if (modal)
-			{
-				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
-				message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
-				std::promise<ipc::Reply> respPromise;
-				auto respFuture = respPromise.get_future();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
-				}
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-				auto resp = respFuture.get();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.erase(messageId);
-				}
-				std::stringstream ss;
-				ss << "Error while setting motion compensation properties: ";
-				if (resp.status == ipc::ReplyStatus::InvalidId)
-				{
-					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str(), (int)resp.status);
-				}
-				else if (resp.status == ipc::ReplyStatus::NotFound)
-				{
-					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str(), (int)resp.status);
-				}
-				else if (resp.status != ipc::ReplyStatus::Ok)
-				{
-					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str(), (int)resp.status);
-				}
-			}
-			else
-			{
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-			}
-		}
-		else
-		{
-			throw vrinputemulator_connectionerror("No active connection.");
-		}
-	}
-
-
 } // end namespace vrinputemulator

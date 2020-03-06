@@ -1,4 +1,7 @@
+#include <boost/asio.hpp>
+
 #include "ServerDriver.h"
+
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include "VirtualDeviceDriver.h"
@@ -29,6 +32,7 @@ namespace vrinputemulator
 			{
 				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
 			}
+
 			return true;
 		}
 
@@ -43,15 +47,14 @@ namespace vrinputemulator
 		void ServerDriver::hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass& eDeviceClass, void* pDriver)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceAdded(" << serverDriverHost << ", " << version << ", " << pchDeviceSerialNumber << ", " << (int)eDeviceClass << ", " << pDriver << ")";
-
 			LOG(INFO) << "Found device " << pchDeviceSerialNumber << " (deviceClass: " << (int)eDeviceClass << ")";
 
 			// Device Class Override
-			if (eDeviceClass == vr::TrackedDeviceClass_GenericTracker && _propertiesOverrideGenericTrackerFakeController)
+			/*if (eDeviceClass == vr::TrackedDeviceClass_GenericTracker && _propertiesOverrideGenericTrackerFakeController)
 			{
 				eDeviceClass = vr::TrackedDeviceClass_Controller;
 				LOG(INFO) << "Disguised GenericTracker " << pchDeviceSerialNumber << " as Controller.";
-			}
+			}*/
 
 			// Create ManipulationInfo entry
 			auto handle = std::make_shared<DeviceManipulationHandle>(pchDeviceSerialNumber, eDeviceClass, pDriver, serverDriverHost, version);
@@ -59,13 +62,15 @@ namespace vrinputemulator
 
 			// Hook into server driver interface
 			handle->setServerDriverHooks(InterfaceHooks::hookInterface(pDriver, "ITrackedDeviceServerDriver_005"));
-
 		}
 
 		void ServerDriver::hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceActivated(" << serverDriver << ", " << version << ", " << unObjectId << ")";
+			
+			//Search for the activated device
 			auto i = _deviceManipulationHandles.find(serverDriver);
+
 			if (i != _deviceManipulationHandles.end())
 			{
 				auto handle = i->second;
@@ -208,7 +213,7 @@ namespace vrinputemulator
 			}
 
 			// Read vrsettings
-			char buffer[vr::k_unMaxPropertyStringSize];
+			/*char buffer[vr::k_unMaxPropertyStringSize];
 			vr::EVRSettingsError peError;
 
 			vr::VRSettings()->GetString(vrsettings_SectionName, vrsettings_overrideHmdManufacturer_string, buffer, vr::k_unMaxPropertyStringSize, &peError);
@@ -237,7 +242,7 @@ namespace vrinputemulator
 			{
 				_propertiesOverrideGenericTrackerFakeController = boolVal;
 				LOG(INFO) << vrsettings_SectionName << "::" << vrsettings_genericTrackerFakeController_bool << " = " << boolVal;
-			}
+			}*/
 
 			// Start IPC thread
 			shmCommunicator.init(this);
@@ -256,11 +261,11 @@ namespace vrinputemulator
 		// Call frequency: ~93Hz
 		void ServerDriver::RunFrame()
 		{
-			for (auto d : _deviceManipulationHandles)
+			/*for (auto d : _deviceManipulationHandles)
 			{
 				d.second->RunFrame();
-			}
-			m_motionCompensation.runFrame();
+			}*/
+			//m_motionCompensation.runFrame();
 		}
 
 		void ServerDriver::_trackedDeviceActivated(uint32_t deviceId, VirtualDeviceDriver* device)
@@ -303,11 +308,15 @@ namespace vrinputemulator
 
 		DeviceManipulationHandle* ServerDriver::getDeviceManipulationHandleById(uint32_t unWhichDevice)
 		{
+			LOG(TRACE) << "getDeviceByID: unWhichDevice: " << unWhichDevice;
+
 			std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
+
 			if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid())
 			{
 				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice];
 			}
+
 			return nullptr;
 		}
 

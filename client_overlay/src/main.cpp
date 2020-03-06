@@ -119,7 +119,6 @@ void removeManifest()
 
 int main(int argc, char* argv[])
 {
-
 	bool desktopMode = false;
 	bool noSound = false;
 	bool noManifest = false;

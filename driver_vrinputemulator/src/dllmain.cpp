@@ -35,7 +35,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		MessageBoxA(NULL, "Loaded!", "Motion Compensation", MB_OK);
+		//MessageBoxA(NULL, "Loaded!", "Motion Compensation", MB_OK);
 		init_logging();
 		LOG(INFO) << "|========================================================================================|";
 		LOG(INFO) << "VRInputEmulator dll loaded...";
