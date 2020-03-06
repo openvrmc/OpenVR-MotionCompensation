@@ -5,11 +5,11 @@
 
 namespace vrinputemulator
 {
-	static const char* const vrsettings_SectionName = "driver_00vrinputemulator";
+	/*static const char* const vrsettings_SectionName = "driver_00vrinputemulator";
 	static const char* const vrsettings_overrideHmdManufacturer_string = "overrideHmdManufacturer";
 	static const char* const vrsettings_overrideHmdModel_string = "overrideHmdModel";
 	static const char* const vrsettings_overrideHmdTrackingSystem_string = "overrideHmdTrackingSystem";
-	static const char* const vrsettings_genericTrackerFakeController_bool = "genericTrackerFakeController";
+	static const char* const vrsettings_genericTrackerFakeController_bool = "genericTrackerFakeController";*/
 
 	enum class VirtualDeviceType : uint32_t
 	{
@@ -29,23 +29,27 @@ namespace vrinputemulator
 		MATRIX44 = 21,
 		VECTOR3 = 22,
 		VECTOR4 = 23
+	};	
+
+	enum class MotionCompensationMode : uint32_t
+	{
+		Disabled = 0,
+		ReferenceTracker = 1,
+	};
+
+	enum class MotionCompensationDeviceMode : uint32_t
+	{
+		Default = 0,
+		ReferenceTracker = 1,
+		MotionCompensated = 2,
 	};
 
 	struct DeviceInfo
 	{
 		uint32_t deviceId;
 		vr::ETrackedDeviceClass deviceClass;
-		int deviceMode;
+		MotionCompensationDeviceMode deviceMode;
 		uint32_t refDeviceId;
-	};
-
-	enum class MotionCompensationVelAccMode : uint32_t
-	{
-		Disabled = 0,
-		SetZero = 1,
-		SubstractMotionRef = 2,
-		LinearApproximation = 3,
-		KalmanFilter = 4
 	};
 
 } // end namespace vrinputemulator

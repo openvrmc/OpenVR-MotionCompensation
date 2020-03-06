@@ -11,9 +11,9 @@ const char* logConfigDefault =
 "	TO_STANDARD_OUTPUT = true\n"
 "	MAX_LOG_FILE_SIZE = 2097152 ## 2MB\n"
 "* TRACE:\n"
-"	ENABLED = false\n"
+"	ENABLED = true\n"
 "* DEBUG:\n"
-"	ENABLED = false\n";
+"	ENABLED = true\n";
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -22,7 +22,7 @@ void init_logging()
 	el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
 	el::Configurations conf(logConfigFileName);
 	conf.parseFromText(logConfigDefault);
-	conf.parseFromFile(logConfigFileName);
+	//conf.parseFromFile(logConfigFileName);
 	conf.setRemainingToDefault();
 	el::Loggers::reconfigureAllLoggers(conf);
 }
@@ -35,8 +35,12 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		//MessageBoxA(NULL, "Loaded!", "Motion Compensation", MB_OK);
 		init_logging();
+		LOG(INFO) << "|========================================================================================|";
 		LOG(INFO) << "VRInputEmulator dll loaded...";
+		LOG(TRACE) << "Trace messages enabled.";
+		LOG(DEBUG) << "Debug messages enabled.";
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

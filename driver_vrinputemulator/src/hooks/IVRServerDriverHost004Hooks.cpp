@@ -2,10 +2,11 @@
 
 #include "../driver/ServerDriver.h"
 
+
 namespace vrinputemulator
 {
 	namespace driver
-	{
+	{		
 		HookData<IVRServerDriverHost004Hooks::trackedDeviceAdded_t> IVRServerDriverHost004Hooks::trackedDeviceAddedHook;
 		HookData<IVRServerDriverHost004Hooks::trackedDevicePoseUpdated_t> IVRServerDriverHost004Hooks::trackedDevicePoseUpdatedHook;
 
@@ -28,7 +29,7 @@ namespace vrinputemulator
 				_isHooked = false;
 			}
 		}
-		
+
 		std::shared_ptr<InterfaceHooks> IVRServerDriverHost004Hooks::createHooks(void* iptr)
 		{
 			std::shared_ptr<InterfaceHooks> retval = std::shared_ptr<InterfaceHooks>(new IVRServerDriverHost004Hooks(iptr));
@@ -51,6 +52,7 @@ namespace vrinputemulator
 			}
 			LOG(TRACE) << "IVRServerDriverHost004Hooks::_trackedDeviceAdded(" << _this << ", " << pchDeviceSerialNumber << ", " << eDeviceClass << ", " << pDriver << ")";
 			serverDriver->hooksTrackedDeviceAdded(_this, 4, pchDeviceSerialNumber, eDeviceClass, pDriver);
+
 			auto retval = trackedDeviceAddedHook.origFunc(_this, pchDeviceSerialNumber, eDeviceClass, pDriver);
 			return retval;
 		}
@@ -69,6 +71,5 @@ namespace vrinputemulator
 				trackedDevicePoseUpdatedHook.origFunc(_this, unWhichDevice, poseCopy, unPoseStructSize);
 			}
 		}
-
 	}
 }

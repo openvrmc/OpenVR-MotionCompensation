@@ -115,7 +115,7 @@ Section "Install" SecInstall
 	File "${OPENVR_BASEDIR}\bin\win64\*.dll"
 
 	; Install redistributable
-	ExecWait '"$INSTDIR\vcredist_x64.exe" /install /quiet'
+	ExecWait '"$INSTDIR\VC_redist.x64.exe" /install /quiet'
 	
 	Var /GLOBAL vrRuntimePath
 	nsExec::ExecToStack '"$INSTDIR\OpenVR-InputEmulatorOverlay.exe" -openvrpath'

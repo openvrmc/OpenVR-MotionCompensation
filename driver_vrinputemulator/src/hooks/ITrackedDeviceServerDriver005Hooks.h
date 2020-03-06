@@ -12,7 +12,7 @@ namespace vrinputemulator
 	{
 		// forward declarations
 		class ServerDriver;
-
+		
 		class ITrackedDeviceServerDriver005Hooks : public InterfaceHooks
 		{
 		public:
@@ -36,6 +36,7 @@ namespace vrinputemulator
 			static std::map<void*, _hookedAdressMapEntry<activate_t>> _hookedActivateAdressMap;
 
 			static vr::EVRInitError _activate(void*, uint32_t unObjectId);
+
 		};
 	}
 }

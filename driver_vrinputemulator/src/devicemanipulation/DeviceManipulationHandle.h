@@ -1,20 +1,18 @@
 #pragma once
-#pragma once
 
 #include <openvr_driver.h>
 #include <vrinputemulator_types.h>
 #include <openvr_math.h>
-#include "utils/KalmanFilter.h"
-#include "utils/MovingAverageRingBuffer.h"
+//#include "utils/MovingAverageRingBuffer.h"
 #include "../logging.h"
 #include "../hooks/common.h"
+
 
 // driver namespace
 namespace vrinputemulator
 {
 	namespace driver
 	{
-
 		// forward declarations
 		class ServerDriver;
 		class InterfaceHooks;
@@ -40,27 +38,9 @@ namespace vrinputemulator
 			std::shared_ptr<InterfaceHooks> m_serverDriverHooks;
 			std::shared_ptr<InterfaceHooks> m_controllerComponentHooks;
 
-			int m_deviceMode = 0; // 0 .. default, 1 .. disabled, 2 .. redirect source, 3 .. redirect target, 4 .. swap mode, 5 .. motion compensation
-			bool _disconnectedMsgSend = false;
-
-			bool m_offsetsEnabled = false;
-			vr::HmdQuaternion_t m_worldFromDriverRotationOffset = { 1.0, 0.0, 0.0, 0.0 };
-			vr::HmdVector3d_t m_worldFromDriverTranslationOffset = { 0.0, 0.0, 0.0 };
-			vr::HmdQuaternion_t m_driverFromHeadRotationOffset = { 1.0, 0.0, 0.0, 0.0 };
-			vr::HmdVector3d_t m_driverFromHeadTranslationOffset = { 0.0, 0.0, 0.0 };
-			vr::HmdQuaternion_t m_deviceRotationOffset = { 1.0, 0.0, 0.0, 0.0 };
-			vr::HmdVector3d_t m_deviceTranslationOffset = { 0.0, 0.0, 0.0 };
-
-			long long m_lastPoseTime = -1;
-			bool m_lastPoseValid = false;
-			vr::DriverPose_t m_lastPose;
-			MovingAverageRingBuffer m_velMovingAverageBuffer;
-			double m_lastPoseTimeOffset = 0.0;
-			PosKalmanFilter m_kalmanFilter;
+			MotionCompensationDeviceMode m_deviceMode = MotionCompensationDeviceMode::Default;
 
 			vr::PropertyContainerHandle_t m_propertyContainerHandle = vr::k_ulInvalidPropertyContainer;
-
-			int _disableOldMode(int newMode);
 
 		public:
 			DeviceManipulationHandle(const char* serial, vr::ETrackedDeviceClass eDeviceClass, void* driverPtr, void* driverHostPtr, int driverInterfaceVersion);
@@ -111,109 +91,16 @@ namespace vrinputemulator
 				m_controllerComponentHooks = hooks;
 			}
 
-			int deviceMode() const
+			MotionCompensationDeviceMode getDeviceMode() const
 			{
 				return m_deviceMode;
 			}
-			int setDefaultMode();
-			int setMotionCompensationMode();
 
-			const vr::HmdQuaternion_t& worldFromDriverRotationOffset() const
-			{
-				return m_worldFromDriverRotationOffset;
-			}
-			vr::HmdQuaternion_t& worldFromDriverRotationOffset()
-			{
-				return m_worldFromDriverRotationOffset;
-			}
-			const vr::HmdVector3d_t& worldFromDriverTranslationOffset() const
-			{
-				return m_worldFromDriverTranslationOffset;
-			}
-			vr::HmdVector3d_t& worldFromDriverTranslationOffset()
-			{
-				return m_worldFromDriverTranslationOffset;
-			}
-			const vr::HmdQuaternion_t& driverFromHeadRotationOffset() const
-			{
-				return m_driverFromHeadRotationOffset;
-			}
-			vr::HmdQuaternion_t& driverFromHeadRotationOffset()
-			{
-				return m_driverFromHeadRotationOffset;
-			}
-			const vr::HmdVector3d_t& driverFromHeadTranslationOffset() const
-			{
-				return m_driverFromHeadTranslationOffset;
-			}
-			vr::HmdVector3d_t& driverFromHeadTranslationOffset()
-			{
-				return m_driverFromHeadTranslationOffset;
-			}
-			const vr::HmdQuaternion_t& deviceRotationOffset() const
-			{
-				return m_deviceRotationOffset;
-			}
-			vr::HmdQuaternion_t& deviceRotationOffset()
-			{
-				return m_deviceRotationOffset;
-			}
-			const vr::HmdVector3d_t& deviceTranslationOffset() const
-			{
-				return m_deviceTranslationOffset;
-			}
-			vr::HmdVector3d_t& deviceTranslationOffset()
-			{
-				return m_deviceTranslationOffset;
-			}
-
+			void setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode);
 
 			void ll_sendPoseUpdate(const vr::DriverPose_t& newPose);
 
 			bool handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
-
-			PosKalmanFilter& kalmanFilter()
-			{
-				return m_kalmanFilter;
-			}
-			MovingAverageRingBuffer& velMovingAverage()
-			{
-				return m_velMovingAverageBuffer;
-			}
-			long long getLastPoseTime()
-			{
-				return m_lastPoseTime;
-			}
-			void setLastPoseTime(long long time)
-			{
-				m_lastPoseTime = time;
-			}
-			double getLastPoseTimeOffset()
-			{
-				return m_lastPoseTimeOffset;
-			}
-			void setLastPoseTimeOffset(double offset)
-			{
-				m_lastPoseTimeOffset = offset;
-			}
-			bool lastDriverPoseValid()
-			{
-				return m_lastPoseValid;
-			}
-			vr::DriverPose_t& lastDriverPose()
-			{
-				return m_lastPose;
-			}
-			void setLastDriverPoseValid(bool valid)
-			{
-				m_lastPoseValid = valid;
-			}
-			void setLastDriverPose(const vr::DriverPose_t& pose, long long time)
-			{
-				m_lastPose = pose;
-				m_lastPoseTime = time;
-				m_lastPoseValid = true;
-			}
 
 			void setPropertyContainer(vr::PropertyContainerHandle_t container)
 			{
@@ -227,7 +114,5 @@ namespace vrinputemulator
 			void RunFrame();
 
 		};
-
-
 	} // end namespace driver
 } // end namespace vrinputemulator

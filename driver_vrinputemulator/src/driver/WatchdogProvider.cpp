@@ -15,7 +15,6 @@ namespace vrinputemulator
 			return vr::VRInitError_None;
 		}
 
-
 		void WatchdogProvider::Cleanup()
 		{
 			LOG(TRACE) << "WatchdogProvider::Cleanup()";

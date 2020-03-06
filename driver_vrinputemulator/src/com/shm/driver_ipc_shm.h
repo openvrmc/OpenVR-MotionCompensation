@@ -11,7 +11,6 @@
 // driver namespace
 namespace vrinputemulator
 {
-
 	// forward declarations
 	namespace ipc
 	{
@@ -20,7 +19,6 @@ namespace vrinputemulator
 
 	namespace driver
 	{
-
 		// forward declarations
 		class ServerDriver;
 
@@ -50,6 +48,5 @@ namespace vrinputemulator
 			uint32_t _setMotionCompensationClientId = 0;
 			uint32_t _setMotionCompensationMessageId = 0;
 		};
-
 	} // end namespace driver
 } // end namespace vrinputemulator

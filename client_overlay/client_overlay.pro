@@ -27,3 +27,40 @@ OBJECTS_DIR += debug
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(client_overlay.pri)
+
+DISTFILES += \
+    bin/win64/res/qml/DeviceManipulationPage.qml \
+    bin/win64/res/qml/DeviceRenderModelPage.qml \
+    bin/win64/res/qml/MotionCompensationPage.qml \
+    bin/win64/res/qml/MyComboBox.qml \
+    bin/win64/res/qml/MyDialogOkCancelPopup.qml \
+    bin/win64/res/qml/MyDialogOkPopup.qml \
+    bin/win64/res/qml/MyOffsetGroupBox.qml \
+    bin/win64/res/qml/MyPushButton.qml \
+    bin/win64/res/qml/MyPushButton2.qml \
+    bin/win64/res/qml/MyRangeSlider.qml \
+    bin/win64/res/qml/MyResources.qlm \
+    bin/win64/res/qml/MyResources.qml \
+    bin/win64/res/qml/MySlider.qml \
+    bin/win64/res/qml/MyStackViewPage.qml \
+    bin/win64/res/qml/MyText.qml \
+    bin/win64/res/qml/MyTextField.qml \
+    bin/win64/res/qml/MyToggleButton.qml \
+    bin/win64/res/qml/backarrow.svg \
+    bin/win64/res/qml/mainwidget.qml \
+    bin/win64/res/qml/qmldir
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_apid
+
+INCLUDEPATH += $$PWD/../openvr/lib/win64
+DEPENDPATH += $$PWD/../openvr/lib/win64
+
+HEADERS +=
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_apid
+else:unix: LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
+
+INCLUDEPATH += $$PWD/../openvr/headers
+DEPENDPATH += $$PWD/../openvr/headers
