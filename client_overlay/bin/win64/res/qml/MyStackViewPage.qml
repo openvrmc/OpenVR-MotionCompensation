@@ -55,7 +55,7 @@ Rectangle {
                 id: headerTitle
                 text: headerText
                 font.pointSize: 30
-                anchors.verticalCenter: headerBackButton.verticalCenter
+                Layout.alignment: Qt.AlignVCenter
                 Layout.leftMargin: 32
             }
         }
@@ -75,7 +75,7 @@ Rectangle {
     }
 
     function goBack() {
-        MyResources.playFocusChangedSound()
+        //MyResources.playFocusChangedSound()
         stackView.pop()
     }
 

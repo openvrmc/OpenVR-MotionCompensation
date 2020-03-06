@@ -4,8 +4,6 @@
 
 No releases have been created, and we are very much in development mode.  If you are interested in testing (and know how to compile code) or are interested in being a maintainer, please connect with us on the [discord `development` channel](https://discord.gg/r7krmSd)
 
----
-
 # [Former docs] OpenVR-InputEmulator
 
 An OpenVR driver that allows to enable motion compensatio. 

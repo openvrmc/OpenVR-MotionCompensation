@@ -73,11 +73,15 @@
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>libvrinputemulator</TargetName>
+    <IncludePath>D:\Programmierung\VR\boost_1_72_0;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>libvrinputemulator</TargetName>
+    <IncludePath>D:\Programmierung\VR\boost_1_72_0;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
@@ -90,7 +94,7 @@
     <TargetName>libvrinputemulator</TargetName>
   </PropertyGroup>
   <PropertyGroup>
-    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\..\openvr</OPENVR_ROOT>
+    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\openvr</OPENVR_ROOT>
     <BOOST_ROOT>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0</BOOST_ROOT>
     <BOOST_LIB>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0\lib64-msvc-14.0</BOOST_LIB>
   </PropertyGroup>
@@ -117,7 +121,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_72_0;.\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>

@@ -6,35 +6,33 @@
 #include <map>
 
 
-namespace vrinputemulator {
-namespace driver {
+namespace vrinputemulator
+{
+	namespace driver
+	{
+		// forward declarations
+		class ServerDriver;
 
-// forward declarations
-class ServerDriver;
+		class IVRDriverContextHooks : public InterfaceHooks
+		{
+		public:
+			typedef void* (*getGenericInterface_t)(vr::IVRDriverContext*, const char* pchInterfaceVersion, vr::EVRInitError* peError);
 
+			static std::shared_ptr<InterfaceHooks> getInterfaceHook(std::string interfaceVersion);
 
-class IVRDriverContextHooks : public InterfaceHooks {
-public:
-	typedef void*(*getGenericInterface_t)(vr::IVRDriverContext*, const char *pchInterfaceVersion, vr::EVRInitError *peError);
+			static std::shared_ptr<InterfaceHooks> createHooks(void* iptr);
+			virtual ~IVRDriverContextHooks();
 
-	static std::shared_ptr<InterfaceHooks> getInterfaceHook(std::string interfaceVersion);
+		private:
+			bool _isHooked = false;
 
-	static std::shared_ptr<InterfaceHooks> createHooks(void* iptr);
-	virtual ~IVRDriverContextHooks();
+			IVRDriverContextHooks(void* iptr);
 
-private:
-	bool _isHooked = false;
+			static HookData<getGenericInterface_t> getGenericInterfaceHook;
 
-	IVRDriverContextHooks(void* iptr);
+			static std::map<std::string, std::shared_ptr<InterfaceHooks>> _hookedInterfaces;
+			static void* _getGenericInterface(vr::IVRDriverContext*, const char* pchInterfaceVersion, vr::EVRInitError* peError);
 
-	static HookData<getGenericInterface_t> getGenericInterfaceHook;
-
-	static std::map<std::string, std::shared_ptr<InterfaceHooks>> _hookedInterfaces;
-	static void* _getGenericInterface(vr::IVRDriverContext*, const char *pchInterfaceVersion, vr::EVRInitError *peError);
-
-};
-
+		};
+	}
 }
-}
-
-
