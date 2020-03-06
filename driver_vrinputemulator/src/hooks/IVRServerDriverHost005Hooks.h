@@ -5,32 +5,32 @@
 #include <openvr_driver.h>
 
 
-namespace vrinputemulator {
-namespace driver {
+namespace vrinputemulator
+{
+	namespace driver
+	{
+		class IVRServerDriverHost005Hooks : public InterfaceHooks
+		{
+		public:
+			typedef bool(*trackedDeviceAdded_t)(void*, const char*, vr::ETrackedDeviceClass, void*);
+			typedef void(*trackedDevicePoseUpdated_t)(void*, uint32_t, const vr::DriverPose_t&, uint32_t);
 
+			static std::shared_ptr<InterfaceHooks> createHooks(void* iptr);
+			virtual ~IVRServerDriverHost005Hooks();
 
-class IVRServerDriverHost005Hooks : public InterfaceHooks {
-public:
-	typedef bool(*trackedDeviceAdded_t)(void*, const char*, vr::ETrackedDeviceClass, void*);
-	typedef void(*trackedDevicePoseUpdated_t)(void*, uint32_t, const vr::DriverPose_t&, uint32_t);
+			static void trackedDevicePoseUpdatedOrig(void* _this, uint32_t unWhichDevice, const vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
 
-	static std::shared_ptr<InterfaceHooks> createHooks(void* iptr);
-	virtual ~IVRServerDriverHost005Hooks();
+		private:
+			bool _isHooked = false;
 
-	static void trackedDevicePoseUpdatedOrig(void* _this, uint32_t unWhichDevice, const vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
+			IVRServerDriverHost005Hooks(void* iptr);
 
-private:
-	bool _isHooked = false;
+			static HookData<trackedDeviceAdded_t> trackedDeviceAddedHook;
+			static HookData<trackedDevicePoseUpdated_t> trackedDevicePoseUpdatedHook;
 
-	IVRServerDriverHost005Hooks(void* iptr);
+			static bool _trackedDeviceAdded(void* _this, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass eDeviceClass, void* pDriver);
+			static void _trackedDevicePoseUpdated(void* _this, uint32_t unWhichDevice, const vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
 
-	static HookData<trackedDeviceAdded_t> trackedDeviceAddedHook;
-	static HookData<trackedDevicePoseUpdated_t> trackedDevicePoseUpdatedHook;
-
-	static bool _trackedDeviceAdded(void* _this, const char *pchDeviceSerialNumber, vr::ETrackedDeviceClass eDeviceClass, void *pDriver);
-	static void _trackedDevicePoseUpdated(void* _this, uint32_t unWhichDevice, const vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
-
-};
-
-}
+		};
+	}
 }

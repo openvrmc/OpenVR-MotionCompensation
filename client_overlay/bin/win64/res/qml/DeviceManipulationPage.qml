@@ -74,19 +74,15 @@ MyStackViewPage {
             if (okClicked) {
                 if (deviceManipulationNewProfileName.text == "") {
                     deviceManipulationMessageDialog.showMessage("Create New Profile", "ERROR: Empty profile name.")
-                } else if (!includeDeviceOffsetsToggle.checked && !includeInputRemapping.checked) {
-                    deviceManipulationMessageDialog.showMessage("Create New Profile", "ERROR: Nothing to include selected.")
                 } else {
                     DeviceManipulationTabController.addDeviceManipulationProfile(deviceManipulationNewProfileName.text, deviceIndex,
-                        includeDeviceOffsetsToggle.checked, includeInputRemapping.checked)
+                        false, false)
                 }
 
             }
         }
         function openPopup(device) {
             deviceManipulationNewProfileName.text = ""
-            includeDeviceOffsetsToggle.checked = false
-            includeInputRemapping.checked = false
             deviceIndex = device
             open()
         }
