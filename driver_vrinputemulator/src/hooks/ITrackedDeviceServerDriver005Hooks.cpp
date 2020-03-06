@@ -6,9 +6,8 @@
 namespace vrinputemulator
 {
 	namespace driver
-	{		
+	{
 		std::map<void*, ITrackedDeviceServerDriver005Hooks::_hookedAdressMapEntry<ITrackedDeviceServerDriver005Hooks::activate_t>> ITrackedDeviceServerDriver005Hooks::_hookedActivateAdressMap;
-
 
 		ITrackedDeviceServerDriver005Hooks::ITrackedDeviceServerDriver005Hooks(void* iptr)
 		{

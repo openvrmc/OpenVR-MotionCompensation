@@ -93,5 +93,6 @@ namespace vrinputemulator
 			unsigned _dataStart = 0;
 			unsigned _dataSize = 0;
 		};
+
 	}
 }

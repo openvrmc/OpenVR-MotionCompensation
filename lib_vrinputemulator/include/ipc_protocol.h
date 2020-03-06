@@ -97,26 +97,28 @@ namespace vrinputemulator
 			uint32_t deviceId;
 		};
 
+		struct Request_DeviceManipulation_DefaultMode
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+			uint32_t MCdeviceId;		// Motion compensated device ID
+			uint32_t RTdeviceId;		// Reference tracker device ID
+		};
+
 		struct Request_DeviceManipulation_MotionCompensationMode
 		{
 			uint32_t clientId;
-			uint32_t messageId; // Used to associate with Reply
-			uint32_t deviceId;
-			MotionCompensationVelAccMode velAccCompensationMode;
+			uint32_t messageId;			// Used to associate with Reply
+			uint32_t MCdeviceId;		// Motion compensated device ID
+			uint32_t RTdeviceId;		// Reference tracker device ID
+			MotionCompensationMode CompensationMode;
 		};
 
 		struct Request_DeviceManipulation_SetMotionCompensationProperties
 		{
 			uint32_t clientId;
 			uint32_t messageId; // Used to associate with Reply
-			bool velAccCompensationModeValid;
-			MotionCompensationVelAccMode velAccCompensationMode;
-			bool kalmanFilterProcessNoiseValid;
-			double kalmanFilterProcessNoise;
-			bool kalmanFilterObservationNoiseValid;
-			double kalmanFilterObservationNoise;
-			bool movingAverageWindowValid;
-			unsigned movingAverageWindow;
+			double LPFBeta;
 		};
 
 		struct Request
@@ -148,6 +150,7 @@ namespace vrinputemulator
 				Request_OpenVR_GenericClientMessage ovr_GenericClientMessage;
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
+				Request_DeviceManipulation_DefaultMode dm_DefaultMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
 				MsgUnion()
 				{
@@ -170,8 +173,7 @@ namespace vrinputemulator
 		{
 			uint32_t deviceId;
 			vr::ETrackedDeviceClass deviceClass;
-			int deviceMode;
-			uint32_t refDeviceId;
+			MotionCompensationDeviceMode deviceMode;
 		};
 
 		struct Reply

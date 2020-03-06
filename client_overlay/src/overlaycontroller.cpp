@@ -47,7 +47,6 @@ namespace inputemulator
 		{ 36, "Axis4" },
 	};
 
-
 	std::vector<std::pair<std::string, WORD>> OverlayController::_keyboardVirtualCodes = {
 		{ "<None>", 0x00 },
 		/*{ "Left Mouse Button", VK_LBUTTON },
@@ -173,7 +172,6 @@ namespace inputemulator
 		{ ".", VK_OEM_PERIOD },
 	};
 
-
 	/* These key codes have different meaning depending on the active keyboard layout, or may not exist at all */
 	std::vector<WORD> OverlayController::_keyboardVaryingVirtualCodes = {
 		VK_OEM_1,
@@ -187,7 +185,6 @@ namespace inputemulator
 		VK_OEM_102,
 	};
 
-
 	std::unique_ptr<OverlayController> OverlayController::singleton;
 
 	QSettings* OverlayController::_appSettings = nullptr;
@@ -199,7 +196,7 @@ namespace inputemulator
 
 	void OverlayController::Init(QQmlEngine* qmlEngine)
 	{
-// Loading the OpenVR Runtime
+		// Loading the OpenVR Runtime
 		auto initError = vr::VRInitError_None;
 		vr::VR_Init(&initError, vr::VRApplication_Overlay);
 		if (initError != vr::VRInitError_None)
@@ -376,7 +373,6 @@ namespace inputemulator
 		m_pOffscreenSurface.reset();
 	}
 
-
 	void OverlayController::SetWidget(QQuickItem* quickItem, const std::string& name, const std::string& key)
 	{
 		if (!desktopMode)
@@ -449,7 +445,6 @@ namespace inputemulator
 		deviceManipulationTabController.initStage2(this, m_pWindow.get());
 	}
 
-
 	void OverlayController::OnRenderRequest()
 	{
 		if (m_pRenderTimer && !m_pRenderTimer->isActive())
@@ -457,12 +452,12 @@ namespace inputemulator
 			m_pRenderTimer->start();
 		}
 	}
-
+	
 	void OverlayController::renderOverlay()
 	{
 		if (!desktopMode)
 		{
-// skip rendering if the overlay isn't visible
+			// skip rendering if the overlay isn't visible
 			if (!vr::VROverlay() || !vr::VROverlay()->IsOverlayVisible(m_ulOverlayHandle) && !vr::VROverlay()->IsOverlayVisible(m_ulOverlayThumbnailHandle))
 				return;
 			m_pRenderControl->polishItems();
@@ -483,8 +478,7 @@ namespace inputemulator
 			m_pOpenGLContext->functions()->glFlush(); // We need to flush otherwise the texture may be empty.*/
 		}
 	}
-
-
+	
 	bool OverlayController::getOverlayTexture(vr::Texture_t& texture)
 	{
 		GLuint unTexture = m_pFbo->texture();
@@ -503,7 +497,6 @@ namespace inputemulator
 			return false;
 		}
 	}
-
 
 	void OverlayController::OnTimeoutPumpEvents()
 	{
@@ -550,7 +543,7 @@ namespace inputemulator
 
 			case vr::VREvent_ScrollSmooth:
 			{
-// Wheel speed is defined as 1/8 of a degree
+				// Wheel speed is defined as 1/8 of a degree
 				QWheelEvent wheelEvent(m_ptLastMouse, m_pWindow->mapToGlobal(m_ptLastMouse), QPoint(),
 									   QPoint(vrEvent.data.scroll.xdelta * 360.0f * 8.0f, vrEvent.data.scroll.ydelta * 360.0f * 8.0f),
 									   0, Qt::Vertical, m_lastMouseButtons, 0);
@@ -627,12 +620,10 @@ namespace inputemulator
 		return QString(applicationVersionString);
 	}
 
-
 	QUrl OverlayController::getVRRuntimePathUrl()
 	{
 		return m_runtimePathUrl;
 	}
-
 
 	bool OverlayController::soundDisabled()
 	{
@@ -644,24 +635,20 @@ namespace inputemulator
 		return m_uniqueNumber.fetch_add(1);
 	}
 
-
 	const vr::VROverlayHandle_t& OverlayController::overlayHandle()
 	{
 		return m_ulOverlayHandle;
 	}
-
 
 	const vr::VROverlayHandle_t& OverlayController::overlayThumbnailHandle()
 	{
 		return m_ulOverlayThumbnailHandle;
 	}
 
-
 	void OverlayController::showKeyboard(QString existingText, unsigned long userValue)
 	{
 		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Input Emulator Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
 	}
-
 
 	void OverlayController::playActivationSound()
 	{
@@ -670,7 +657,6 @@ namespace inputemulator
 			activationSoundEffect.play();
 		}
 	}
-
 
 	void OverlayController::playFocusChangedSound()
 	{

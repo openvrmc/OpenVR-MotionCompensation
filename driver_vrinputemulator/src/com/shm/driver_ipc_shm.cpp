@@ -34,6 +34,7 @@ namespace vrinputemulator
 			{
 				ipc::Reply resp(ipc::ReplyType::GenericReply);
 				resp.messageId = _setMotionCompensationMessageId;
+
 				if (success)
 				{
 					resp.status = ipc::ReplyStatus::Ok;
@@ -42,6 +43,7 @@ namespace vrinputemulator
 				{
 					resp.status = ipc::ReplyStatus::NotTracking;
 				}
+
 				sendReply(_setMotionCompensationClientId, resp);
 			}
 			_setMotionCompensationMessageId = 0;
@@ -151,10 +153,11 @@ namespace vrinputemulator
 								}
 								break;
 
-								case ipc::RequestType::DeviceManipulation_DefaultMode:
+								case ipc::RequestType::DeviceManipulation_GetDeviceInfo:
 								{
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
 									resp.messageId = message.msg.ovr_GenericDeviceIdMessage.messageId;
+
 									if (message.msg.ovr_GenericDeviceIdMessage.deviceId >= vr::k_unMaxTrackedDeviceCount)
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
@@ -168,15 +171,18 @@ namespace vrinputemulator
 										}
 										else
 										{
-											info->setDefaultMode();
 											resp.status = ipc::ReplyStatus::Ok;
+											resp.msg.dm_deviceInfo.deviceId = message.msg.ovr_GenericDeviceIdMessage.deviceId;
+											resp.msg.dm_deviceInfo.deviceMode = info->getDeviceMode();
+											resp.msg.dm_deviceInfo.deviceClass = info->deviceClass();
 										}
-										LOG(INFO) << "Setting driver into default mode";
 									}
+
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
-										LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
+										LOG(ERROR) << "Error while getting device info: Error code " << (int)resp.status;
 									}
+
 									if (resp.messageId != 0)
 									{
 										_this->sendReply(message.msg.ovr_GenericDeviceIdMessage.clientId, resp);
@@ -184,31 +190,93 @@ namespace vrinputemulator
 								}
 								break;
 
-								case ipc::RequestType::DeviceManipulation_MotionCompensationMode:
+								case ipc::RequestType::DeviceManipulation_DefaultMode:
 								{
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
-									resp.messageId = message.msg.dm_MotionCompensationMode.messageId;
-									if (message.msg.dm_MotionCompensationMode.deviceId >= vr::k_unMaxTrackedDeviceCount)
+									resp.messageId = message.msg.dm_DefaultMode.messageId;
+
+									if (message.msg.dm_DefaultMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount && message.msg.dm_DefaultMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
 									}
 									else
 									{
-										DeviceManipulationHandle* info = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.deviceId);
-										if (!info)
+										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(message.msg.dm_DefaultMode.MCdeviceId);
+										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(message.msg.dm_DefaultMode.RTdeviceId);
+
+										if (!MCdevice || !RTdevice)
 										{
 											resp.status = ipc::ReplyStatus::NotFound;
 										}
 										else
 										{
 											auto serverDriver = ServerDriver::getInstance();
+
+											if (serverDriver)
+											{
+												LOG(INFO) << "Setting driver into default mode";
+
+												MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+												RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+
+												//Reset and set some vars for every device
+												serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled);
+
+												resp.status = ipc::ReplyStatus::Ok;
+											}
+											else
+											{
+												resp.status = ipc::ReplyStatus::UnknownError;
+											}
+										}										
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dm_DefaultMode.clientId, resp);
+									}
+								}
+								break;
+
+								case ipc::RequestType::DeviceManipulation_MotionCompensationMode:
+								{
+									//Create reply message
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dm_MotionCompensationMode.messageId;
+
+									if (message.msg.dm_MotionCompensationMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount && message.msg.dm_MotionCompensationMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
+									{
+										resp.status = ipc::ReplyStatus::InvalidId;
+									}
+									else
+									{
+										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.MCdeviceId);
+										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.RTdeviceId);
+
+										if (!MCdevice || !RTdevice)
+										{
+											resp.status = ipc::ReplyStatus::NotFound;
+										}
+										else
+										{
+											auto serverDriver = ServerDriver::getInstance();
+
 											if (serverDriver)
 											{
 												LOG(INFO) << "Setting driver into motion compensation mode";
-												serverDriver->motionCompensation().setMotionCompensationVelAccMode(message.msg.dm_MotionCompensationMode.velAccCompensationMode);
-												info->setMotionCompensationMode();
-												_this->_setMotionCompensationMessageId = message.msg.dm_MotionCompensationMode.messageId;
-												_this->_setMotionCompensationClientId = message.msg.dm_MotionCompensationMode.clientId;
+												
+												//Activate motion compensation mode for specified device
+												MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+												RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+
+												//Reset and set some vars for every device
+												serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker);
+
 												resp.status = ipc::ReplyStatus::Ok;
 											}
 											else
@@ -217,11 +285,13 @@ namespace vrinputemulator
 											}
 										}
 									}
+
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
 									}
-									if (resp.messageId != 0 && resp.status != ipc::ReplyStatus::Ok)
+
+									if (resp.messageId != 0/* && resp.status != ipc::ReplyStatus::Ok*/)
 									{
 										_this->sendReply(message.msg.dm_MotionCompensationMode.clientId, resp);
 									}
@@ -235,33 +305,21 @@ namespace vrinputemulator
 									auto serverDriver = ServerDriver::getInstance();
 									if (serverDriver)
 									{
-										LOG(INFO) << "Setting driver motion compensation properties";
-										if (message.msg.dm_SetMotionCompensationProperties.velAccCompensationModeValid)
-										{
-											serverDriver->motionCompensation().setMotionCompensationVelAccMode(message.msg.dm_SetMotionCompensationProperties.velAccCompensationMode);
-										}
-										if (message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoiseValid)
-										{
-											serverDriver->motionCompensation().setMotionCompensationKalmanProcessVariance(message.msg.dm_SetMotionCompensationProperties.kalmanFilterProcessNoise);
-										}
-										if (message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoiseValid)
-										{
-											serverDriver->motionCompensation().setMotionCompensationKalmanObservationVariance(message.msg.dm_SetMotionCompensationProperties.kalmanFilterObservationNoise);
-										}
-										if (message.msg.dm_SetMotionCompensationProperties.movingAverageWindowValid)
-										{
-											serverDriver->motionCompensation().setMotionCompensationMovingAverageWindow(message.msg.dm_SetMotionCompensationProperties.movingAverageWindow);
-										}
+										LOG(INFO) << "Setting driver motion compensation properties: LPF_Beta = " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
+										serverDriver->motionCompensation().setLPFBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
+
 										resp.status = ipc::ReplyStatus::Ok;
 									}
 									else
 									{
 										resp.status = ipc::ReplyStatus::UnknownError;
 									}
+
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while setting motion compensation properties: Error code " << (int)resp.status;
 									}
+
 									if (resp.messageId != 0)
 									{
 										_this->sendReply(message.msg.dm_SetMotionCompensationProperties.clientId, resp);
@@ -294,7 +352,6 @@ namespace vrinputemulator
 			_this->_ipcThreadRunning = false;
 			LOG(DEBUG) << "CServerDriver::_ipcThreadFunc: thread stopped";
 		}
-
 
 		void IpcShmCommunicator::sendReply(uint32_t clientId, const ipc::Reply& reply)
 		{

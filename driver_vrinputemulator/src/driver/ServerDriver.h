@@ -11,13 +11,11 @@
 #include "../com/shm/driver_ipc_shm.h"
 #include "../devicemanipulation/MotionCompensationManager.h"
 
-
-
 // driver namespace
 namespace vrinputemulator
 {
 	namespace driver
-	{
+	{		
 		// forward declarations
 		class ServerDriver;
 		class InterfaceHooks;
@@ -70,9 +68,7 @@ namespace vrinputemulator
 			{
 			}
 
-
-			  //// self ////
-
+			 //// self ////
 			static ServerDriver* getInstance()
 			{
 				return singleton;
@@ -126,11 +122,17 @@ namespace vrinputemulator
 			void addDriverEventForInjection(void* serverDriverHost, std::shared_ptr<void> event, uint32_t size);
 			std::pair<std::shared_ptr<void>, uint32_t> getDriverEventForInjection(void* serverDriverHost);
 
+			int LogDelayCounter_1 = 0;
+			int LogDelayCounter_2 = 0;
 
+			bool LogEnable_1 = false;
+			bool LogEnable_2 = false;
+			bool LogEnable_3 = false;
+			bool LogEnable_4 = false;
 		private:
 			static ServerDriver* singleton;
 
-			static std::string installDir;
+			static std::string installDir;			
 
 			//// virtual devices related ////
 			std::recursive_mutex _virtualDevicesMutex;
@@ -165,7 +167,5 @@ namespace vrinputemulator
 			std::string _propertiesOverrideHmdTrackingSystem;
 			bool _propertiesOverrideGenericTrackerFakeController;
 		};
-
-
 	} // end namespace driver
 } // end namespace vrinputemulator

@@ -117,10 +117,8 @@ void removeManifest()
 	}
 }
 
-
 int main(int argc, char* argv[])
 {
-
 	bool desktopMode = false;
 	bool noSound = false;
 	bool noManifest = false;
@@ -142,7 +140,7 @@ int main(int argc, char* argv[])
 		}
 		else if (std::string(argv[i]).compare("-installmanifest") == 0)
 		{
-			std::this_thread::sleep_for(std::chrono::seconds(1)); // When we don't wait here we get might an ipc error during installation
+			std::this_thread::sleep_for(std::chrono::seconds(1)); // When we don't wait here we get an ipc error during installation
 			int exitcode = 0;
 			QCoreApplication coreApp(argc, argv);
 			auto initError = vr::VRInitError_None;
@@ -264,6 +262,8 @@ int main(int argc, char* argv[])
 		}
 		conf.setRemainingToDefault();
 		el::Loggers::reconfigureAllLoggers(conf);
+
+		LOG(INFO) << "|========================================================================================|";
 		LOG(INFO) << "Application started";
 		LOG(INFO) << "Log Config: " << QDir::toNativeSeparators(logconfigfile).toStdString();
 		if (!logFilePath.isEmpty())

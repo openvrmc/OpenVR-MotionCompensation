@@ -8,7 +8,6 @@ namespace vrinputemulator
 		HookData<IVRDriverContextHooks::getGenericInterface_t> IVRDriverContextHooks::getGenericInterfaceHook;
 		std::map<std::string, std::shared_ptr<InterfaceHooks>> IVRDriverContextHooks::_hookedInterfaces;
 
-
 		IVRDriverContextHooks::IVRDriverContextHooks(void* iptr)
 		{
 			if (!_isHooked)

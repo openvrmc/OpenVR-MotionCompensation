@@ -1,8 +1,12 @@
+#include <boost/asio.hpp>
+
 #include "ServerDriver.h"
+
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include "VirtualDeviceDriver.h"
 #include "../devicemanipulation/DeviceManipulationHandle.h"
+
 
 namespace vrinputemulator
 {
@@ -11,19 +15,16 @@ namespace vrinputemulator
 		ServerDriver* ServerDriver::singleton = nullptr;
 		std::string ServerDriver::installDir;
 
-
 		ServerDriver::ServerDriver() : m_motionCompensation(this)
 		{
 			singleton = this;
 			memset(_openvrIdToDeviceManipulationHandleMap, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
 		}
 
-
 		ServerDriver::~ServerDriver()
 		{
 			LOG(TRACE) << "CServerDriver::~CServerDriver_InputEmulator()";
 		}
-
 
 		bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize)
 		{
@@ -31,6 +32,7 @@ namespace vrinputemulator
 			{
 				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
 			}
+
 			return true;
 		}
 
@@ -45,15 +47,14 @@ namespace vrinputemulator
 		void ServerDriver::hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass& eDeviceClass, void* pDriver)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceAdded(" << serverDriverHost << ", " << version << ", " << pchDeviceSerialNumber << ", " << (int)eDeviceClass << ", " << pDriver << ")";
-
 			LOG(INFO) << "Found device " << pchDeviceSerialNumber << " (deviceClass: " << (int)eDeviceClass << ")";
 
 			// Device Class Override
-			if (eDeviceClass == vr::TrackedDeviceClass_GenericTracker && _propertiesOverrideGenericTrackerFakeController)
+			/*if (eDeviceClass == vr::TrackedDeviceClass_GenericTracker && _propertiesOverrideGenericTrackerFakeController)
 			{
 				eDeviceClass = vr::TrackedDeviceClass_Controller;
 				LOG(INFO) << "Disguised GenericTracker " << pchDeviceSerialNumber << " as Controller.";
-			}
+			}*/
 
 			// Create ManipulationInfo entry
 			auto handle = std::make_shared<DeviceManipulationHandle>(pchDeviceSerialNumber, eDeviceClass, pDriver, serverDriverHost, version);
@@ -61,14 +62,15 @@ namespace vrinputemulator
 
 			// Hook into server driver interface
 			handle->setServerDriverHooks(InterfaceHooks::hookInterface(pDriver, "ITrackedDeviceServerDriver_005"));
-
 		}
-
 
 		void ServerDriver::hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceActivated(" << serverDriver << ", " << version << ", " << unObjectId << ")";
+			
+			//Search for the activated device
 			auto i = _deviceManipulationHandles.find(serverDriver);
+
 			if (i != _deviceManipulationHandles.end())
 			{
 				auto handle = i->second;
@@ -83,7 +85,6 @@ namespace vrinputemulator
 				LOG(INFO) << "Successfully added device " << handle->serialNumber() << " (OpenVR Id: " << handle->openvrId() << ")";
 			}
 		}
-
 
 		std::string _propertyValueToString(void* pvBuffer, uint32_t unBufferSize, vr::PropertyTypeTag_t unTag)
 		{
@@ -132,10 +133,9 @@ namespace vrinputemulator
 		{
 		}
 
-
 		void ServerDriver::hooksPropertiesWritePropertyBatch(void* properties, int version, vr::PropertyContainerHandle_t ulContainer, void* pBatch, uint32_t unBatchEntryCount)
 		{
-			//LOG(TRACE) << "ServerDriver::hooksPropertiesWritePropertyBatch(" << properties << ", " << (uint64_t)ulContainer << ", " << (void*)pBatch << ", " << unBatchEntryCount << ")";
+//LOG(TRACE) << "ServerDriver::hooksPropertiesWritePropertyBatch(" << properties << ", " << (uint64_t)ulContainer << ", " << (void*)pBatch << ", " << unBatchEntryCount << ")";
 			uint32_t deviceId = vr::k_unTrackedDeviceIndexInvalid;
 			DeviceManipulationHandle* deviceHandle = nullptr;
 			auto entryIt = _propertyContainerToDeviceManipulationHandleMap.find(ulContainer);
@@ -183,7 +183,7 @@ namespace vrinputemulator
 
 		vr::EVRInitError ServerDriver::Init(vr::IVRDriverContext* pDriverContext)
 		{
-			LOG(TRACE) << "CServerDriver::Init()";
+			LOG(INFO) << "CServerDriver::Init()";
 
 			// Initialize Hooking
 			InterfaceHooks::setServerDriver(this);
@@ -213,38 +213,41 @@ namespace vrinputemulator
 			}
 
 			// Read vrsettings
-			char buffer[vr::k_unMaxPropertyStringSize];
+			/*char buffer[vr::k_unMaxPropertyStringSize];
 			vr::EVRSettingsError peError;
+
 			vr::VRSettings()->GetString(vrsettings_SectionName, vrsettings_overrideHmdManufacturer_string, buffer, vr::k_unMaxPropertyStringSize, &peError);
 			if (peError == vr::VRSettingsError_None)
 			{
 				_propertiesOverrideHmdManufacturer = buffer;
 				LOG(INFO) << vrsettings_SectionName << "::" << vrsettings_overrideHmdManufacturer_string << " = " << _propertiesOverrideHmdManufacturer;
 			}
+
 			vr::VRSettings()->GetString(vrsettings_SectionName, vrsettings_overrideHmdModel_string, buffer, vr::k_unMaxPropertyStringSize, &peError);
 			if (peError == vr::VRSettingsError_None)
 			{
 				_propertiesOverrideHmdModel = buffer;
 				LOG(INFO) << vrsettings_SectionName << "::" << vrsettings_overrideHmdModel_string << " = " << _propertiesOverrideHmdModel;
 			}
+
 			vr::VRSettings()->GetString(vrsettings_SectionName, vrsettings_overrideHmdTrackingSystem_string, buffer, vr::k_unMaxPropertyStringSize, &peError);
 			if (peError == vr::VRSettingsError_None)
 			{
 				_propertiesOverrideHmdTrackingSystem = buffer;
 				LOG(INFO) << vrsettings_SectionName << "::" << vrsettings_overrideHmdTrackingSystem_string << " = " << _propertiesOverrideHmdTrackingSystem;
 			}
+
 			auto boolVal = vr::VRSettings()->GetBool(vrsettings_SectionName, vrsettings_genericTrackerFakeController_bool, &peError);
 			if (peError == vr::VRSettingsError_None)
 			{
 				_propertiesOverrideGenericTrackerFakeController = boolVal;
 				LOG(INFO) << vrsettings_SectionName << "::" << vrsettings_genericTrackerFakeController_bool << " = " << boolVal;
-			}
+			}*/
 
 			// Start IPC thread
 			shmCommunicator.init(this);
 			return vr::VRInitError_None;
 		}
-
 
 		void ServerDriver::Cleanup()
 		{
@@ -255,15 +258,14 @@ namespace vrinputemulator
 			VR_CLEANUP_SERVER_DRIVER_CONTEXT();
 		}
 
-
 		// Call frequency: ~93Hz
 		void ServerDriver::RunFrame()
 		{
-			for (auto d : _deviceManipulationHandles)
+			/*for (auto d : _deviceManipulationHandles)
 			{
 				d.second->RunFrame();
-			}
-			m_motionCompensation.runFrame();
+			}*/
+			//m_motionCompensation.runFrame();
 		}
 
 		void ServerDriver::_trackedDeviceActivated(uint32_t deviceId, VirtualDeviceDriver* device)
@@ -306,14 +308,17 @@ namespace vrinputemulator
 
 		DeviceManipulationHandle* ServerDriver::getDeviceManipulationHandleById(uint32_t unWhichDevice)
 		{
+			LOG(TRACE) << "getDeviceByID: unWhichDevice: " << unWhichDevice;
+
 			std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
+
 			if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid())
 			{
 				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice];
 			}
+
 			return nullptr;
 		}
-
 
 		DeviceManipulationHandle* ServerDriver::getDeviceManipulationHandleByPropertyContainer(vr::PropertyContainerHandle_t container)
 		{
@@ -326,12 +331,10 @@ namespace vrinputemulator
 			return nullptr;
 		}
 
-
 		void ServerDriver::sendReplySetMotionCompensationMode(bool success)
 		{
 			shmCommunicator.sendReplySetMotionCompensationMode(success);
 		}
-
 
 		void ServerDriver::addDriverEventForInjection(void* serverDriverHost, std::shared_ptr<void> event, uint32_t size)
 		{
@@ -354,7 +357,6 @@ namespace vrinputemulator
 			}
 			return std::pair<std::shared_ptr<void>, uint32_t>({ std::shared_ptr<void>(), 0 });
 		}
-
 
 	} // end namespace driver
 } // end namespace vrinputemulator

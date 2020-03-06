@@ -152,11 +152,9 @@ namespace vrinputemulator
 		void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);
 		void setDeviceNormalMode(uint32_t deviceId, bool modal = true);
 
-		void setDeviceMotionCompensationMode(uint32_t deviceId, MotionCompensationVelAccMode velAccMode = MotionCompensationVelAccMode::Disabled, bool modal = true);
-		void setMotionVelAccCompensationMode(MotionCompensationVelAccMode velAccMode, bool modal = true);
-		void setMotionCompensationKalmanProcessNoise(double variance, bool modal = true);
-		void setMotionCompensationKalmanObservationNoise(double variance, bool modal = true);
-		void setMotionCompensationMovingAverageWindow(unsigned window, bool modal = true);
+		void setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode = MotionCompensationMode::Disabled, bool modal = true);
+
+		void setLPFBeta(double value, bool modal = true);
 
 	private:
 		std::recursive_mutex _mutex;
@@ -169,6 +167,7 @@ namespace vrinputemulator
 
 		std::random_device _ipcRandomDevice;
 		std::uniform_int_distribution<uint32_t> _ipcRandomDist;
+
 		struct _ipcPromiseMapEntry
 		{
 			_ipcPromiseMapEntry() : isValid(false)
@@ -181,12 +180,12 @@ namespace vrinputemulator
 			bool isValid;
 			std::promise<ipc::Reply> promise;
 		};
+
 		std::map<uint32_t, _ipcPromiseMapEntry> _ipcPromiseMap;
 		std::string _ipcServerQueueName;
 		std::string _ipcClientQueueName;
 		boost::interprocess::message_queue* _ipcServerQueue = nullptr;
 		boost::interprocess::message_queue* _ipcClientQueue = nullptr;
-
 	};
 
 } // end namespace vrinputemulator

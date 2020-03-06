@@ -36,7 +36,6 @@ namespace vrinputemulator
 			return vr::VRInitError_None;
 		}
 
-
 		void VirtualDeviceDriver::Deactivate()
 		{
 			LOG(TRACE) << "VirtualDeviceDriver[" << m_serialNumber << "]::Deactivate()";
@@ -70,7 +69,6 @@ namespace vrinputemulator
 			LOG(TRACE) << "VirtualDeviceDriver[" << m_serialNumber << "]::GetPose()";
 			return m_pose;
 		}
-
 
 		void VirtualDeviceDriver::updatePose(const vr::DriverPose_t& newPose, double timeOffset, bool notify)
 		{
@@ -146,11 +144,11 @@ namespace vrinputemulator
 		{
 			return vr::EVRInputError::VRInputError_None;
 		}
+		
 		vr::EVRInputError VirtualDeviceDriver::UpdateSkeletonComponent(vr::VRInputComponentHandle_t ulComponent, vr::EVRSkeletalMotionRange eMotionRange, const vr::VRBoneTransform_t* pTransforms, uint32_t unTransformCount)
 		{
 			return vr::EVRInputError::VRInputError_None;
 		}
-
 
 	} // end namespace driver
 } // end namespace vrinputemulator

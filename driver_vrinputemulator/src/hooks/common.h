@@ -19,7 +19,7 @@ namespace vrinputemulator
 	namespace driver
 	{
 
-	#define CREATE_MH_HOOK(detourInfo, detourFunc, logName, objPtr, vtableOffset) {\
+		#define CREATE_MH_HOOK(detourInfo, detourFunc, logName, objPtr, vtableOffset) {\
 		detourInfo.targetFunc = (*((void***)objPtr))[vtableOffset]; \
 		MH_STATUS mhError = MH_CreateHook(detourInfo.targetFunc, (void*)&detourFunc, reinterpret_cast<LPVOID*>(&detourInfo.origFunc)); \
 		if (mhError == MH_OK) { \
@@ -37,7 +37,7 @@ namespace vrinputemulator
 	}
 
 
-	#define REMOVE_MH_HOOK(detourInfo) {\
+		#define REMOVE_MH_HOOK(detourInfo) {\
 		if (detourInfo.enabled) { \
 			MH_RemoveHook(detourInfo.targetFunc); \
 			detourInfo.enabled = false; \

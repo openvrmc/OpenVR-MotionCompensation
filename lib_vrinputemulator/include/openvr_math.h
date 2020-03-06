@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-
 inline vr::HmdQuaternion_t operator+(const vr::HmdQuaternion_t& lhs, const vr::HmdQuaternion_t& rhs)
 {
 	return {

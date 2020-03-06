@@ -33,6 +33,7 @@ MyStackViewPage {
 
             MyComboBox {
                 id: deviceRenderModelComboBox
+                editable: true
                 Layout.maximumWidth: 910
                 Layout.minimumWidth: 910
                 Layout.preferredWidth: 910

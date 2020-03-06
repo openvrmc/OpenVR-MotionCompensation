@@ -9,8 +9,7 @@ class QQuickWindow;
 // application namespace
 namespace inputemulator
 {
-
-// forward declaration
+	// forward declaration
 	class OverlayController;
 
 	struct DeviceManipulationProfile
@@ -20,20 +19,18 @@ namespace inputemulator
 		int motionCompensationMode = 0;
 	};
 
-
 	struct DeviceInfo
 	{
 		std::string serial;
 		vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 		uint32_t openvrId = 0;
-		int deviceStatus = 0; // 0 .. Normal, 1 .. Disconnected/Suspended
-		int deviceMode = 0; // 0 .. Default, 1 .. Motion Compensation
+		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
+		int deviceMode = 0;						// 0: Default, 1: Motion Compensation
 		uint32_t refDeviceId = 0;
 		uint32_t renderModelIndex = 0;
 		vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
 		std::string renderModelOverlayName;
 	};
-
 
 	class DeviceManipulationTabController : public QObject
 	{
@@ -48,7 +45,7 @@ namespace inputemulator
 
 		std::vector<DeviceManipulationProfile> deviceManipulationProfiles;
 
-		vrinputemulator::MotionCompensationVelAccMode motionCompensationVelAccMode = vrinputemulator::MotionCompensationVelAccMode::Disabled;
+		vrinputemulator::MotionCompensationMode motionCompensationMode = vrinputemulator::MotionCompensationMode::Disabled;
 		double motionCompensationKalmanProcessNoise = 0.1;
 		double motionCompensationKalmanObservationNoise = 0.1;
 		unsigned motionCompensationMovingAverageWindow = 3;
@@ -86,25 +83,16 @@ namespace inputemulator
 		Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
 		Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);
 
-		Q_INVOKABLE unsigned getRenderModelCount();
-		Q_INVOKABLE QString getRenderModelName(unsigned index);
 		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
 
-		Q_INVOKABLE bool setDeviceMode(unsigned index, unsigned mode, unsigned targedIndex, bool notify = true);
+		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
+		Q_INVOKABLE bool setLPFBeta(double value);
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
-
 	public slots:
-		void setDeviceRenderModel(unsigned deviceIndex, unsigned renderModelIndex);
-
 		void addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping);
 		void applyDeviceManipulationProfile(unsigned index, unsigned deviceIndex);
 		void deleteDeviceManipulationProfile(unsigned index);
-
-		void setMotionCompensationVelAccMode(unsigned mode, bool notify = true);
-		void setMotionCompensationKalmanProcessNoise(double variance, bool notify = true);
-		void setMotionCompensationKalmanObservationNoise(double variance, bool notify = true);
-		void setMotionCompensationMovingAverageWindow(unsigned window, bool notify = true);
 
 	signals:
 		void deviceCountChanged(unsigned deviceCount);
@@ -115,7 +103,5 @@ namespace inputemulator
 		void motionCompensationKalmanProcessNoiseChanged(double variance);
 		void motionCompensationKalmanObservationNoiseChanged(double variance);
 		void motionCompensationMovingAverageWindowChanged(unsigned window);
-
 	};
-
 } // namespace inputemulator

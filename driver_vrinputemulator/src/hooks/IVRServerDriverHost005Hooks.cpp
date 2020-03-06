@@ -10,6 +10,7 @@ namespace vrinputemulator
 		HookData<IVRServerDriverHost005Hooks::trackedDeviceAdded_t> IVRServerDriverHost005Hooks::trackedDeviceAddedHook;
 		HookData<IVRServerDriverHost005Hooks::trackedDevicePoseUpdated_t> IVRServerDriverHost005Hooks::trackedDevicePoseUpdatedHook;
 
+
 		IVRServerDriverHost005Hooks::IVRServerDriverHost005Hooks(void* iptr)
 		{
 			if (!_isHooked)
@@ -44,8 +45,10 @@ namespace vrinputemulator
 		bool IVRServerDriverHost005Hooks::_trackedDeviceAdded(void* _this, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass eDeviceClass, void* pDriver)
 		{
 			LOG(TRACE) << "IVRServerDriverHost005Hooks::_trackedDeviceAdded(" << _this << ", " << pchDeviceSerialNumber << ", " << eDeviceClass << ", " << pDriver << ")";
+			
 			serverDriver->hooksTrackedDeviceAdded(_this, 5, pchDeviceSerialNumber, eDeviceClass, pDriver);
-			auto retval = trackedDeviceAddedHook.origFunc(_this, pchDeviceSerialNumber, eDeviceClass, pDriver);
+			
+			auto retval = trackedDeviceAddedHook.origFunc(_this, pchDeviceSerialNumber, eDeviceClass, pDriver);			
 			return retval;
 		}
 
@@ -63,5 +66,6 @@ namespace vrinputemulator
 				trackedDevicePoseUpdatedHook.origFunc(_this, unWhichDevice, poseCopy, unPoseStructSize);
 			}
 		}
+
 	}
 }

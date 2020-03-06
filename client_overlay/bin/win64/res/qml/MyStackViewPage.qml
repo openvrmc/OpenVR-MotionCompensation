@@ -75,7 +75,7 @@ Rectangle {
     }
 
     function goBack() {
-        MyResources.playFocusChangedSound()
+        //MyResources.playFocusChangedSound()
         stackView.pop()
     }
 

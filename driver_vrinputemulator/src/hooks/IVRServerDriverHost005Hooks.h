@@ -8,7 +8,7 @@
 namespace vrinputemulator
 {
 	namespace driver
-	{
+	{		
 		class IVRServerDriverHost005Hooks : public InterfaceHooks
 		{
 		public:

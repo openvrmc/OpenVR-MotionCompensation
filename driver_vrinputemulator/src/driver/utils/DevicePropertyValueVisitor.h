@@ -142,7 +142,5 @@ namespace vrinputemulator
 				}
 			}
 		};
-
-
 	} // end namespace driver
 } // end namespace vrinputemulator

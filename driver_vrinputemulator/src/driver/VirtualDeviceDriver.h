@@ -6,16 +6,15 @@
 #include <vrinputemulator_types.h>
 #include "utils/DevicePropertyValueVisitor.h"
 
+
+
 // driver namespace
 namespace vrinputemulator
 {
 	namespace driver
 	{
-
-
 		// forward declarations
 		class ServerDriver;
-
 
 		/**
 		* Implements the ITrackedDeviceServerDriver interface.
@@ -63,7 +62,6 @@ namespace vrinputemulator
 			virtual vr::EVRInputError UpdateSkeletonComponent(vr::VRInputComponentHandle_t ulComponent, vr::EVRSkeletalMotionRange eMotionRange, const vr::VRBoneTransform_t* pTransforms, uint32_t unTransformCount) override;
 
 			// from self
-
 			const std::string& serialNumber()
 			{
 				return m_serialNumber;
@@ -103,6 +101,7 @@ namespace vrinputemulator
 			{
 				return m_periodicPoseUpdates;
 			}
+
 			void publish();
 
 			void updatePose(const vr::DriverPose_t& newPose, double timeOffset, bool notify = true);
@@ -178,7 +177,5 @@ namespace vrinputemulator
 			}
 
 		};
-
-
 	} // end namespace driver
 } // end namespace vrinputemulator
