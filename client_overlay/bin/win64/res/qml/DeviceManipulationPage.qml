@@ -68,14 +68,6 @@ MyStackViewPage {
                 Layout.topMargin: 16
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
-                MyToggleButton {
-                    id: includeDeviceOffsetsToggle
-                    text: "Include Device Offsets"
-                }
-                MyToggleButton {
-                    id: includeInputRemapping
-                    text: "Include Input Remapping"
-                }
             }
         }
         onClosed: {
@@ -136,7 +128,6 @@ MyStackViewPage {
                 text: "Identify"
                 onClicked: {
                     if (deviceSelectionComboBox.currentIndex >= 0) {
-                        DeviceManipulationTabController.triggerHapticPulse(deviceSelectionComboBox.currentIndex)
                     }
                 }
             }
@@ -168,39 +159,11 @@ MyStackViewPage {
                 Layout.minimumWidth: 350
                 Layout.preferredWidth: 400
                 Layout.fillWidth: true
-                model: ["Default", "Disable", "Redirect to", "Swap with", "Motion Compensation"]
+                model: ["Default", "Motion Compensation"]
                 onCurrentIndexChanged: {
-                    if (currentIndex == 2 || currentIndex == 3) {
-                        deviceModeTargetSelectionComboBox.enabled = true
-                        var targetDevices = []
-                        var deviceCount = DeviceManipulationTabController.getDeviceCount()
-                        for (var i = 0; i < deviceCount; i++) {
-                            var deviceMode = DeviceManipulationTabController.getDeviceMode(i)
-                            var deviceId = DeviceManipulationTabController.getDeviceId(i)
-                            if (i != deviceSelectionComboBox.currentIndex) {
-                                var deviceName =deviceId + ": " + DeviceManipulationTabController.getDeviceSerial(i)
-                                var deviceClass = DeviceManipulationTabController.getDeviceClass(i)
-                                if (deviceClass == 1) {
-                                    deviceName += " (HMD)"
-                                } else if (deviceClass == 2) {
-                                    deviceName += " (Controller)"
-                                } else if (deviceClass == 3) {
-                                    deviceName += " (Tracker)"
-                                } else if (deviceClass == 4) {
-                                    deviceName += " (Base-Station)"
-                                } else {
-                                    deviceName += " (Unknown " + deviceClass.toString() + ")"
-                                }
-                                deviceModeTargetSelectionComboBox.deviceIndices.push(i)
-                                targetDevices.push(deviceName)
-                            }
-                        }
-                        deviceModeTargetSelectionComboBox.model = targetDevices
-                    } else {
-                        deviceModeTargetSelectionComboBox.enabled = false
-                        deviceModeTargetSelectionComboBox.model = []
-                        deviceModeTargetSelectionComboBox.deviceIndices = []
-                    }
+                    deviceModeTargetSelectionComboBox.enabled = false
+                    deviceModeTargetSelectionComboBox.model = []
+                    deviceModeTargetSelectionComboBox.deviceIndices = []
                 }
             }
 
@@ -223,17 +186,8 @@ MyStackViewPage {
                 enabled: false
                 text: "Apply"
                 onClicked: {
-                    if (deviceModeSelectionComboBox.currentIndex == 2 || deviceModeSelectionComboBox.currentIndex == 3) {
-                        var targetId = deviceModeTargetSelectionComboBox.deviceIndices[deviceModeTargetSelectionComboBox.currentIndex]
-                        if (targetId >= 0) {
-                            if (!DeviceManipulationTabController.setDeviceMode(deviceSelectionComboBox.currentIndex, deviceModeSelectionComboBox.currentIndex, targetId)) {
-                                deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode: " + DeviceManipulationTabController.getDeviceModeErrorString())
-                            }
-                        }
-                    } else {
-                        if (!DeviceManipulationTabController.setDeviceMode(deviceSelectionComboBox.currentIndex, deviceModeSelectionComboBox.currentIndex, 0)) {
-                            deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode: " + DeviceManipulationTabController.getDeviceModeErrorString())
-                        }
+                    if (!DeviceManipulationTabController.setDeviceMode(deviceSelectionComboBox.currentIndex, deviceModeSelectionComboBox.currentIndex, 0)) {
+                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode: " + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
                 }
             }
@@ -242,21 +196,6 @@ MyStackViewPage {
 
         RowLayout {
             spacing: 18
-
-            MyPushButton {
-                id: deviceManipulationOffsetButton
-                enabled: false
-                activationSoundEnabled: false
-                Layout.preferredWidth: 548
-                text: "Device Offsets"
-                onClicked: {
-                    if (deviceSelectionComboBox.currentIndex >= 0) {
-                        deviceOffsetsPage.setDeviceIndex(deviceSelectionComboBox.currentIndex)
-                        MyResources.playFocusChangedSound()
-                        var res = mainView.push(deviceOffsetsPage)
-                    }
-                }
-            }
 
             MyPushButton {
                 id: motionCompensationButton
@@ -287,21 +226,6 @@ MyStackViewPage {
                         deviceRenderModelPage.setDeviceIndex(deviceSelectionComboBox.currentIndex)
                         MyResources.playFocusChangedSound()
                         var res = mainView.push(deviceRenderModelPage)
-                    }
-                }
-            }
-
-            MyPushButton {
-                id: deviceInputRemappingButton
-                activationSoundEnabled: false
-                Layout.preferredWidth: 548
-                enabled: false
-                text: "Input Remapping"
-                onClicked: {
-                    if (deviceSelectionComboBox.currentIndex >= 0) {
-                        deviceInputRemappingPage.setDeviceIndex(deviceSelectionComboBox.currentIndex)
-                        MyResources.playFocusChangedSound()
-                        var res = mainView.push(deviceInputRemappingPage)
                     }
                 }
             }
@@ -447,17 +371,13 @@ MyStackViewPage {
             deviceModeSelectionComboBox.enabled = false
             deviceModeApplyButton.enabled = false
             motionCompensationButton.enabled = false
-            deviceManipulationOffsetButton.enabled = false
-            deviceInputRemappingButton.enabled = false
             deviceRenderModelButton.enabled = false
             deviceIdentifyButton.enabled = false
             deviceManipulationNewProfileButton.enabled = false
             deviceManipulationProfileComboBox.enabled = false
         } else {
             deviceModeSelectionComboBox.enabled = true
-            deviceManipulationOffsetButton.enabled = true
             deviceRenderModelButton.enabled = true
-            deviceInputRemappingButton.enabled = true
             motionCompensationButton.enabled = true
             deviceModeApplyButton.enabled = true
             deviceIdentifyButton.enabled = true
@@ -488,63 +408,8 @@ MyStackViewPage {
                 } else {
                     statusText = "Default (Unknown state " + deviceState.toString() + ")"
                 }
-            } else if (deviceMode == 1) { // fake disconnection
+            } else if (deviceMode == 1) { // motion compensation
                 deviceModeSelectionComboBox.currentIndex = 1
-                if (deviceState == 0 || deviceState == 1) {
-                    statusText = "Disabled"
-                } else {
-                    statusText = "Disabled (Unknown state " + deviceState.toString() + ")"
-                }
-            } else if (deviceMode == 2) { // redirect source
-                deviceModeSelectionComboBox.currentIndex = 2
-                var refIndex = DeviceManipulationTabController.getDeviceModeRefDeviceIndex(index)
-                for (var i = 0; i < deviceModeTargetSelectionComboBox.deviceIndices.length; i++) {
-                    if (refIndex == deviceModeTargetSelectionComboBox.deviceIndices[i]) {
-                        deviceModeTargetSelectionComboBox.currentIndex = i
-                        break
-                    }
-                }
-                if (deviceState == 0) {
-                    statusText = "Redirect Source"
-                } else if (deviceState == 1) {
-                    statusText = "Redirect Source (Suspended)"
-                } else {
-                    statusText = "Redirect Source (Unknown state " + deviceState.toString() + ")"
-                }
-            } else if (deviceMode == 3) { // redirect target
-                deviceModeSelectionComboBox.currentIndex = 2
-                var refIndex = DeviceManipulationTabController.getDeviceModeRefDeviceIndex(index)
-                for (var i = 0; i < deviceModeTargetSelectionComboBox.deviceIndices.length; i++) {
-                    if (refIndex == deviceModeTargetSelectionComboBox.deviceIndices[i]) {
-                        deviceModeTargetSelectionComboBox.currentIndex = i
-                        break
-                    }
-                }
-                if (deviceState == 0) {
-                    statusText = "Redirect Target"
-                } else if (deviceState == 1) {
-                    statusText = "Redirect Target (Suspended)"
-                } else {
-                    statusText = "Redirect Target (Unknown state " + deviceState.toString() + ")"
-                }
-            } else if (deviceMode == 4) { // swap mode
-                deviceModeSelectionComboBox.currentIndex = 3
-                var refIndex = DeviceManipulationTabController.getDeviceModeRefDeviceIndex(index)
-                for (var i = 0; i < deviceModeTargetSelectionComboBox.deviceIndices.length; i++) {
-                    if (refIndex == deviceModeTargetSelectionComboBox.deviceIndices[i]) {
-                        deviceModeTargetSelectionComboBox.currentIndex = i
-                        break
-                    }
-                }
-                if (deviceState == 0) {
-                    statusText = "Swapped"
-                } else if (deviceState == 1) {
-                    statusText = "Swapped (Disconnected)"
-                } else {
-                    statusText = "Swapped (Unknown state " + deviceState.toString() + ")"
-                }
-            } else if (deviceMode == 5) { // motion compens4tion
-                deviceModeSelectionComboBox.currentIndex = 4
                 if (deviceState == 0) {
                     statusText = "Motion Compensation"
                 } else {
@@ -554,11 +419,7 @@ MyStackViewPage {
                 statusText = "Unknown Mode " + deviceMode.toString()
             }
             deviceStatusText.text = statusText
-            if (deviceClass == 2 || deviceClass == 3) {
-                deviceIdentifyButton.enabled = true
-            } else {
-                deviceIdentifyButton.enabled = false
-            }
+            deviceIdentifyButton.enabled = false
         }
     }
 

@@ -22,7 +22,7 @@ class ServerDriver;
 *
 * Represents a single virtual device managed by this driver. It has a serial number, a device type, device properties, a pose and components.
 **/
-class VirtualDeviceDriver : public vr::ITrackedDeviceServerDriver, public vr::IVRControllerComponent {
+class VirtualDeviceDriver : public vr::ITrackedDeviceServerDriver, public vr::IVRDriverInput {
 protected:
 	std::recursive_mutex _mutex;
 
@@ -44,19 +44,22 @@ protected:
 public:
 	VirtualDeviceDriver(ServerDriver* parent, VirtualDeviceType type, const std::string& serial, uint32_t virtualId = vr::k_unTrackedDeviceIndexInvalid);
 
-	// from ITrackedDeviceServerDriver
 
+	// Inherited via ITrackedDeviceServerDriver
 	virtual vr::EVRInitError Activate(uint32_t unObjectId) override;
 	virtual void Deactivate() override;
-	virtual void EnterStandby() override {}
-	virtual void *GetComponent(const char *pchComponentNameAndVersion) override;
-	virtual void DebugRequest(const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize) override {}
+	virtual void EnterStandby() override;
+	virtual void* GetComponent(const char* pchComponentNameAndVersion) override;
+	virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
 	virtual vr::DriverPose_t GetPose() override;
-
-	// from IVRControllerComponent
-
-	virtual vr::VRControllerState_t GetControllerState() override;
-	virtual bool TriggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds) override;
+	//Inherited via IVRDriverInputvirtual
+	virtual vr::EVRInputError CreateBooleanComponent(vr::PropertyContainerHandle_t ulContainer, const char* pchName, vr::VRInputComponentHandle_t* pHandle) override;
+	virtual vr::EVRInputError UpdateBooleanComponent(vr::VRInputComponentHandle_t ulComponent, bool bNewValue, double fTimeOffset) override;
+	virtual vr::EVRInputError CreateScalarComponent(vr::PropertyContainerHandle_t ulContainer, const char* pchName, vr::VRInputComponentHandle_t* pHandle, vr::EVRScalarType eType, vr::EVRScalarUnits eUnits) override;
+	virtual vr::EVRInputError UpdateScalarComponent(vr::VRInputComponentHandle_t ulComponent, float fNewValue, double fTimeOffset) override;
+	virtual vr::EVRInputError CreateHapticComponent(vr::PropertyContainerHandle_t ulContainer, const char* pchName, vr::VRInputComponentHandle_t* pHandle) override;
+	virtual vr::EVRInputError CreateSkeletonComponent(vr::PropertyContainerHandle_t ulContainer, const char* pchName, const char* pchSkeletonPath, const char* pchBasePosePath, vr::EVRSkeletalTrackingLevel eSkeletalTrackingLevel, const vr::VRBoneTransform_t* pGripLimitTransforms, uint32_t unGripLimitTransformCount, vr::VRInputComponentHandle_t* pHandle) override;
+	virtual vr::EVRInputError UpdateSkeletonComponent(vr::VRInputComponentHandle_t ulComponent, vr::EVRSkeletalMotionRange eMotionRange, const vr::VRBoneTransform_t* pTransforms, uint32_t unTransformCount) override;
 
 	// from self
 
@@ -127,9 +130,6 @@ public:
 
 	vr::VRControllerState_t& controllerState() { return m_ControllerState; }
 
-	void updateControllerState(const vr::VRControllerState_t& newState, double timeOffset, bool notify = true);
-	void buttonEvent(ButtonEventType eventType, uint32_t buttonId, double timeOffset, bool notify = true);
-	void axisEvent(uint32_t axisId, const vr::VRControllerAxis_t& axisState, bool notify = true);
 };
 
 

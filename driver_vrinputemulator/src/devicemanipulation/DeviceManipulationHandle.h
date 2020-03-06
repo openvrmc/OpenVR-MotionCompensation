@@ -51,41 +51,6 @@ private:
 	vr::HmdQuaternion_t m_deviceRotationOffset = { 1.0, 0.0, 0.0, 0.0 };
 	vr::HmdVector3d_t m_deviceTranslationOffset = { 0.0, 0.0, 0.0 };
 
-	struct DigitalInputRemappingInfo {
-		int state = 0;
-		std::chrono::system_clock::time_point timeout;
-		struct BindingInfo {
-			int state = 0;
-			std::chrono::system_clock::time_point timeout;
-			bool pressedState = false;
-			bool touchedState = false;
-			bool touchedAutoset = false;
-			bool autoTriggerEnabled = false;
-			bool autoTriggerState = false;
-			std::chrono::system_clock::time_point autoTriggerTimeout;
-			std::chrono::system_clock::time_point autoTriggerUnpressTimeout;
-			uint32_t autoTriggerTimeoutTime;
-		} bindings[3]; // 0 .. normal, 1 .. long press, 2 .. double press
-		DigitalInputRemapping remapping;
-	};
-	std::map<uint32_t, DigitalInputRemappingInfo> m_digitalInputRemapping;
-
-	struct AnalogInputRemappingInfo {
-		struct BindingInfo {
-			bool pressedState = false;
-			bool touchedState = false;
-			vr::VRControllerAxis_t lastSeenAxisState = { 0, 0 };
-			vr::VRControllerAxis_t lastSendAxisState = { 0, 0 };
-		} binding;
-		AnalogInputRemapping remapping;
-	};
-	AnalogInputRemappingInfo m_analogInputRemapping[5];
-
-	static bool touchpadEmulationEnabledFlag;
-
-	bool m_redirectSuspended = false;
-	DeviceManipulationHandle* m_redirectRef = nullptr;
-
 	long long m_lastPoseTime = -1;
 	bool m_lastPoseValid = false;
 	vr::DriverPose_t m_lastPose;
@@ -94,21 +59,6 @@ private:
 	PosKalmanFilter m_kalmanFilter;
 
 	vr::PropertyContainerHandle_t m_propertyContainerHandle = vr::k_ulInvalidPropertyContainer;
-	uint64_t m_inputHapticComponentHandle = 0; // Let's assume for now that there is only one haptic component
-	std::map<uint64_t, std::pair<vr::EVRButtonId, int>> _componentHandleToButtonIdMap;
-	std::map<vr::EVRButtonId, std::pair<uint64_t, uint64_t>> _ButtonIdToComponentHandleMap;
-	std::map<uint64_t, std::pair<unsigned, unsigned>> _componentHandleToAxisIdMap;
-	std::pair<uint64_t, uint64_t> _AxisIdToComponentHandleMap[5];
-
-	HANDLE _vibrationCueTheadHandle = NULL;
-
-	void sendDigitalBinding(vrinputemulator::DigitalBinding& binding, uint32_t unWhichDevice, ButtonEventType eventType, vr::EVRButtonId eButtonId, double eventTimeOffset, DigitalInputRemappingInfo::BindingInfo* bindingInfo = nullptr);
-	void sendAnalogBinding(vrinputemulator::AnalogBinding& binding, uint32_t unWhichDevice, uint32_t axisId, const vr::VRControllerAxis_t& axisState, AnalogInputRemappingInfo::BindingInfo* bindingInfo = nullptr);
-	void sendAnalogBinding(vrinputemulator::AnalogBinding& binding, uint32_t unWhichDevice, uint32_t unWhichAxis, uint32_t unAxisDim, vr::VRInputComponentHandle_t ulComponent, float fNewValue, double fTimeOffset);
-
-	void _buttonPressDeadzoneFix(vr::EVRButtonId eButtonId);
-	void _vibrationCue();
-	void _audioCue();
 
 	int _disableOldMode(int newMode);
 
@@ -130,13 +80,8 @@ public:
 
 	int deviceMode() const { return m_deviceMode; }
 	int setDefaultMode();
-	int setRedirectMode(bool target, DeviceManipulationHandle* ref);
-	int setSwapMode(DeviceManipulationHandle* ref);
 	int setMotionCompensationMode();
-	int setFakeDisconnectedMode();
 
-	bool areOffsetsEnabled() const { return m_offsetsEnabled; }
-	void enableOffsets(bool enable) { m_offsetsEnabled = enable; }
 	const vr::HmdQuaternion_t& worldFromDriverRotationOffset() const { return m_worldFromDriverRotationOffset; }
 	vr::HmdQuaternion_t& worldFromDriverRotationOffset() { return m_worldFromDriverRotationOffset; }
 	const vr::HmdVector3d_t& worldFromDriverTranslationOffset() const { return m_worldFromDriverTranslationOffset; }
@@ -150,41 +95,10 @@ public:
 	const vr::HmdVector3d_t& deviceTranslationOffset() const { return m_deviceTranslationOffset; }
 	vr::HmdVector3d_t& deviceTranslationOffset() { return m_deviceTranslationOffset; }
 
-	void setDigitalInputRemapping(uint32_t buttonId, const DigitalInputRemapping& remapping);
-	DigitalInputRemapping getDigitalInputRemapping(uint32_t buttonId);
-
-	void setAnalogInputRemapping(uint32_t axisId, const AnalogInputRemapping& remapping);
-	AnalogInputRemapping getAnalogInputRemapping(uint32_t axisId);
-
-	bool redirectSuspended() const { return m_redirectSuspended; }
-	DeviceManipulationHandle* redirectRef() const { return m_redirectRef; }
 
 	void ll_sendPoseUpdate(const vr::DriverPose_t& newPose);
-	void ll_sendButtonEvent(ButtonEventType eventType, vr::EVRButtonId eButtonId, double eventTimeOffset);
-	void ll_sendAxisEvent(uint32_t unWhichAxis, const vr::VRControllerAxis_t& axisState);
-	void ll_sendScalarComponentUpdate(vr::VRInputComponentHandle_t ulComponent, float fNewValue, double fTimeOffset);
-	bool ll_triggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds);
-	bool ll_sendHapticPulseEvent(float fDurationSeconds, float fFrequency, float fAmplitude);
 
 	bool handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
-	bool handleButtonEvent(uint32_t& unWhichDevice, ButtonEventType eventType, vr::EVRButtonId& eButtonId, double& eventTimeOffset);
-	bool handleAxisUpdate(uint32_t& unWhichDevice, uint32_t& unWhichAxis, vr::VRControllerAxis_t& axisState);
-	bool handleBooleanComponentUpdate(vr::VRInputComponentHandle_t& ulComponent, bool& bNewValue, double& fTimeOffset);
-	bool handleScalarComponentUpdate(vr::VRInputComponentHandle_t& ulComponent, float& fNewValue, double& fTimeOffset);
-	bool handleHapticPulseEvent(float& fDurationSeconds, float& fFrequency, float& fAmplitude);
-
-	void sendButtonEvent(uint32_t unWhichDevice, ButtonEventType eventType, vr::EVRButtonId eButtonId, double eventTimeOffset, bool directMode = false, DigitalInputRemappingInfo::BindingInfo* binding = nullptr);
-	void sendKeyboardEvent(ButtonEventType eventType, bool shiftPressed, bool ctrlPressed, bool altPressed, WORD keyCode, bool sendScanCode, DigitalInputRemappingInfo::BindingInfo* binding = nullptr);
-	void sendAxisEvent(uint32_t unWhichDevice, uint32_t unWhichAxis, const vr::VRControllerAxis_t& axisState, bool directMode = false, AnalogInputRemappingInfo::BindingInfo* binding = nullptr);
-	void sendScalarComponentUpdate(uint32_t unWhichDevice, uint32_t unWhichAxis, uint32_t unAxisDim, vr::VRInputComponentHandle_t ulComponent, float fNewValue, double fTimeOffset, bool directMode = false);
-	void sendScalarComponentUpdate(uint32_t unWhichDevice, uint32_t unWhichAxis, uint32_t unAxisDim, float, double fTimeOffset, bool directMode = false);
-	
-
-	bool triggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds, bool directMode = false);
-
-	void inputAddBooleanComponent(const char *pchName, uint64_t pHandle);
-	void inputAddScalarComponent(const char *pchName, uint64_t pHandle, vr::EVRScalarType eType, vr::EVRScalarUnits eUnits);
-	void inputAddHapticComponent(const char * pchName, uint64_t pHandle);
 
 	PosKalmanFilter& kalmanFilter() { return m_kalmanFilter; }
 	MovingAverageRingBuffer& velMovingAverage() { return m_velMovingAverageBuffer; }
@@ -205,16 +119,7 @@ public:
 	vr::PropertyContainerHandle_t propertyContainer() { return m_propertyContainerHandle; }
 
 	void RunFrame();
-	void RunFrameDigitalBinding(vrinputemulator::DigitalBinding& binding, vr::EVRButtonId eButtonId, DigitalInputRemappingInfo::BindingInfo& bindingInfo);
 
-	void suspendRedirectMode();
-
-	static bool getTouchpadEmulationFixFlag() {
-		return touchpadEmulationEnabledFlag;
-	}
-	static void setTouchpadEmulationFixFlag(bool flag) {
-		touchpadEmulationEnabledFlag = flag;
-	}
 };
 
 

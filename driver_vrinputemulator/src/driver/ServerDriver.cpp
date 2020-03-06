@@ -17,7 +17,6 @@ std::string ServerDriver::installDir;
 
 ServerDriver::ServerDriver() : m_motionCompensation(this) {
 	singleton = this;
-	memset(m_openvrIdToVirtualDeviceMap, 0, sizeof(VirtualDeviceDriver*) * vr::k_unMaxTrackedDeviceCount);
 	memset(_openvrIdToDeviceManipulationHandleMap, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
 }
 
@@ -34,81 +33,10 @@ bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int ver
 	return true;
 }
 
-
-bool ServerDriver::hooksTrackedDeviceButtonPressed(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
-	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonPressed(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonPressed, eButtonId, eventTimeOffset);
-	}
-	return true;
-}
-
-bool ServerDriver::hooksTrackedDeviceButtonUnpressed(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
-	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonUnpressed(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonUnpressed, eButtonId, eventTimeOffset);
-	}
-	return true;
-}
-
-bool ServerDriver::hooksTrackedDeviceButtonTouched(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
-	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonTouched(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonTouched, eButtonId, eventTimeOffset);
-	}
-	return true;
-}
-
-bool ServerDriver::hooksTrackedDeviceButtonUntouched(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
-	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonUntouched(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonUntouched, eButtonId, eventTimeOffset);
-	}
-	return true;
-}
-
-bool ServerDriver::hooksTrackedDeviceAxisUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, uint32_t& unWhichAxis, vr::VRControllerAxis_t& axisState) {
-	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceAxisUpdated(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)unWhichAxis << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleAxisUpdate(unWhichDevice, unWhichAxis, axisState);
-	}
-	return true;
-}
-
-
 bool ServerDriver::hooksPollNextEvent(void* serverDriverHost, int version, void* pEvent, uint32_t uncbVREvent) {
 		vr::VREvent_t* event = (vr::VREvent_t*)pEvent;
 		LOG(DEBUG) << "ServerDriver::hooksPollNextEvent(" << serverDriverHost << ", " << version << ", " << pEvent << ", " << uncbVREvent << ")"
-			<< " : " << event->eventType << ", " << event->trackedDeviceIndex;
-		if (event->eventType == 1700) { // haptic pulse events
-			struct VREvent_HapticVibration_t {
-				uint64_t containerHandle; // property container handle of the device with the haptic component
-				uint64_t componentHandle; // Which haptic component needs to vibrate
-				float fDurationSeconds;
-				float fFrequency;
-				float fAmplitude;
-			};
-
-			auto eventData = reinterpret_cast<VREvent_HapticVibration_t*>(&event->data);
-			LOG(DEBUG) << "\tHapticPulseEvent: containerHandle = " << eventData->containerHandle << ", componentHandle = " << eventData->componentHandle
-				<< ", duration = " << eventData->fDurationSeconds << ", frequency = " << eventData->fFrequency << ", amplitude = " << eventData->fAmplitude;
-
-			auto it = _propertyContainerToDeviceManipulationHandleMap.find(eventData->containerHandle);
-			if (it != _propertyContainerToDeviceManipulationHandleMap.end()) {
-				return it->second->handleHapticPulseEvent(eventData->fDurationSeconds, eventData->fFrequency, eventData->fAmplitude);
-			}
-		}
-	return true;
-}
-
-
-bool ServerDriver::hooksControllerTriggerHapticPulse(void* controllerComponent, int version, uint32_t& unAxisId, uint16_t& usPulseDurationMicroseconds) {
-	LOG(TRACE) << "ServerDriver::hooksControllerTriggerHapticPulse(" << controllerComponent << ", " << version << ", " << unAxisId << ", " << usPulseDurationMicroseconds << ")";
-	auto it = _ptrToDeviceManipulationHandleMap.find(controllerComponent);
-	if (it != _ptrToDeviceManipulationHandleMap.end()) {
-		it->second->triggerHapticPulse(unAxisId, usPulseDurationMicroseconds);
-		return false;
-	}
+			<< " : " << event->eventType << ", " << event->trackedDeviceIndex;		
 	return true;
 }
 
@@ -130,12 +58,6 @@ void ServerDriver::hooksTrackedDeviceAdded(void* serverDriverHost, int version, 
 	// Hook into server driver interface
 	handle->setServerDriverHooks(InterfaceHooks::hookInterface(pDriver, "ITrackedDeviceServerDriver_005"));
 
-	// Hook into controller component interface if available
-	auto controllerComponent = (vr::IVRControllerComponent*)((vr::ITrackedDeviceServerDriver*)pDriver)->GetComponent(vr::IVRControllerComponent_Version);
-	if (controllerComponent) {
-		handle->setControllerComponentHooks(InterfaceHooks::hookInterface(controllerComponent, "IVRControllerComponent_001"));
-		_ptrToDeviceManipulationHandleMap[controllerComponent] = handle.get();
-	}
 }
 
 
@@ -238,54 +160,6 @@ void ServerDriver::hooksPropertiesWritePropertyBatch(void* properties, int versi
 	}
 }
 
-void ServerDriver::hooksCreateBooleanComponent(void * driverInput, int version, vr::PropertyContainerHandle_t ulContainer, const char * pchName, void * pHandle) {
-	auto it = _propertyContainerToDeviceManipulationHandleMap.find(ulContainer);
-	if (it != _propertyContainerToDeviceManipulationHandleMap.end()) {
-		LOG(INFO) << "Device " << it->second->serialNumber() << " has boolean input component \"" << pchName << "\"";
-		it->second->setDriverInputPtr(driverInput);
-		_inputComponentToDeviceManipulationHandleMap[*((uint64_t*)pHandle)] = it->second;
-		it->second->inputAddBooleanComponent(pchName, *((uint64_t*)pHandle));
-	}
-}
-
-void ServerDriver::hooksCreateScalarComponent(void * driverInput, int version, vr::PropertyContainerHandle_t ulContainer, const char * pchName, void * pHandle, 
-		vr::EVRScalarType eType, vr::EVRScalarUnits eUnits) {
-	auto it = _propertyContainerToDeviceManipulationHandleMap.find(ulContainer);
-	if (it != _propertyContainerToDeviceManipulationHandleMap.end()) {
-		LOG(INFO) << "Device " << it->second->serialNumber() << " has scalar input component \"" << pchName << "\" (type: " << (int)eType << ", units: " << (int)eUnits << ")";
-		it->second->setDriverInputPtr(driverInput);
-		_inputComponentToDeviceManipulationHandleMap[*((uint64_t*)pHandle)] = it->second;
-		it->second->inputAddScalarComponent(pchName, *((uint64_t*)pHandle), eType, eUnits);
-	}
-}
-
-void ServerDriver::hooksCreateHapticComponent(void * driverInput, int version, vr::PropertyContainerHandle_t ulContainer, const char * pchName, void * pHandle) {
-	auto it = _propertyContainerToDeviceManipulationHandleMap.find(ulContainer);
-	if (it != _propertyContainerToDeviceManipulationHandleMap.end()) {
-	LOG(INFO) << "Device " << it->second->serialNumber() << " has haptic input component \"" << pchName << "\"";
-		it->second->setDriverInputPtr(driverInput);
-		_inputComponentToDeviceManipulationHandleMap[*((uint64_t*)pHandle)] = it->second;
-		it->second->inputAddHapticComponent(pchName, *((uint64_t*)pHandle));
-	}
-}
-
-bool ServerDriver::hooksUpdateBooleanComponent(void* driverInput, int version, vr::VRInputComponentHandle_t& ulComponent, bool& bNewValue, double& fTimeOffset) {
-	auto it = _inputComponentToDeviceManipulationHandleMap.find(ulComponent);
-	if (it != _inputComponentToDeviceManipulationHandleMap.end()) {
-		return it->second->handleBooleanComponentUpdate(ulComponent, bNewValue, fTimeOffset);
-	}
-	return true;
-}
-
-bool ServerDriver::hooksUpdateScalarComponent(void* driverInput, int version, vr::VRInputComponentHandle_t& ulComponent, float& fNewValue, double& fTimeOffset) {
-	auto it = _inputComponentToDeviceManipulationHandleMap.find(ulComponent);
-	if (it != _inputComponentToDeviceManipulationHandleMap.end()) {
-		return it->second->handleScalarComponentUpdate(ulComponent, fNewValue, fTimeOffset);
-	}
-	return true;
-}
-
-
 vr::EVRInitError ServerDriver::Init(vr::IVRDriverContext *pDriverContext) {
 	LOG(TRACE) << "CServerDriver::Init()";
 
@@ -351,71 +225,10 @@ void ServerDriver::Cleanup() {
 
 // Call frequency: ~93Hz
 void ServerDriver::RunFrame() {
-	for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) {
-		auto vd = m_virtualDevices[i];
-		if (vd && vd->published() && vd->periodicPoseUpdates()) {
-			vd->sendPoseUpdate();
-		}
-	}
 	for (auto d : _deviceManipulationHandles) {
 		d.second->RunFrame();
 	}
 	m_motionCompensation.runFrame();
-}
-
-
-int32_t ServerDriver::virtualDevices_addDevice(VirtualDeviceType type, const std::string& serial) {
-	LOG(TRACE) << "CServerDriver::addTrackedDevice( " << serial << " )";
-	std::lock_guard<std::recursive_mutex> lock(_virtualDevicesMutex);
-	if (m_virtualDeviceCount >= vr::k_unMaxTrackedDeviceCount) {
-		return -1;
-	}
-	for (uint32_t i = 0; i < m_virtualDeviceCount; ++i) {
-		if (m_virtualDevices[i]->serialNumber().compare(serial) == 0) {
-			return -2;
-		}
-	}
-	uint32_t virtualDeviceId = 0;
-	for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) {
-		if (!m_virtualDevices[i]) {
-			virtualDeviceId = i;
-			break;
-		}
-	}
-	switch (type) {
-		case VirtualDeviceType::TrackedController: {
-			m_virtualDevices[virtualDeviceId] = std::make_shared<VirtualDeviceDriver>(this, VirtualDeviceType::TrackedController, serial, virtualDeviceId);
-			LOG(INFO) << "Added new tracked controller:  type " << (int)type << ", serial \"" << serial << "\", emulatedDeviceId " << virtualDeviceId;
-			m_virtualDeviceCount++;
-			return virtualDeviceId;
-		}
-		default:
-			return -3;
-	}
-}
-
-
-int32_t ServerDriver::virtualDevices_publishDevice(uint32_t emulatedDeviceId, bool notify) {
-	LOG(TRACE) << "CServerDriver::publishTrackedDevice( " << emulatedDeviceId << " )";
-	std::lock_guard<std::recursive_mutex> lock(_virtualDevicesMutex);
-	if (emulatedDeviceId >= m_virtualDeviceCount) {
-		return -1;
-	} else if (!m_virtualDevices[emulatedDeviceId]) {
-		return -2;
-	} else {
-		auto device = m_virtualDevices[emulatedDeviceId].get();
-		if (device->published()) {
-			return -3;
-		}
-		try {
-			device->publish();
-			LOG(INFO) << "Published tracked controller: virtualDeviceId " << emulatedDeviceId;
-		} catch (std::exception& e) {
-			LOG(ERROR) << "Error while publishing controller " << emulatedDeviceId << ": " << e.what();
-			return -4;
-		}
-		return 0;
-	}
 }
 
 void ServerDriver::_trackedDeviceActivated(uint32_t deviceId, VirtualDeviceDriver * device) {
@@ -424,28 +237,6 @@ void ServerDriver::_trackedDeviceActivated(uint32_t deviceId, VirtualDeviceDrive
 
 void ServerDriver::_trackedDeviceDeactivated(uint32_t deviceId) {
 	m_openvrIdToVirtualDeviceMap[deviceId] = nullptr;
-}
-
-void ServerDriver::openvr_buttonEvent(uint32_t unWhichDevice, ButtonEventType eventType, vr::EVRButtonId eButtonId, double eventTimeOffset) {
-	auto devicePtr = this->m_openvrIdToVirtualDeviceMap[unWhichDevice];
-	if (devicePtr && devicePtr->deviceType() == VirtualDeviceType::TrackedController) {
-		devicePtr->buttonEvent(eventType, eButtonId, eventTimeOffset);
-	} else {
-		if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-			_openvrIdToDeviceManipulationHandleMap[unWhichDevice]->ll_sendButtonEvent(eventType, eButtonId, eventTimeOffset);
-		}
-	}
-}
-
-void ServerDriver::openvr_axisEvent(uint32_t unWhichDevice, uint32_t unWhichAxis, const vr::VRControllerAxis_t & axisState) {
-	auto devicePtr = this->m_openvrIdToVirtualDeviceMap[unWhichDevice];
-	if (devicePtr && devicePtr->deviceType() == VirtualDeviceType::TrackedController) {
-		devicePtr->axisEvent(unWhichAxis, axisState);
-	} else {
-		if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
-			_openvrIdToDeviceManipulationHandleMap[unWhichDevice]->ll_sendAxisEvent(unWhichAxis, axisState);
-		}
-	}
 }
 
 void ServerDriver::openvr_poseUpdate(uint32_t unWhichDevice, vr::DriverPose_t & newPose, int64_t timestamp) {
@@ -465,34 +256,8 @@ void ServerDriver::openvr_poseUpdate(uint32_t unWhichDevice, vr::DriverPose_t & 
 	}
 }
 
-void ServerDriver::openvr_proximityEvent(uint32_t unWhichDevice, bool bProximitySensorTriggered) {
-	vr::VRServerDriverHost()->ProximitySensorState(unWhichDevice, bProximitySensorTriggered);
-}
-
 void ServerDriver::openvr_vendorSpecificEvent(uint32_t unWhichDevice, vr::EVREventType eventType, vr::VREvent_Data_t & eventData, double eventTimeOffset) {
 	vr::VRServerDriverHost()->VendorSpecificEvent(unWhichDevice, eventType, eventData, eventTimeOffset);
-}
-
-uint32_t ServerDriver::virtualDevices_getDeviceCount() {
-	std::lock_guard<std::recursive_mutex> lock(this->_virtualDevicesMutex);
-	return this->m_virtualDeviceCount;
-}
-
-VirtualDeviceDriver* ServerDriver::virtualDevices_getDevice(uint32_t unWhichDevice) {
-	std::lock_guard<std::recursive_mutex> lock(this->_virtualDevicesMutex);
-	if (this->m_virtualDevices[unWhichDevice]) {
-		return this->m_virtualDevices[unWhichDevice].get();
-	}
-	return nullptr;
-}
-
-VirtualDeviceDriver* ServerDriver::virtualDevices_findDevice(const std::string& serial) {
-	for (uint32_t i = 0; i < this->m_virtualDeviceCount; ++i) {
-		if (this->m_virtualDevices[i]->serialNumber().compare(serial) == 0) {
-			return this->m_virtualDevices[i].get();
-		}
-	}
-	return nullptr;
 }
 
 DeviceManipulationHandle* ServerDriver::getDeviceManipulationHandleById(uint32_t unWhichDevice) {

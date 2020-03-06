@@ -90,7 +90,7 @@
     <TargetName>libvrinputemulator</TargetName>
   </PropertyGroup>
   <PropertyGroup>
-    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\..\openvr</OPENVR_ROOT>
+    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\openvr</OPENVR_ROOT>
     <BOOST_ROOT>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0</BOOST_ROOT>
     <BOOST_LIB>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0\lib64-msvc-14.0</BOOST_LIB>
   </PropertyGroup>
