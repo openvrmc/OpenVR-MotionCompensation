@@ -81,8 +81,6 @@ namespace vrinputemulator
 
 			void openvr_vendorSpecificEvent(uint32_t unWhichDevice, vr::EVREventType eventType, vr::VREvent_Data_t& eventData, double eventTimeOffset);
 
-			void openvr_poseUpdate(uint32_t unWhichDevice, vr::DriverPose_t& newPose, int64_t timestamp);
-
 			DeviceManipulationHandle* getDeviceManipulationHandleById(uint32_t unWhichDevice);
 			DeviceManipulationHandle* getDeviceManipulationHandleByPropertyContainer(vr::PropertyContainerHandle_t container);
 

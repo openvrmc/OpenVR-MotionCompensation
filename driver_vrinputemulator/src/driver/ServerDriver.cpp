@@ -4,7 +4,6 @@
 
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
-#include "VirtualDeviceDriver.h"
 #include "../devicemanipulation/DeviceManipulationHandle.h"
 
 
@@ -276,29 +275,6 @@ namespace vrinputemulator
 		void ServerDriver::_trackedDeviceDeactivated(uint32_t deviceId)
 		{
 			m_openvrIdToVirtualDeviceMap[deviceId] = nullptr;
-		}
-
-		void ServerDriver::openvr_poseUpdate(uint32_t unWhichDevice, vr::DriverPose_t& newPose, int64_t timestamp)
-		{
-			auto devicePtr = this->m_openvrIdToVirtualDeviceMap[unWhichDevice];
-			auto now = std::chrono::duration_cast <std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-			auto diff = 0.0;
-			if (timestamp < now)
-			{
-				diff = ((double)now - timestamp) / 1000.0;
-			}
-			if (devicePtr)
-			{
-				devicePtr->updatePose(newPose, -diff);
-			}
-			else
-			{
-				if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid())
-				{
-					newPose.poseTimeOffset -= diff;
-					_openvrIdToDeviceManipulationHandleMap[unWhichDevice]->ll_sendPoseUpdate(newPose);
-				}
-			}
 		}
 
 		void ServerDriver::openvr_vendorSpecificEvent(uint32_t unWhichDevice, vr::EVREventType eventType, vr::VREvent_Data_t& eventData, double eventTimeOffset)
