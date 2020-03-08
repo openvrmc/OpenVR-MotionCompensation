@@ -1,7 +1,5 @@
 #include "DeviceManipulationHandle.h"
 
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
 #include "../driver/ServerDriver.h"
 #include "../hooks/IVRServerDriverHost004Hooks.h"
 #include "../hooks/IVRServerDriverHost005Hooks.h"
@@ -18,9 +16,8 @@ namespace vrinputemulator
 {
 	namespace driver
 	{
-		DeviceManipulationHandle::DeviceManipulationHandle(const char* serial, vr::ETrackedDeviceClass eDeviceClass, void* driverPtr, void* driverHostPtr, int driverInterfaceVersion)
-			: m_isValid(true), m_parent(ServerDriver::getInstance()), m_motionCompensationManager(m_parent->motionCompensation()), m_deviceDriverPtr(driverPtr), m_deviceDriverHostPtr(driverHostPtr),
-			m_deviceDriverInterfaceVersion(driverInterfaceVersion), m_eDeviceClass(eDeviceClass), m_serialNumber(serial)
+		DeviceManipulationHandle::DeviceManipulationHandle(const char* serial, vr::ETrackedDeviceClass eDeviceClass)
+			: m_isValid(true), m_parent(ServerDriver::getInstance()), m_motionCompensationManager(m_parent->motionCompensation()), m_eDeviceClass(eDeviceClass), m_serialNumber(serial)
 		{
 		}
 
@@ -30,7 +27,7 @@ namespace vrinputemulator
 
 			if (m_deviceMode == MotionCompensationDeviceMode::ReferenceTracker)
 			{ 
-				//Check if the pose is valid to prefent unwanted jitter and movement
+				//Check if the pose is valid to prevent unwanted jitter and movement
 				if (newPose.poseIsValid && newPose.result == vr::TrackingResult_Running_OK)
 				{
 					//Set the Zero-Point for the reference tracker if not done yet
@@ -53,22 +50,6 @@ namespace vrinputemulator
 			}
 
 			return true;
-		}
-
-		void DeviceManipulationHandle::ll_sendPoseUpdate(const vr::DriverPose_t& newPose)
-		{
-			if (m_deviceDriverInterfaceVersion == 4)
-			{
-				IVRServerDriverHost004Hooks::trackedDevicePoseUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, newPose, sizeof(vr::DriverPose_t));
-			}
-			else if (m_deviceDriverInterfaceVersion == 5)
-			{
-				IVRServerDriverHost005Hooks::trackedDevicePoseUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, newPose, sizeof(vr::DriverPose_t));
-			}
-		}
-
-		void DeviceManipulationHandle::RunFrame()
-		{
 		}
 
 		void DeviceManipulationHandle::setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode)

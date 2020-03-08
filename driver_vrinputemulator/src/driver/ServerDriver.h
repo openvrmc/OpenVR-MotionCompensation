@@ -5,7 +5,6 @@
 #include <queue>
 #include <openvr_driver.h>
 #include <vrinputemulator_types.h>
-#include <openvr_math.h>
 #include "../hooks/common.h"
 #include "../logging.h"
 #include "../com/shm/driver_ipc_shm.h"
@@ -63,7 +62,7 @@ namespace vrinputemulator
 			{
 			}
 
-			  /** Called when the system is leaving Standby mode */
+			/** Called when the system is leaving Standby mode */
 			virtual void LeaveStandby() override
 			{
 			}
@@ -79,26 +78,9 @@ namespace vrinputemulator
 				return installDir;
 			}
 
-			void openvr_vendorSpecificEvent(uint32_t unWhichDevice, vr::EVREventType eventType, vr::VREvent_Data_t& eventData, double eventTimeOffset);
-
 			DeviceManipulationHandle* getDeviceManipulationHandleById(uint32_t unWhichDevice);
-			DeviceManipulationHandle* getDeviceManipulationHandleByPropertyContainer(vr::PropertyContainerHandle_t container);
 
 			// internal API
-
-			void executeCodeForEachDeviceManipulationHandle(std::function<void(DeviceManipulationHandle*)> code)
-			{
-				for (auto d : _deviceManipulationHandles)
-				{
-					code(d.second.get());
-				}
-			}
-
-			/** Called by virtual devices when they are activated */
-			void _trackedDeviceActivated(uint32_t deviceId, VirtualDeviceDriver* device);
-
-			/** Called by virtual devices when they are deactivated */
-			void _trackedDeviceDeactivated(uint32_t deviceId);
 
 			/* Motion Compensation related */
 			MotionCompensationManager& motionCompensation()
@@ -111,32 +93,11 @@ namespace vrinputemulator
 			void hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass& eDeviceClass, void* pDriver);
 			void hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId);
 			bool hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize);
-			bool hooksPollNextEvent(void* serverDriverHost, int version, void* pEvent, uint32_t uncbVREvent);
 
-			void hooksPropertiesReadPropertyBatch(void* properties, int version, vr::PropertyContainerHandle_t ulContainer, void* pBatch, uint32_t unBatchEntryCount);
-			void hooksPropertiesWritePropertyBatch(void* properties, int version, vr::PropertyContainerHandle_t ulContainer, void* pBatch, uint32_t unBatchEntryCount);
-
-			// driver events injection
-			void addDriverEventForInjection(void* serverDriverHost, std::shared_ptr<void> event, uint32_t size);
-			std::pair<std::shared_ptr<void>, uint32_t> getDriverEventForInjection(void* serverDriverHost);
-
-			int LogDelayCounter_1 = 0;
-			int LogDelayCounter_2 = 0;
-
-			bool LogEnable_1 = false;
-			bool LogEnable_2 = false;
-			bool LogEnable_3 = false;
-			bool LogEnable_4 = false;
 		private:
 			static ServerDriver* singleton;
 
 			static std::string installDir;			
-
-			//// virtual devices related ////
-			std::recursive_mutex _virtualDevicesMutex;
-			uint32_t m_virtualDeviceCount = 0;
-			std::shared_ptr<VirtualDeviceDriver> m_virtualDevices[vr::k_unMaxTrackedDeviceCount];
-			VirtualDeviceDriver* m_openvrIdToVirtualDeviceMap[vr::k_unMaxTrackedDeviceCount];
 
 			//// ipc shm related ////
 			IpcShmCommunicator shmCommunicator;
@@ -145,7 +106,6 @@ namespace vrinputemulator
 			std::recursive_mutex _deviceManipulationHandlesMutex;
 			std::map<void*, std::shared_ptr<DeviceManipulationHandle>> _deviceManipulationHandles;
 			DeviceManipulationHandle* _openvrIdToDeviceManipulationHandleMap[vr::k_unMaxTrackedDeviceCount];
-			std::map<vr::PropertyContainerHandle_t, DeviceManipulationHandle*> _propertyContainerToDeviceManipulationHandleMap;
 			std::map<void*, DeviceManipulationHandle*> _ptrToDeviceManipulationHandleMap;
 			std::map<uint64_t, DeviceManipulationHandle*> _inputComponentToDeviceManipulationHandleMap;
 
@@ -154,16 +114,6 @@ namespace vrinputemulator
 
 			//// function hooks related ////
 			std::shared_ptr<InterfaceHooks> _driverContextHooks;
-
-			// driver events injection
-			std::mutex _driverEventInjectionMutex;
-			std::map<void*, std::queue<std::pair<std::shared_ptr<void>, uint32_t>>> m_eventsToInjectQueues;
-
-			// Device Property Overrides
-			std::string _propertiesOverrideHmdManufacturer;
-			std::string _propertiesOverrideHmdModel;
-			std::string _propertiesOverrideHmdTrackingSystem;
-			bool _propertiesOverrideGenericTrackerFakeController;
 		};
 	} // end namespace driver
 } // end namespace vrinputemulator

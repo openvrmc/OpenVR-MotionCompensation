@@ -147,8 +147,6 @@ namespace vrinputemulator
 
 		void ping(bool modal = true, bool enableReply = false);
 
-		void openvrVendorSpecificEvent(uint32_t deviceId, vr::EVREventType eventType, const vr::VREvent_Data_t& eventData, double timeOffset = 0.0);
-
 		void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);
 		void setDeviceNormalMode(uint32_t deviceId, bool modal = true);
 

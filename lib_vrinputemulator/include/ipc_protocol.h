@@ -20,7 +20,6 @@ namespace vrinputemulator
 			IPC_Ping,
 
 			DeviceManipulation_GetDeviceInfo,
-			OpenVR_VendorSpecificEvent,
 			DeviceManipulation_DefaultMode,
 			DeviceManipulation_MotionCompensationMode,
 			DeviceManipulation_SetMotionCompensationProperties
@@ -74,14 +73,6 @@ namespace vrinputemulator
 			uint32_t clientId;
 			uint32_t messageId;
 			uint64_t nonce;
-		};
-
-		struct Request_OpenVR_VendorSpecificEvent
-		{
-			uint32_t deviceId;
-			vr::EVREventType eventType;
-			vr::VREvent_Data_t eventData;
-			double timeOffset;
 		};
 
 		struct Request_OpenVR_GenericClientMessage
@@ -146,7 +137,6 @@ namespace vrinputemulator
 				Request_IPC_ClientConnect ipc_ClientConnect;
 				Request_IPC_ClientDisconnect ipc_ClientDisconnect;
 				Request_IPC_Ping ipc_Ping;
-				Request_OpenVR_VendorSpecificEvent ovr_VendorSpecificEvent;
 				Request_OpenVR_GenericClientMessage ovr_GenericClientMessage;
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;

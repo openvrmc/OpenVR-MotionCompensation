@@ -253,23 +253,6 @@ namespace vrinputemulator
 			throw vrinputemulator_connectionerror("No active connection.");
 		}
 	}
-	
-	void VRInputEmulator::openvrVendorSpecificEvent(uint32_t deviceId, vr::EVREventType eventType, const vr::VREvent_Data_t& eventData, double timeOffset)
-	{
-		if (_ipcServerQueue)
-		{
-			ipc::Request message(ipc::RequestType::OpenVR_VendorSpecificEvent);
-			message.msg.ovr_VendorSpecificEvent.deviceId = deviceId;
-			message.msg.ovr_VendorSpecificEvent.eventType = eventType;
-			message.msg.ovr_VendorSpecificEvent.eventData = eventData;
-			message.msg.ovr_VendorSpecificEvent.timeOffset = timeOffset;
-			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-		}
-		else
-		{
-			throw vrinputemulator_connectionerror("No active connection.");
-		}
-	}
 
 	void VRInputEmulator::getDeviceInfo(uint32_t deviceId, DeviceInfo& info)
 	{

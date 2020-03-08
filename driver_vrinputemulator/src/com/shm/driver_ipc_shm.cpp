@@ -146,13 +146,6 @@ namespace vrinputemulator
 								}
 								break;
 
-								case ipc::RequestType::OpenVR_VendorSpecificEvent:
-								{
-									driver->openvr_vendorSpecificEvent(message.msg.ovr_VendorSpecificEvent.deviceId, message.msg.ovr_VendorSpecificEvent.eventType,
-																	   message.msg.ovr_VendorSpecificEvent.eventData, message.msg.ovr_VendorSpecificEvent.timeOffset);
-								}
-								break;
-
 								case ipc::RequestType::DeviceManipulation_GetDeviceInfo:
 								{
 									ipc::Reply resp(ipc::ReplyType::GenericReply);

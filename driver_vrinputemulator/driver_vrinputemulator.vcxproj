@@ -44,7 +44,6 @@
     <ClInclude Include="src\hooks\common.h" />
     <ClInclude Include="src\hooks\IVRServerDriverHost004Hooks.h" />
     <ClInclude Include="src\logging.h" />
-    <ClInclude Include="src\driver\utils\DevicePropertyValueVisitor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}</ProjectGuid>
@@ -124,7 +123,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\$(ProjectName)\bin\win64\</OutDir>
+    <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>driver_00vrinputemulator</TargetName>
     <IncludePath>D:\Programmierung\VR\boost_1_72_0\boost;$(IncludePath)</IncludePath>
