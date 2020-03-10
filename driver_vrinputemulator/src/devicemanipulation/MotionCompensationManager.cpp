@@ -3,6 +3,9 @@
 #include "DeviceManipulationHandle.h"
 #include "../driver/ServerDriver.h"
 
+#include <boost/chrono/chrono_io.hpp>
+#include <boost/chrono/floor.hpp>
+#include <iostream>
 
 // driver namespace
 namespace vrinputemulator
@@ -23,6 +26,7 @@ namespace vrinputemulator
 			}
 
 			_motionCompensationMode = Mode;
+			DebugTimer.start();
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()
@@ -66,6 +70,18 @@ namespace vrinputemulator
 
 		void MotionCompensationManager::_updateMotionCompensationRefPose(const vr::DriverPose_t& pose)
 		{
+			if (DebugCounter >= 10000)
+			{
+				DebugCounter = 0;
+			}
+
+			DebugTiming[DebugCounter] = DebugTimer.seconds();
+			DebugData[DebugCounter].v[0] = pose.vecPosition[0];
+			DebugData[DebugCounter].v[1] = pose.vecPosition[1];
+			DebugData[DebugCounter].v[2] = pose.vecPosition[2];
+
+			DebugCounter++;
+
 			// From https://github.com/ValveSoftware/driver_hydra/blob/master/drivers/driver_hydra/driver_hydra.cpp Line 835:
 			// "True acceleration is highly volatile, so it's not really reasonable to
 			// extrapolate much from it anyway.  Passing it as 0 from any driver should
@@ -80,13 +96,24 @@ namespace vrinputemulator
 			// by disabling velocity (which effectively disables prediction for rendering)."
 			// That means that we have to calculate the velocity to not interfere with the prediction for rendering
 
-			//Position
-			//Add a simple low pass filter
-			_motionCompensationRefPos.v[0] = LPF(pose.vecPosition[0], _motionCompensationRefPos.v[0]);
-			_motionCompensationRefPos.v[1] = LPF(pose.vecPosition[1], _motionCompensationRefPos.v[1]);
-			_motionCompensationRefPos.v[2] = LPF(pose.vecPosition[2], _motionCompensationRefPos.v[2]);
+			// Position
+			// Add a simple low pass filter
+			// 1st stage
+			_mCFilter_1.v[0] = LPF(pose.vecPosition[0], _mCFilter_1.v[0]);
+			_mCFilter_1.v[1] = LPF(pose.vecPosition[1], _mCFilter_1.v[1]);
+			_mCFilter_1.v[2] = LPF(pose.vecPosition[2], _mCFilter_1.v[2]);
 
-			//Now we need to calculate the difference between the smoothed and the raw position to adjust the velocity
+			// 2nd stage
+			_mCFilter_2.v[0] = LPF(_mCFilter_1.v[0], _mCFilter_2.v[0]);
+			_mCFilter_2.v[1] = LPF(_mCFilter_1.v[1], _mCFilter_2.v[1]);
+			_mCFilter_2.v[2] = LPF(_mCFilter_1.v[2], _mCFilter_2.v[2]);
+
+			// 3rd stage
+			_motionCompensationRefPos.v[0] = LPF(_mCFilter_2.v[0], _motionCompensationRefPos.v[0]);
+			_motionCompensationRefPos.v[1] = LPF(_mCFilter_2.v[1], _motionCompensationRefPos.v[1]);
+			_motionCompensationRefPos.v[2] = LPF(_mCFilter_2.v[2], _motionCompensationRefPos.v[2]);
+
+			// Now we need to calculate the difference between the smoothed and the raw position to adjust the velocity
 			if (pose.vecPosition[0] != (double)0.0)
 			{
 				_motionCompensationRefPosVel.v[0] = pose.vecVelocity[0] * (_motionCompensationRefPos.v[0] / pose.vecPosition[0]);

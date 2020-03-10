@@ -1,6 +1,8 @@
 #include "ServerDriver.h"
 #include "../devicemanipulation/DeviceManipulationHandle.h"
 
+#include <iostream>
+#include <fstream>
 
 namespace vrinputemulator
 {
@@ -98,6 +100,19 @@ namespace vrinputemulator
 
 		void ServerDriver::Cleanup()
 		{
+			std::ofstream DebugFile;
+			DebugFile.open("MotionData.txt");
+
+			for (int i = 0; i < m_motionCompensation.DebugCounter; i++)
+			{
+				DebugFile << m_motionCompensation.DebugTiming[i] << ";";
+				DebugFile << m_motionCompensation.DebugData[i].v[0] << ";";
+				DebugFile << m_motionCompensation.DebugData[i].v[1] << ";";
+				DebugFile << m_motionCompensation.DebugData[i].v[2] << ";" << std::endl;
+			}
+
+			DebugFile.close();
+
 			LOG(TRACE) << "CServerDriver::Cleanup()";
 			_driverContextHooks.reset();
 			MH_Uninitialize();
