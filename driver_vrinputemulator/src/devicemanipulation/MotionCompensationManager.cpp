@@ -7,7 +7,7 @@
 #include <boost/math/quaternion.hpp>
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

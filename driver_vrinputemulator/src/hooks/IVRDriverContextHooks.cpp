@@ -1,7 +1,7 @@
 #include "IVRDriverContextHooks.h"
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

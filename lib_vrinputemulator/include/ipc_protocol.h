@@ -6,7 +6,7 @@
 
 #define IPC_PROTOCOL_VERSION 3
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace ipc
 	{
@@ -195,4 +195,4 @@ namespace vrinputemulator
 		};
 
 	} // end namespace ipc
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

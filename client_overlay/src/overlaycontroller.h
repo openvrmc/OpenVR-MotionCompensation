@@ -55,7 +55,7 @@ namespace inputemulator
 		QPoint m_ptLastMouse;
 		Qt::MouseButtons m_lastMouseButtons = 0;
 
-		vrinputemulator::VRInputEmulator m_vrInputEmulator;
+		vrmotioncompensation::VRMotionCompensation m_vrInputEmulator;
 
 		bool desktopMode;
 		bool noSound;
@@ -85,7 +85,7 @@ namespace inputemulator
 		void Init(QQmlEngine* qmlEngine);
 		void Shutdown();
 
-		vrinputemulator::VRInputEmulator& vrInputEmulator()
+		vrmotioncompensation::VRMotionCompensation& vrInputEmulator()
 		{
 			return m_vrInputEmulator;
 		}

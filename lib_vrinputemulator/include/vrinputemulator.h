@@ -86,60 +86,60 @@ namespace vr
 
 #include <ipc_protocol.h>
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 
-	class vrinputemulator_exception : public std::runtime_error
+	class vrmotioncompensation_exception : public std::runtime_error
 	{
 	public:
 		const int errorcode = 0;
 		using std::runtime_error::runtime_error;
-		vrinputemulator_exception(const std::string& msg, int code) : std::runtime_error(msg), errorcode(code)
+		vrmotioncompensation_exception(const std::string& msg, int code) : std::runtime_error(msg), errorcode(code)
 		{
 		}
 	};
 
-	class vrinputemulator_connectionerror : public vrinputemulator_exception
+	class vrmotioncompensation_connectionerror : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_invalidversion : public vrinputemulator_exception
+	class vrmotioncompensation_invalidversion : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_invalidid : public vrinputemulator_exception
+	class vrmotioncompensation_invalidid : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_invalidtype : public vrinputemulator_exception
+	class vrmotioncompensation_invalidtype : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_notfound : public vrinputemulator_exception
+	class vrmotioncompensation_notfound : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_alreadyinuse : public vrinputemulator_exception
+	class vrmotioncompensation_alreadyinuse : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
-	class vrinputemulator_toomanydevices : public vrinputemulator_exception
+	class vrmotioncompensation_toomanydevices : public vrmotioncompensation_exception
 	{
-		using vrinputemulator_exception::vrinputemulator_exception;
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
 
-	class VRInputEmulator
+	class VRMotionCompensation
 	{
 	public:
-		VRInputEmulator(const std::string& driverQueue = "driver_vrinputemulator.server_queue", const std::string& clientQueue = "driver_vrinputemulator.client_queue.");
-		~VRInputEmulator();
+		VRMotionCompensation(const std::string& driverQueue = "driver_vrinputemulator.server_queue", const std::string& clientQueue = "driver_vrinputemulator.client_queue.");
+		~VRMotionCompensation();
 
 		void connect();
 		bool isConnected() const;
@@ -161,7 +161,7 @@ namespace vrinputemulator
 		bool _ipcThreadRunning = false;
 		volatile bool _ipcThreadStop = false;
 		std::thread _ipcThread;
-		static void _ipcThreadFunc(VRInputEmulator* _this);
+		static void _ipcThreadFunc(VRMotionCompensation* _this);
 
 		std::random_device _ipcRandomDevice;
 		std::uniform_int_distribution<uint32_t> _ipcRandomDist;
@@ -186,4 +186,4 @@ namespace vrinputemulator
 		boost::interprocess::message_queue* _ipcClientQueue = nullptr;
 	};
 
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

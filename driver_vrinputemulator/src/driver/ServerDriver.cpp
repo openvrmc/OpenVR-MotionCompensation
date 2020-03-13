@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{
@@ -19,7 +19,7 @@ namespace vrinputemulator
 
 		ServerDriver::~ServerDriver()
 		{
-			LOG(TRACE) << "CServerDriver::~CServerDriver_InputEmulator()";
+			LOG(TRACE) << "driver::~ServerDriver()";
 		}
 
 		bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize)
@@ -122,7 +122,7 @@ namespace vrinputemulator
 
 			DebugFile.close();
 
-			LOG(TRACE) << "CServerDriver::Cleanup()";
+			LOG(TRACE) << "ServerDriver::Cleanup()";
 			_driverContextHooks.reset();
 			MH_Uninitialize();
 			shmCommunicator.shutdown();
@@ -154,4 +154,4 @@ namespace vrinputemulator
 		}
 
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

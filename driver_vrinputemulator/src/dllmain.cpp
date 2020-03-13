@@ -37,7 +37,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_PROCESS_ATTACH:
 		init_logging();
 		LOG(INFO) << "|========================================================================================|";
-		LOG(INFO) << "VRInputEmulator dll loaded...";
+		LOG(INFO) << "VRMotionCompensation dll loaded...";
 		LOG(TRACE) << "Trace messages enabled.";
 		LOG(DEBUG) << "Debug messages enabled.";
 		break;

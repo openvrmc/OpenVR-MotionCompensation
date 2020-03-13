@@ -15,10 +15,10 @@
 
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 // Receives and dispatches ipc messages
-	void VRInputEmulator::_ipcThreadFunc(VRInputEmulator* _this)
+	void VRMotionCompensation::_ipcThreadFunc(VRMotionCompensation* _this)
 	{
 		_this->_ipcThreadRunning = true;
 		while (!_this->_ipcThreadStop)
@@ -62,21 +62,21 @@ namespace vrinputemulator
 	}
 
 
-	VRInputEmulator::VRInputEmulator(const std::string& serverQueue, const std::string& clientQueue) : _ipcServerQueueName(serverQueue), _ipcClientQueueName(clientQueue)
+	VRMotionCompensation::VRMotionCompensation(const std::string& serverQueue, const std::string& clientQueue) : _ipcServerQueueName(serverQueue), _ipcClientQueueName(clientQueue)
 	{
 	}
 
-	VRInputEmulator::~VRInputEmulator()
+	VRMotionCompensation::~VRMotionCompensation()
 	{
 		disconnect();
 	}
 
-	bool VRInputEmulator::isConnected() const
+	bool VRMotionCompensation::isConnected() const
 	{
 		return _ipcServerQueue != nullptr;
 	}
 
-	void VRInputEmulator::connect()
+	void VRMotionCompensation::connect()
 	{
 		if (!_ipcServerQueue)
 		{
@@ -90,7 +90,7 @@ namespace vrinputemulator
 				_ipcServerQueue = nullptr;
 				std::stringstream ss;
 				ss << "Could not open server-side message queue: " << e.what();
-				throw vrinputemulator_connectionerror(ss.str());
+				throw vrmotioncompensation_connectionerror(ss.str());
 			}
 			// Append random number to client queue name (and hopefully no other client uses the same random number)
 			_ipcClientQueueName += std::to_string(_ipcRandomDist(_ipcRandomDevice));
@@ -112,7 +112,7 @@ namespace vrinputemulator
 				_ipcClientQueue = nullptr;
 				std::stringstream ss;
 				ss << "Could not open client-side message queue: " << e.what();
-				throw vrinputemulator_connectionerror(ss.str());
+				throw vrmotioncompensation_connectionerror(ss.str());
 			}
 			// Start ipc thread
 			_ipcThreadStop = false;
@@ -149,18 +149,18 @@ namespace vrinputemulator
 				if (resp.status == ipc::ReplyStatus::InvalidVersion)
 				{
 					ss << "Incompatible ipc protocol versions (server: " << resp.msg.ipc_ClientConnect.ipcProcotolVersion << ", client: " << IPC_PROTOCOL_VERSION << ")";
-					throw vrinputemulator_invalidversion(ss.str());
+					throw vrmotioncompensation_invalidversion(ss.str());
 				}
 				else if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_connectionerror(ss.str());
+					throw vrmotioncompensation_connectionerror(ss.str());
 				}
 			}
 		}
 	}
 
-	void VRInputEmulator::disconnect()
+	void VRMotionCompensation::disconnect()
 	{
 		if (_ipcServerQueue)
 		{
@@ -202,7 +202,7 @@ namespace vrinputemulator
 		}
 	}
 
-	void VRInputEmulator::ping(bool modal, bool enableReply)
+	void VRMotionCompensation::ping(bool modal, bool enableReply)
 	{
 		if (_ipcServerQueue)
 		{
@@ -230,7 +230,7 @@ namespace vrinputemulator
 				{
 					std::stringstream ss;
 					ss << "Error while pinging server: Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str());
+					throw vrmotioncompensation_exception(ss.str());
 				}
 			}
 			else
@@ -250,11 +250,11 @@ namespace vrinputemulator
 		}
 		else
 		{
-			throw vrinputemulator_connectionerror("No active connection.");
+			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
 
-	void VRInputEmulator::getDeviceInfo(uint32_t deviceId, DeviceInfo& info)
+	void VRMotionCompensation::getDeviceInfo(uint32_t deviceId, DeviceInfo& info)
 	{
 		if (_ipcServerQueue)
 		{
@@ -287,26 +287,26 @@ namespace vrinputemulator
 			else if (resp.status == ipc::ReplyStatus::InvalidId)
 			{
 				ss << "Invalid device id";
-				throw vrinputemulator_invalidid(ss.str());
+				throw vrmotioncompensation_invalidid(ss.str());
 			}
 			else if (resp.status == ipc::ReplyStatus::NotFound)
 			{
 				ss << "Device not found";
-				throw vrinputemulator_notfound(ss.str());
+				throw vrmotioncompensation_notfound(ss.str());
 			}
 			else if (resp.status != ipc::ReplyStatus::Ok)
 			{
 				ss << "Error code " << (int)resp.status;
-				throw vrinputemulator_exception(ss.str());
+				throw vrmotioncompensation_exception(ss.str());
 			}
 		}
 		else
 		{
-			throw vrinputemulator_connectionerror("No active connection.");
+			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
 
-	void VRInputEmulator::setDeviceNormalMode(uint32_t deviceId, bool modal)
+	void VRMotionCompensation::setDeviceNormalMode(uint32_t deviceId, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
@@ -342,17 +342,17 @@ namespace vrinputemulator
 				if (resp.status == ipc::ReplyStatus::InvalidId)
 				{
 					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str());
+					throw vrmotioncompensation_invalidid(ss.str());
 				}
 				else if (resp.status == ipc::ReplyStatus::NotFound)
 				{
 					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str());
+					throw vrmotioncompensation_notfound(ss.str());
 				}
 				else if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str());
+					throw vrmotioncompensation_exception(ss.str());
 				}
 			}
 			else
@@ -362,11 +362,11 @@ namespace vrinputemulator
 		}
 		else
 		{
-			throw vrinputemulator_connectionerror("No active connection.");
+			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
 
-	void VRInputEmulator::setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode, bool modal)
+	void VRMotionCompensation::setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
@@ -409,17 +409,17 @@ namespace vrinputemulator
 				if (resp.status == ipc::ReplyStatus::InvalidId)
 				{
 					ss << "Invalid device id";
-					throw vrinputemulator_invalidid(ss.str(), (int)resp.status);
+					throw vrmotioncompensation_invalidid(ss.str(), (int)resp.status);
 				}
 				else if (resp.status == ipc::ReplyStatus::NotFound)
 				{
 					ss << "Device not found";
-					throw vrinputemulator_notfound(ss.str(), (int)resp.status);
+					throw vrmotioncompensation_notfound(ss.str(), (int)resp.status);
 				}
 				else if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str(), (int)resp.status);
+					throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
 				}
 			}
 			else
@@ -429,11 +429,11 @@ namespace vrinputemulator
 		}
 		else
 		{
-			throw vrinputemulator_connectionerror("No active connection.");
+			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
 
-	void VRInputEmulator::setLPFBeta(double value, bool modal)
+	void VRMotionCompensation::setLPFBeta(double value, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
@@ -475,7 +475,7 @@ namespace vrinputemulator
 				if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
-					throw vrinputemulator_exception(ss.str(), (int)resp.status);
+					throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
 				}
 			}
 			else
@@ -486,7 +486,7 @@ namespace vrinputemulator
 		}
 		else
 		{
-			throw vrinputemulator_connectionerror("No active connection.");
+			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

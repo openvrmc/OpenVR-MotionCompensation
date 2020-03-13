@@ -45,7 +45,7 @@ namespace inputemulator
 
 		std::vector<DeviceManipulationProfile> deviceManipulationProfiles;
 
-		vrinputemulator::MotionCompensationMode motionCompensationMode = vrinputemulator::MotionCompensationMode::Disabled;
+		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double motionCompensationKalmanProcessNoise = 0.1;
 		double motionCompensationKalmanObservationNoise = 0.1;
 		unsigned motionCompensationMovingAverageWindow = 3;

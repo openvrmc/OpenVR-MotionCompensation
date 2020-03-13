@@ -6,7 +6,7 @@
 
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{
@@ -75,4 +75,4 @@ namespace vrinputemulator
 			bool handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
 		};
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

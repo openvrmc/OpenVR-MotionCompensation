@@ -6,7 +6,7 @@
 #include "../logging.h"
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

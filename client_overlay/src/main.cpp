@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 		}
 		if (!conf.get(el::Level::Global, el::ConfigurationType::Filename))
 		{
-			logFilePath = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("VRInputEmulator.log");
+			logFilePath = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("VRMotionCompensation.log");
 			conf.set(el::Level::Global, el::ConfigurationType::Filename, QDir::toNativeSeparators(logFilePath).toStdString());
 		}
 		conf.setRemainingToDefault();

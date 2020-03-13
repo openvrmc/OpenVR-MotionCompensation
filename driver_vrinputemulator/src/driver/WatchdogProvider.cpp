@@ -4,7 +4,7 @@
 
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

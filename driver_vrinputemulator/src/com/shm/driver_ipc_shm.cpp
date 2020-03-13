@@ -8,7 +8,7 @@
 #include "../../devicemanipulation/DeviceManipulationHandle.h"
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{
@@ -361,4 +361,4 @@ namespace vrinputemulator
 		}
 
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

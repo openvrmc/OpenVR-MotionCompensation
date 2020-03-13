@@ -9,7 +9,7 @@
 
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	// forward declarations
 	namespace ipc
@@ -49,4 +49,4 @@ namespace vrinputemulator
 			uint32_t _setMotionCompensationMessageId = 0;
 		};
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

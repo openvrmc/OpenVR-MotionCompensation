@@ -56,7 +56,7 @@ namespace inputemulator
 						}
 
 						/*try {
-							vrinputemulator::DeviceInfo info2;
+							vrmotioncompensation::DeviceInfo info2;
 							parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
 							info->getDeviceMode = info2.getDeviceMode;
 						} catch (std::exception& e) {
@@ -130,7 +130,7 @@ namespace inputemulator
 							}
 
 							/*try {
-								vrinputemulator::DeviceInfo info2;
+								vrmotioncompensation::DeviceInfo info2;
 								parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
 								info->getDeviceMode = info2.getDeviceMode;
 							} catch (std::exception& e) {
@@ -253,7 +253,7 @@ namespace inputemulator
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		motionCompensationMode = (vrinputemulator::MotionCompensationMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
+		motionCompensationMode = (vrmotioncompensation::MotionCompensationMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
 		motionCompensationKalmanProcessNoise = settings->value("motionCompensationKalmanProcessNoise", 0.1).toDouble();
 		motionCompensationKalmanObservationNoise = settings->value("motionCompensationKalmanObservationNoise", 0.1).toDouble();
 		motionCompensationMovingAverageWindow = settings->value("motionCompensationMovingAverageWindow", 3).toUInt();
@@ -414,7 +414,7 @@ namespace inputemulator
 			if (EnableMotionCompensation)
 			{
 				LOG(TRACE) << "Sending Motion Compensation Mode";
-				motionCompensationMode = vrinputemulator::MotionCompensationMode::ReferenceTracker;
+				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 				parent->vrInputEmulator().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
 			}
 			else
@@ -424,27 +424,27 @@ namespace inputemulator
 				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[RTindex]->openvrId);
 			}
 		}
-		catch (vrinputemulator::vrinputemulator_exception & e)
+		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
 			switch (e.errorcode)
 			{
-			case (int)vrinputemulator::ipc::ReplyStatus::Ok:
+			case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
 			{
 				m_deviceModeErrorString = "Not an error";
 			} break;
-			case (int)vrinputemulator::ipc::ReplyStatus::AlreadyInUse:
+			case (int)vrmotioncompensation::ipc::ReplyStatus::AlreadyInUse:
 			{
 				m_deviceModeErrorString = "Device already in use";
 			} break;
-			case (int)vrinputemulator::ipc::ReplyStatus::InvalidId:
+			case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
 			{
 				m_deviceModeErrorString = "Invalid Id";
 			} break;
-			case (int)vrinputemulator::ipc::ReplyStatus::NotFound:
+			case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
 			{
 				m_deviceModeErrorString = "Device not found";
 			} break;
-			case (int)vrinputemulator::ipc::ReplyStatus::NotTracking:
+			case (int)vrmotioncompensation::ipc::ReplyStatus::NotTracking:
 			{
 				m_deviceModeErrorString = "Device not tracking";
 			} break;
@@ -493,11 +493,11 @@ namespace inputemulator
 			LOG(TRACE) << "Sending new LPF Beta value:" << value;
 			parent->vrInputEmulator().setLPFBeta(value);
 		}
-		catch (vrinputemulator::vrinputemulator_exception & e)
+		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
 			switch (e.errorcode)
 			{
-				case (int)vrinputemulator::ipc::ReplyStatus::Ok:
+				case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
 				{
 					m_deviceModeErrorString = "Not an error";
 					break;
@@ -537,7 +537,7 @@ namespace inputemulator
 		{
 			try
 			{
-				vrinputemulator::DeviceInfo info;
+				vrmotioncompensation::DeviceInfo info;
 
 				parent->vrInputEmulator().getDeviceInfo(deviceInfos[index]->openvrId, info);
 				if (deviceInfos[index]->getDeviceMode != info.getDeviceMode)

@@ -11,7 +11,7 @@
 #include "../devicemanipulation/MotionCompensationManager.h"
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{		
@@ -116,4 +116,4 @@ namespace vrinputemulator
 			std::shared_ptr<InterfaceHooks> _driverContextHooks;
 		};
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

@@ -3,7 +3,7 @@
 #include "../driver/ServerDriver.h"
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

@@ -5,7 +5,7 @@
 #include <openvr_driver.h>
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

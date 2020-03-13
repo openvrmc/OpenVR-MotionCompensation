@@ -6,7 +6,7 @@
 #include <map>
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

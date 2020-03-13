@@ -214,10 +214,10 @@ namespace inputemulator
 		m_runtimePathUrl = QUrl::fromLocalFile(rchBuffer);
 		LOG(INFO) << "VR Runtime Path: " << m_runtimePathUrl.toLocalFile();
 
-		LOG(INFO) << "sizeof(ipc::Request) = " << sizeof(vrinputemulator::ipc::Request);
-		LOG(INFO) << "sizeof(ipc::Request::msg) = " << sizeof(vrinputemulator::ipc::Request::msg);
-		LOG(INFO) << "sizeof(ipc::Reply) = " << sizeof(vrinputemulator::ipc::Reply);
-		LOG(INFO) << "sizeof(ipc::Reply::msg) = " << sizeof(vrinputemulator::ipc::Reply::msg);
+		LOG(INFO) << "sizeof(ipc::Request) = " << sizeof(vrmotioncompensation::ipc::Request);
+		LOG(INFO) << "sizeof(ipc::Request::msg) = " << sizeof(vrmotioncompensation::ipc::Request::msg);
+		LOG(INFO) << "sizeof(ipc::Reply) = " << sizeof(vrmotioncompensation::ipc::Reply);
+		LOG(INFO) << "sizeof(ipc::Reply::msg) = " << sizeof(vrmotioncompensation::ipc::Reply::msg);
 
 		/* Handle keyboard layout dependent virtual key codes */
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

@@ -2,8 +2,8 @@
 #include "driver/WatchdogProvider.h"
 
 
-vrinputemulator::driver::ServerDriver serverDriver;
-vrinputemulator::driver::WatchdogProvider watchdogProvider;
+vrmotioncompensation::driver::ServerDriver serverDriver;
+vrmotioncompensation::driver::WatchdogProvider watchdogProvider;
 
 
 #define HMD_DLL_EXPORT extern "C" __declspec( dllexport )

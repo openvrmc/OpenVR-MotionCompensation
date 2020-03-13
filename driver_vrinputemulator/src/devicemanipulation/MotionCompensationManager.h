@@ -11,7 +11,7 @@
 #include <chrono\system_clocks.hpp>
 
 // driver namespace
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	template< class Clock > class timer
 	{

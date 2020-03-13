@@ -7,7 +7,7 @@
 #include "ITrackedDeviceServerDriver005Hooks.h"
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

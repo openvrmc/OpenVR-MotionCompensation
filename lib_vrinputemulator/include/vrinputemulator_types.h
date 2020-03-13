@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	enum class MotionCompensationMode : uint32_t
 	{
@@ -26,4 +26,4 @@ namespace vrinputemulator
 		uint32_t refDeviceId;
 	};
 
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation

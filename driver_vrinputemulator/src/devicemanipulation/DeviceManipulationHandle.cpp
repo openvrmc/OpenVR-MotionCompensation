@@ -12,7 +12,7 @@
 #include <mmsystem.h>
 
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{
@@ -59,4 +59,4 @@ namespace vrinputemulator
 			m_deviceMode = DeviceMode;
 		}
 	} // end namespace driver
-} // end namespace vrinputemulator
+} // end namespace vrmotioncompensation
