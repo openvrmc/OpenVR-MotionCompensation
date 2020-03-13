@@ -70,9 +70,22 @@ namespace vrinputemulator
 
 			void runFrame();
 
-			double LPF(double RawData, double SmoothData);
+			vr::HmdVector3d_t LPF(const double RawData[3], vr::HmdVector3d_t SmoothData);
 
-			vr::HmdVector3d_t DebugData[10000];
+			vr::HmdVector3d_t LPF(vr::HmdVector3d_t RawData, vr::HmdVector3d_t SmoothData);
+
+			vr::HmdQuaternion_t lowPassFilterQuaternion(vr::HmdQuaternion_t RawData, vr::HmdQuaternion_t SmoothData);			
+
+			vr::HmdQuaternion_t Slerp(vr::HmdQuaternion_t q1, vr::HmdQuaternion_t q2, double lambda);
+
+			/*inline double Norm(vr::HmdQuaternion_t q1);
+
+			inline void Normalize(vr::HmdQuaternion_t& q1);*/
+
+			vr::HmdVector3d_t DebugData_RawXYZ[10000];
+			vr::HmdVector3d_t DebugData_FilterXYZ[10000];
+			vr::HmdVector3d_t DebugData_RawRot[10000];
+			vr::HmdVector3d_t DebugData_FilterRot[10000];
 			int DebugCounter = 0;
 			timer<boost::chrono::high_resolution_clock> DebugTimer;
 			double DebugTiming[10000];
@@ -86,22 +99,34 @@ namespace vrinputemulator
 			double LPF_Beta = 0.4;
 
 			bool _motionCompensationEnabled = false;
-			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;
-
-			bool _motionCompensationZeroPoseValid = false;
+			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
 			
+			// Zero position
 			vr::HmdVector3d_t _motionCompensationZeroPos;
 			vr::HmdQuaternion_t _motionCompensationZeroRot;
-
-			bool _motionCompensationRefPoseValid = false;
-
+			bool _motionCompensationZeroPoseValid = false;
+			
+			// Reference position
 			vr::HmdVector3d_t _motionCompensationRefPos;
-			vr::HmdVector3d_t _mCFilter_1;
-			vr::HmdVector3d_t _mCFilter_2;
+			vr::HmdVector3d_t _Filter_vecPosition_1;
+			vr::HmdVector3d_t _Filter_vecPosition_2;
+			vr::HmdVector3d_t _Filter_vecPosition_3;
 
 			vr::HmdVector3d_t _motionCompensationRefPosVel;
+			vr::HmdVector3d_t _motionCompensationRefPosAcc;
+			//vr::HmdQuaternion_t _motionCompensationRefRot;
+			
+
 			vr::HmdQuaternion_t _motionCompensationRefRot;
+			vr::HmdQuaternion_t _motionCompensationRefRotInv;
+			vr::HmdQuaternion_t _Filter_rotPosition_1;
+			vr::HmdQuaternion_t _Filter_rotPosition_2;
+			vr::HmdQuaternion_t _Filter_rotPosition_3;
+
 			vr::HmdVector3d_t _motionCompensationRefRotVel;			
+			vr::HmdVector3d_t _motionCompensationRefRotAcc;
+
+			bool _motionCompensationRefPoseValid = false;
 		};
 	}
 }
