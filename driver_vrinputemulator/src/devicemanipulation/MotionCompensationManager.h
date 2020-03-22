@@ -4,7 +4,7 @@
 #include <vrinputemulator_types.h>
 #include <openvr_math.h>
 #include "../logging.h"
-
+#include "Debugger.h"
 
 #include <boost/timer/timer.hpp>
 #include <boost/chrono/chrono.hpp>
@@ -17,7 +17,7 @@ namespace vrinputemulator
 	{
 		typename Clock::time_point tstart;
 	public:
-		timer()/* : start(Clock::now())*/
+		timer()
 		{
 		}
 		typename Clock::duration elapsed() const
@@ -48,6 +48,8 @@ namespace vrinputemulator
 			{
 			}
 			
+			void WriteDebugData();
+
 			void setMotionCompensationMode(MotionCompensationMode Mode);
 
 			void setLPFBeta(double NewBeta)
@@ -78,23 +80,21 @@ namespace vrinputemulator
 
 			vr::HmdQuaternion_t Slerp(vr::HmdQuaternion_t q1, vr::HmdQuaternion_t q2, double lambda);
 
-			/*inline double Norm(vr::HmdQuaternion_t q1);
+			vr::HmdVector3d_t ToEulerAngles(vr::HmdQuaternion_t q);
 
-			inline void Normalize(vr::HmdQuaternion_t& q1);*/
-
-			vr::HmdVector3d_t DebugData_RawXYZ[10000];
+			/*vr::HmdVector3d_t DebugData_RawXYZ[10000];
 			vr::HmdVector3d_t DebugData_FilterXYZ[10000];
 			vr::HmdVector3d_t DebugData_RawRot[10000];
 			vr::HmdVector3d_t DebugData_FilterRot[10000];
 			int DebugCounter = 0;
 			timer<boost::chrono::high_resolution_clock> DebugTimer;
-			double DebugTiming[10000];
+			double DebugTiming[10000];*/
 			
 
 		private:
-			//boost::timer::auto_cpu_timer t;
-
 			ServerDriver* m_parent;
+
+			Debugger DebugLogger;
 
 			double LPF_Beta = 0.4;
 

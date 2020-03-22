@@ -73,6 +73,8 @@ namespace vrinputemulator
 			void setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode);
 
 			bool handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
+
+			vr::HmdVector3d_t ToEulerAngles(vr::HmdQuaternion_t q);
 		};
 	} // end namespace driver
 } // end namespace vrinputemulator

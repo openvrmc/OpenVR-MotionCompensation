@@ -100,27 +100,7 @@ namespace vrinputemulator
 
 		void ServerDriver::Cleanup()
 		{
-			std::ofstream DebugFile;
-			DebugFile.open("MotionData.txt");
-
-			for (int i = 0; i < m_motionCompensation.DebugCounter; i++)
-			{
-				DebugFile << m_motionCompensation.DebugTiming[i] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawXYZ[i].v[0] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawXYZ[i].v[1] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawXYZ[i].v[2] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterXYZ[i].v[0] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterXYZ[i].v[1] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterXYZ[i].v[2] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawRot[i].v[0] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawRot[i].v[1] << ";";
-				DebugFile << m_motionCompensation.DebugData_RawRot[i].v[2] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterRot[i].v[0] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterRot[i].v[1] << ";";
-				DebugFile << m_motionCompensation.DebugData_FilterRot[i].v[2] << ";" << std::endl;
-			}
-
-			DebugFile.close();
+			m_motionCompensation.WriteDebugData();
 
 			LOG(TRACE) << "CServerDriver::Cleanup()";
 			_driverContextHooks.reset();
