@@ -82,21 +82,14 @@ namespace vrinputemulator
 
 			vr::HmdVector3d_t ToEulerAngles(vr::HmdQuaternion_t q);
 
-			/*vr::HmdVector3d_t DebugData_RawXYZ[10000];
-			vr::HmdVector3d_t DebugData_FilterXYZ[10000];
-			vr::HmdVector3d_t DebugData_RawRot[10000];
-			vr::HmdVector3d_t DebugData_FilterRot[10000];
-			int DebugCounter = 0;
-			timer<boost::chrono::high_resolution_clock> DebugTimer;
-			double DebugTiming[10000];*/
-			
+			const double AngleDifference(double angle1, double angle2);
 
 		private:
 			ServerDriver* m_parent;
 
 			Debugger DebugLogger;
 
-			double LPF_Beta = 0.4;
+			double LPF_Beta = 0.1;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
@@ -114,8 +107,6 @@ namespace vrinputemulator
 
 			vr::HmdVector3d_t _motionCompensationRefPosVel;
 			vr::HmdVector3d_t _motionCompensationRefPosAcc;
-			//vr::HmdQuaternion_t _motionCompensationRefRot;
-			
 
 			vr::HmdQuaternion_t _motionCompensationRefRot;
 			vr::HmdQuaternion_t _motionCompensationRefRotInv;
@@ -123,7 +114,7 @@ namespace vrinputemulator
 			vr::HmdQuaternion_t _Filter_rotPosition_2;
 			vr::HmdQuaternion_t _Filter_rotPosition_3;
 
-			vr::HmdVector3d_t _motionCompensationRefRotVel;			
+			vr::HmdVector3d_t _motionCompensationRefRotVel;
 			vr::HmdVector3d_t _motionCompensationRefRotAcc;
 
 			bool _motionCompensationRefPoseValid = false;

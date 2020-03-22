@@ -3,6 +3,7 @@
 #include "DeviceManipulationHandle.h"
 #include "../driver/ServerDriver.h"
 
+#include <cmath>
 #include <boost/math/constants/constants.hpp>
 
 // driver namespace
@@ -107,6 +108,8 @@ namespace vrinputemulator
 			// by disabling velocity (which effectively disables prediction for rendering)."
 			// That means that we have to calculate the velocity to not interfere with the prediction for rendering
 
+			// It appears that Acceleration values are never used in any device.
+
 			// Position
 			// Add a simple low pass filter
 			// 1st stage
@@ -181,11 +184,12 @@ namespace vrinputemulator
 
 			vr::HmdVector3d_t RotEulerRaw = ToEulerAngles(pose.qRotation);
 			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_3);
-			/*vr::HmdVector3d_t Filter_vecAngularVelocity;
+			
+			vr::HmdVector3d_t Filter_vecAngularVelocity;
 
 			if (RotEulerRaw.v[0] != (double)0.0)
 			{
-				Filter_vecAngularVelocity.v[0] = pose.vecAngularVelocity[0] * (RotEulerFilter.v[0] / RotEulerRaw.v[0]);
+				Filter_vecAngularVelocity.v[0] = pose.vecAngularVelocity[0] * (1 - (AngleDifference(RotEulerRaw.v[0], RotEulerFilter.v[0]) / RotEulerRaw.v[0]));
 			}
 			else
 			{
@@ -194,7 +198,7 @@ namespace vrinputemulator
 
 			if (RotEulerRaw.v[1] != (double)0.0)
 			{
-				Filter_vecAngularVelocity.v[1] = pose.vecAngularVelocity[1] * (RotEulerFilter.v[1] / RotEulerRaw.v[1]);
+				Filter_vecAngularVelocity.v[1] = pose.vecAngularVelocity[1] * (1 - (AngleDifference(RotEulerRaw.v[1], RotEulerFilter.v[1]) / RotEulerRaw.v[1]));
 			}
 			else
 			{
@@ -203,19 +207,22 @@ namespace vrinputemulator
 
 			if (RotEulerRaw.v[2] != (double)0.0)
 			{
-				Filter_vecAngularVelocity.v[2] = pose.vecAngularVelocity[2] * (RotEulerFilter.v[2] / RotEulerRaw.v[2]);
+				Filter_vecAngularVelocity.v[2] = pose.vecAngularVelocity[2] * (1 - (AngleDifference(RotEulerRaw.v[2], RotEulerFilter.v[2]) / RotEulerRaw.v[2]));
 			}
 			else
 			{
 				Filter_vecAngularVelocity.v[2] = pose.vecAngularVelocity[2];
-			}*/
+			}
 
 
-			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
+			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);			
+			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
+
+			// Acceleration is not needed
 			//_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
-			//_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
-			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
 			//_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
+			
+			//Position is valid (only needed for the first frame)
 			_motionCompensationRefPoseValid = true;
 
 			// ----------------------------------------------------------------------------------------------- //
@@ -234,7 +241,7 @@ namespace vrinputemulator
 			DebugLogger.AddDebugData(_motionCompensationRefPosAcc, 5);
 
 			DebugLogger.AddDebugData(pose.vecAngularVelocity, 6);
-			DebugLogger.AddDebugData(_motionCompensationRefRotVel, 7);
+			DebugLogger.AddDebugData(Filter_vecAngularVelocity, 7);
 
 			DebugLogger.AddDebugData(pose.vecAngularAcceleration, 8);
 			DebugLogger.AddDebugData(_motionCompensationRefRotAcc, 9);
@@ -243,9 +250,6 @@ namespace vrinputemulator
 			DebugLogger.AddDebugData(_Filter_rotPosition_3, 1);
 
 			DebugLogger.SetInSync(true);
-
-			//Position is valid (only needed for the first frame)
-			_motionCompensationRefPoseValid = true;
 		}
 
 		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo)
@@ -267,7 +271,7 @@ namespace vrinputemulator
 					DebugLogger.AddDebugData(pose.qRotation, 2);
 				}
 
-				//All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
+				// All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
 				// convert pose from driver space to app space
 				vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
 				vr::HmdVector3d_t poseWorldPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
@@ -277,9 +281,7 @@ namespace vrinputemulator
 				vr::HmdVector3d_t compensatedPoseWorldPos = _motionCompensationZeroPos + vrmath::quaternionRotateVector(_motionCompensationRefRot, _motionCompensationRefRotInv, poseWorldPos - _motionCompensationRefPos, true);
 				vr::HmdQuaternion_t compensatedPoseWorldRot = _motionCompensationRefRotInv * poseWorldRot;
 
-				//auto now = std::chrono::duration_cast <std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-				// We translate the motion ref vel/acc values into driver space and directly substract them
+				// Translate the motion ref vel/acc values into driver space and directly subtract them
 				if (_motionCompensationRefPoseValid)
 				{
 					vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
@@ -346,8 +348,6 @@ namespace vrinputemulator
 			RetVal.v[0] = SmoothData.v[0] - (LPF_Beta * (SmoothData.v[0] - RawData[0]));
 			RetVal.v[1] = SmoothData.v[1] - (LPF_Beta * (SmoothData.v[1] - RawData[1]));
 			RetVal.v[2] = SmoothData.v[2] - (LPF_Beta * (SmoothData.v[2] - RawData[2]));
-
-			//return SmoothData - (LPF_Beta * (SmoothData - RawData));
 
 			return RetVal;
 		}
@@ -433,6 +433,13 @@ namespace vrinputemulator
 			angles.v[2] = std::atan2(siny_cosp, cosy_cosp);
 
 			return angles;
+		}
+
+		//Returns the shortest difference between to angles
+		const double MotionCompensationManager::AngleDifference(double Raw, double New)
+		{
+			double diff = fmod((New - Raw + (double)180), (double)360) - (double)180;
+			return diff < -(double)180 ? diff + (double)360 : diff;
 		}
 	}
 }
