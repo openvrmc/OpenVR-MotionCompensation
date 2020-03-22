@@ -6,7 +6,7 @@
 #include <boost/chrono/chrono.hpp>
 #include <chrono\system_clocks.hpp>
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace vrinputemulator
+namespace vrmotioncompensation
 {
 	namespace driver
 	{

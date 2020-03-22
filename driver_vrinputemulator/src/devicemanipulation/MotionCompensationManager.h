@@ -13,27 +13,6 @@
 // driver namespace
 namespace vrmotioncompensation
 {
-	template< class Clock > class timer
-	{
-		typename Clock::time_point tstart;
-	public:
-		timer()
-		{
-		}
-		typename Clock::duration elapsed() const
-		{
-			return Clock::now() - tstart;
-		}
-		double seconds() const
-		{
-			return elapsed().count() * ((double)Clock::period::num / Clock::period::den);
-		}
-		void start()
-		{
-			tstart = Clock::now();
-		}
-	};
-
 	namespace driver
 	{
 		// forward declarations
@@ -89,7 +68,7 @@ namespace vrmotioncompensation
 
 			Debugger DebugLogger;
 
-			double LPF_Beta = 0.1;
+			double LPF_Beta = 0.2;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
