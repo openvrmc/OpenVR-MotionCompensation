@@ -203,7 +203,7 @@ namespace motioncompensation
 		{
 			if (initError == vr::VRInitError_Init_HmdNotFound || initError == vr::VRInitError_Init_HmdNotFoundPresenceFailed)
 			{
-				QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "Could not find HMD!");
+				QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "Could not find HMD!");
 			}
 			throw std::runtime_error(std::string("Failed to initialize OpenVR: ") + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError)));
 		}
@@ -259,42 +259,42 @@ namespace motioncompensation
 		// Check whether OpenVR is too outdated
 		if (!vr::VR_IsInterfaceVersionValid(vr::IVRSystem_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRSystem_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRSettings_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRSettings_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVROverlay_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVROverlay_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRApplications_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRApplications_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRChaperone_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRChaperone_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRChaperoneSetup_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRChaperoneSetup_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRCompositor_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRCompositor_Version) + std::string(" not found."));
 		}
 		else if (!vr::VR_IsInterfaceVersionValid(vr::IVRNotifications_Version))
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "OpenVR version is too outdated. Please update OpenVR.");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "OpenVR version is too outdated. Please update OpenVR.");
 			throw std::runtime_error(std::string("OpenVR version is too outdated: Interface version ") + std::string(vr::IVRNotifications_Version) + std::string(" not found."));
 		}
 
@@ -324,7 +324,7 @@ namespace motioncompensation
 
 		if (!vr::VROverlay())
 		{
-			QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "Is OpenVR running?");
+			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "Is OpenVR running?");
 			throw std::runtime_error(std::string("No Overlay interface"));
 		}
 
@@ -382,7 +382,7 @@ namespace motioncompensation
 			{
 				if (overlayError == vr::VROverlayError_KeyInUse)
 				{
-					QMessageBox::critical(nullptr, "OpenVR Input Emulator Overlay", "Another instance is already running.");
+					QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "Another instance is already running.");
 				}
 				throw std::runtime_error(std::string("Failed to create Overlay: " + std::string(vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError))));
 			}
@@ -435,7 +435,7 @@ namespace motioncompensation
 
 		try
 		{
-			m_vrInputEmulator.connect();
+			m_vrMotionCompensation.connect();
 		}
 		catch (const std::exception & e)
 		{
@@ -647,7 +647,7 @@ namespace motioncompensation
 
 	void OverlayController::showKeyboard(QString existingText, unsigned long userValue)
 	{
-		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Input Emulator Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
+		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
 	}
 
 	void OverlayController::playActivationSound()

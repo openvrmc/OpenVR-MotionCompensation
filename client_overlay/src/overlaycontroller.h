@@ -36,7 +36,7 @@ namespace motioncompensation
 	public:
 		static constexpr const char* applicationKey = "matzman666.VRInputEmulator";
 		static constexpr const char* applicationName = "OpenVR Input Emulator";
-		static constexpr const char* applicationVersionString = "v1.3";
+		static constexpr const char* applicationVersionString = "v0.0.7";
 
 	private:
 		vr::VROverlayHandle_t m_ulOverlayHandle = vr::k_ulOverlayHandleInvalid;
@@ -55,7 +55,7 @@ namespace motioncompensation
 		QPoint m_ptLastMouse;
 		Qt::MouseButtons m_lastMouseButtons = 0;
 
-		vrmotioncompensation::VRMotionCompensation m_vrInputEmulator;
+		vrmotioncompensation::VRMotionCompensation m_vrMotionCompensation;
 
 		bool desktopMode;
 		bool noSound;
@@ -85,9 +85,9 @@ namespace motioncompensation
 		void Init(QQmlEngine* qmlEngine);
 		void Shutdown();
 
-		vrmotioncompensation::VRMotionCompensation& vrInputEmulator()
+		vrmotioncompensation::VRMotionCompensation& vrMotionCompensation()
 		{
-			return m_vrInputEmulator;
+			return m_vrMotionCompensation;
 		}
 
 		bool isDashboardVisible()

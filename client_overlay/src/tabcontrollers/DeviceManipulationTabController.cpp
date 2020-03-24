@@ -57,7 +57,7 @@ namespace motioncompensation
 
 						/*try {
 							vrmotioncompensation::DeviceInfo info2;
-							parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
+							parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
 							info->getDeviceMode = info2.getDeviceMode;
 						} catch (std::exception& e) {
 							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
@@ -131,7 +131,7 @@ namespace motioncompensation
 
 							/*try {
 								vrmotioncompensation::DeviceInfo info2;
-								parent->vrInputEmulator().getDeviceInfo(info->openvrId, info2);
+								parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
 								info->getDeviceMode = info2.getDeviceMode;
 							} catch (std::exception& e) {
 								LOG(ERROR) << "Exception caught while getting device info: " << e.what();
@@ -415,13 +415,13 @@ namespace motioncompensation
 			{
 				LOG(TRACE) << "Sending Motion Compensation Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
-				parent->vrInputEmulator().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
+				parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
 			}
 			else
 			{
 				LOG(TRACE) << "Sending Normal Mode";
-				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[MCindex]->openvrId);
-				parent->vrInputEmulator().setDeviceNormalMode(deviceInfos[RTindex]->openvrId);
+				parent->vrMotionCompensation().setDeviceNormalMode(deviceInfos[MCindex]->openvrId);
+				parent->vrMotionCompensation().setDeviceNormalMode(deviceInfos[RTindex]->openvrId);
 			}
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
@@ -491,7 +491,7 @@ namespace motioncompensation
 		try
 		{
 			LOG(TRACE) << "Sending new LPF Beta value:" << value;
-			parent->vrInputEmulator().setLPFBeta(value);
+			parent->vrMotionCompensation().setLPFBeta(value);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
@@ -539,7 +539,7 @@ namespace motioncompensation
 			{
 				vrmotioncompensation::DeviceInfo info;
 
-				parent->vrInputEmulator().getDeviceInfo(deviceInfos[index]->openvrId, info);
+				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[index]->openvrId, info);
 				if (deviceInfos[index]->getDeviceMode != info.getDeviceMode)
 				{
 					deviceInfos[index]->getDeviceMode = info.getDeviceMode;

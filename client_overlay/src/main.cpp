@@ -15,7 +15,7 @@ const char* logConfigFileName = "logging.conf";
 const char* logConfigDefault =
 "* GLOBAL:\n"
 "	FORMAT = \"[%level] %datetime{%Y-%M-%d %H:%m:%s}: %msg\"\n"
-"	FILENAME = \"OpenVR-InputEmulatorOverlay.log\"\n"
+"	FILENAME = \"OpenVR-MotionCompensationOverlay.log\"\n"
 "	ENABLED = true\n"
 "	TO_FILE = true\n"
 "	TO_STANDARD_OUTPUT = true\n"
