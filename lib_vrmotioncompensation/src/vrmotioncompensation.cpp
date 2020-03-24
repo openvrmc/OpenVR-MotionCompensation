@@ -1,4 +1,4 @@
-#include <vrinputemulator.h>
+#include <vrmotioncompensation.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <cstdlib>
 #include <functional>

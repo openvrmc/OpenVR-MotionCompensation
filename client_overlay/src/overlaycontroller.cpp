@@ -20,7 +20,7 @@
 #include <cmath>
 #include <openvr.h>
 #include "logging.h"
-#include <vrinputemulator_types.h>
+#include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
 #include <locale>
 #include <codecvt>
@@ -28,7 +28,7 @@
 
 
 // application namespace
-namespace inputemulator
+namespace motioncompensation
 {
 	std::map<int, const char*> OverlayController::_openVRButtonNames = {
 		{ 0, "System" },
@@ -666,4 +666,4 @@ namespace inputemulator
 		}
 	}
 
-} // namespace inputemulator
+} // namespace motioncompensation

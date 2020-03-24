@@ -21,8 +21,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{05AC9994-2B63-4DE5-ABF3-95CE346F3A64}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>lib_vrinputemulator</RootNamespace>
+    <RootNamespace>lib_vrmotioncompensation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>lib_vrmotioncompensation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,7 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
-    <TargetName>libvrinputemulator</TargetName>
+    <TargetName>libvrmotioncompensation</TargetName>
     <IncludePath>D:\Programmierung\VR\boost_1_72_0;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -174,12 +175,12 @@
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\ipc_protocol.h" />
     <ClInclude Include="include\openvr_math.h" />
-    <ClInclude Include="include\vrinputemulator.h" />
-    <ClInclude Include="include\vrinputemulator_types.h" />
+    <ClInclude Include="include\vrmotioncompensation.h" />
+    <ClInclude Include="include\vrmotioncompensation_types.h" />
     <ClInclude Include="src\logging.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\vrinputemulator.cpp" />
+    <ClCompile Include="src\vrmotioncompensation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

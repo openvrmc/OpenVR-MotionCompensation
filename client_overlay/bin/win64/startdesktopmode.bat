@@ -1,1 +1,1 @@
-start OpenVR-InputEmulatorOverlay.exe -desktop -nosound
+start OpenVR-MotionCompensationOverlay.exe -desktop -nosound

@@ -3,11 +3,11 @@
 #include <QObject>
 #include <memory>
 #include <openvr.h>
-#include <vrinputemulator.h>
+#include <vrmotioncompensation.h>
 
 class QQuickWindow;
 // application namespace
-namespace inputemulator
+namespace motioncompensation
 {
 	// forward declaration
 	class OverlayController;
@@ -104,4 +104,4 @@ namespace inputemulator
 		void motionCompensationKalmanObservationNoiseChanged(double variance);
 		void motionCompensationMovingAverageWindowChanged(unsigned window);
 	};
-} // namespace inputemulator
+} // namespace motioncompensation

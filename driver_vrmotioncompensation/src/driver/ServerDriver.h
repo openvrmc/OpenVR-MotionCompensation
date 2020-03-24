@@ -4,7 +4,7 @@
 #include <mutex>
 #include <queue>
 #include <openvr_driver.h>
-#include <vrinputemulator_types.h>
+#include <vrmotioncompensation_types.h>
 #include "../hooks/common.h"
 #include "../logging.h"
 #include "../com/shm/driver_ipc_shm.h"

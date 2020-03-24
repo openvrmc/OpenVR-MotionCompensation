@@ -1,6 +1,6 @@
 {
 	"alwaysActivate": true,
-	"name" : "00vrinputemulator",
+	"name" : "00vrmotioncompensation",
 	"directory" : "",
 	"resourceOnly" : false
 }

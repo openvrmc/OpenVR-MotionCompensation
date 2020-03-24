@@ -26,7 +26,7 @@
 #include "tabcontrollers/DeviceManipulationTabController.h"
 
 // application namespace
-namespace inputemulator
+namespace motioncompensation
 {
 	class OverlayController : public QObject
 	{
@@ -138,7 +138,7 @@ namespace inputemulator
 
 		static OverlayController* createInstance(bool desktopMode, bool noSound)
 		{
-			singleton.reset(new inputemulator::OverlayController(desktopMode, noSound));
+			singleton.reset(new motioncompensation::OverlayController(desktopMode, noSound));
 			return singleton.get();
 		}
 
@@ -153,4 +153,4 @@ namespace inputemulator
 		}
 	};
 
-} // namespace inputemulator
+} // namespace motioncompensation

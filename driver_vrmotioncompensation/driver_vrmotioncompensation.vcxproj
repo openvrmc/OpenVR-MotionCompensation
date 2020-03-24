@@ -30,7 +30,7 @@
     <ClCompile Include="src\devicemanipulation\DeviceManipulationHandle.cpp" />
     <ClCompile Include="src\com\shm\driver_ipc_shm.cpp" />
     <ClCompile Include="src\driver\ServerDriver.cpp" />
-    <ClCompile Include="src\driver_vrinputemulator.cpp" />
+    <ClCompile Include="src\driver_motioncompensation.cpp" />
     <ClCompile Include="src\hooks\IVRServerDriverHost004Hooks.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -50,8 +50,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>driver_vrinputemulator</RootNamespace>
+    <RootNamespace>driver_motioncompensation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>driver_vrmotioncompensation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -107,27 +108,27 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\driver\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
-    <TargetName>driver_00vrinputemulator</TargetName>
+    <TargetName>driver_00vrmotioncompensation</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
-    <TargetName>driver_00vrinputemulator</TargetName>
+    <TargetName>driver_00vrmotioncompensation</TargetName>
     <IncludePath>D:\Programmierung\VR\boost_1_72_0\boost;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\driver\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
-    <TargetName>driver_00vrinputemulator</TargetName>
+    <TargetName>driver_00vrmotioncompensation</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
-    <TargetName>driver_00vrinputemulator</TargetName>
+    <TargetName>driver_00vrmotioncompensation</TargetName>
     <IncludePath>D:\Programmierung\VR\boost_1_72_0\boost;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -194,7 +195,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRIVER_VRINPUTEMULATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_72_0;..\lib_vrinputemulator\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_72_0;..\lib_vrmotioncompensation\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

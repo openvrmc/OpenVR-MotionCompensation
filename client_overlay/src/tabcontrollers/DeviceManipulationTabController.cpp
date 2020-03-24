@@ -3,12 +3,12 @@
 #include <QApplication>
 #include "../overlaycontroller.h"
 #include <openvr_math.h>
-#include <vrinputemulator_types.h>
+#include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
 #include <chrono>
 
 // application namespace
-namespace inputemulator
+namespace motioncompensation
 {
 	DeviceManipulationTabController::~DeviceManipulationTabController()
 	{
@@ -553,4 +553,4 @@ namespace inputemulator
 		return retval;*/
 		return false;
 	}
-} // namespace inputemulator
+} // namespace motioncompensation

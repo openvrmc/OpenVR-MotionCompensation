@@ -56,13 +56,13 @@ void installManifest(bool cleaninstall = false)
 	if (QFile::exists(manifestQPath))
 	{
 		bool alreadyInstalled = false;
-		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey))
+		if (vr::VRApplications()->IsApplicationInstalled(motioncompensation::OverlayController::applicationKey))
 		{
 			if (cleaninstall)
 			{
 				char buffer[1024];
 				auto appError = vr::VRApplicationError_None;
-				vr::VRApplications()->GetApplicationPropertyString(inputemulator::OverlayController::applicationKey, vr::VRApplicationProperty_WorkingDirectory_String, buffer, 1024, &appError);
+				vr::VRApplications()->GetApplicationPropertyString(motioncompensation::OverlayController::applicationKey, vr::VRApplicationProperty_WorkingDirectory_String, buffer, 1024, &appError);
 				if (appError == vr::VRApplicationError_None)
 				{
 					auto oldManifestQPath = QDir::cleanPath(QDir(buffer).absoluteFilePath("manifest.vrmanifest"));
@@ -88,7 +88,7 @@ void installManifest(bool cleaninstall = false)
 		}
 		else if (!alreadyInstalled || cleaninstall)
 		{
-			auto apperror = vr::VRApplications()->SetApplicationAutoLaunch(inputemulator::OverlayController::applicationKey, true);
+			auto apperror = vr::VRApplications()->SetApplicationAutoLaunch(motioncompensation::OverlayController::applicationKey, true);
 			if (apperror != vr::VRApplicationError_None)
 			{
 				throw std::runtime_error(std::string("Could not set auto start: ") + std::string(vr::VRApplications()->GetApplicationsErrorNameFromEnum(apperror)));
@@ -106,7 +106,7 @@ void removeManifest()
 	auto manifestQPath = QDir::cleanPath(QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("manifest.vrmanifest"));
 	if (QFile::exists(manifestQPath))
 	{
-		if (vr::VRApplications()->IsApplicationInstalled(inputemulator::OverlayController::applicationKey))
+		if (vr::VRApplications()->IsApplicationInstalled(motioncompensation::OverlayController::applicationKey))
 		{
 			vr::VRApplications()->RemoveApplicationManifest(QDir::toNativeSeparators(manifestQPath).toStdString().c_str());
 		}
@@ -236,8 +236,8 @@ int main(int argc, char* argv[])
 		QApplication a(argc, argv);
 		a.setOrganizationName("matzman666");
 		a.setApplicationName("OpenVRInputEmulator");
-		a.setApplicationDisplayName(inputemulator::OverlayController::applicationName);
-		a.setApplicationVersion(inputemulator::OverlayController::applicationVersionString);
+		a.setApplicationDisplayName(motioncompensation::OverlayController::applicationName);
+		a.setApplicationVersion(motioncompensation::OverlayController::applicationVersionString);
 
 		qInstallMessageHandler(myQtMessageHandler);
 
@@ -285,12 +285,12 @@ int main(int argc, char* argv[])
 		}
 
 		QSettings appSettings(QSettings::IniFormat, QSettings::UserScope, a.organizationName(), a.applicationName());
-		inputemulator::OverlayController::setAppSettings(&appSettings);
+		motioncompensation::OverlayController::setAppSettings(&appSettings);
 		LOG(INFO) << "Settings File: " << appSettings.fileName().toStdString();
 
 		QQmlEngine qmlEngine;
 
-		inputemulator::OverlayController* controller = inputemulator::OverlayController::createInstance(desktopMode, noSound);
+		motioncompensation::OverlayController* controller = motioncompensation::OverlayController::createInstance(desktopMode, noSound);
 		controller->Init(&qmlEngine);
 
 		QQmlComponent component(&qmlEngine, QUrl::fromLocalFile(a.applicationDirPath() + "/res/qml/mainwidget.qml"));
@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
 			LOG(ERROR) << "QML Error: " << e.toString().toStdString() << std::endl;
 		}
 		auto quickObj = component.create();
-		controller->SetWidget(qobject_cast<QQuickItem*>(quickObj), inputemulator::OverlayController::applicationName, inputemulator::OverlayController::applicationKey);
+		controller->SetWidget(qobject_cast<QQuickItem*>(quickObj), motioncompensation::OverlayController::applicationName, motioncompensation::OverlayController::applicationKey);
 
 		if (!desktopMode && !noManifest)
 		{

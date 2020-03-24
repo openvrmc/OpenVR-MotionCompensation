@@ -1,7 +1,7 @@
 #pragma once
 
 #include <openvr_driver.h>
-#include <vrinputemulator_types.h>
+#include <vrmotioncompensation_types.h>
 #include <openvr_math.h>
 #include "../logging.h"
 #include "Debugger.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vrinputemulator_types.h"
+#include "vrmotioncompensation_types.h"
 #include <utility>
 
 
