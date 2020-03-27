@@ -234,8 +234,8 @@ int main(int argc, char* argv[])
 	try
 	{
 		QApplication a(argc, argv);
-		a.setOrganizationName("matzman666");
-		a.setApplicationName("OpenVRInputEmulator");
+		a.setOrganizationName("OVRMC");
+		a.setApplicationName("OpenVRMotionCompensation");
 		a.setApplicationDisplayName(motioncompensation::OverlayController::applicationName);
 		a.setApplicationVersion(motioncompensation::OverlayController::applicationVersionString);
 

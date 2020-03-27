@@ -5,7 +5,7 @@ const char* logConfigFileName = "logging.conf";
 const char* logConfigDefault =
 "* GLOBAL:\n"
 "	FORMAT = \"[%level] %datetime{%Y-%M-%d %H:%m:%s}: %msg\"\n"
-"	FILENAME = \"driver_vrinputemulator.log\"\n"
+"	FILENAME = \"driver_motioncompensation.log\"\n"
 "	ENABLED = true\n"
 "	TO_FILE = true\n"
 "	TO_STANDARD_OUTPUT = true\n"

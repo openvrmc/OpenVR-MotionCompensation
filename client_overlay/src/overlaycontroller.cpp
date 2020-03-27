@@ -336,13 +336,13 @@ namespace motioncompensation
 		qmlEngine->rootContext()->setContextProperty("vrRuntimePath", getVRRuntimePathUrl());
 
 		// Register qml singletons
-		qmlRegisterSingletonType<OverlayController>("matzman666.inputemulator", 1, 0, "OverlayController", [](QQmlEngine*, QJSEngine*)
+		qmlRegisterSingletonType<OverlayController>("ovrmc.motioncompensation", 1, 0, "OverlayController", [](QQmlEngine*, QJSEngine*)
 													{
 														QObject* obj = getInstance();
 														QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);
 														return obj;
 													});
-		qmlRegisterSingletonType<DeviceManipulationTabController>("matzman666.inputemulator", 1, 0, "DeviceManipulationTabController", [](QQmlEngine*, QJSEngine*)
+		qmlRegisterSingletonType<DeviceManipulationTabController>("ovrmc.motioncompensation", 1, 0, "DeviceManipulationTabController", [](QQmlEngine*, QJSEngine*)
 																  {
 																	  QObject* obj = &getInstance()->deviceManipulationTabController;
 																	  QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership);

@@ -40,7 +40,7 @@ namespace vrmotioncompensation
 			std::thread _ipcThread;
 			volatile bool _ipcThreadRunning = false;
 			volatile bool _ipcThreadStopFlag = false;
-			std::string _ipcQueueName = "driver_vrinputemulator.server_queue";
+			std::string _ipcQueueName = "driver_vrmotioncompensation.server_queue";
 			uint32_t _ipcClientIdNext = 1;
 			std::map<uint32_t, std::shared_ptr<boost::interprocess::message_queue>> _ipcEndpoints;
 

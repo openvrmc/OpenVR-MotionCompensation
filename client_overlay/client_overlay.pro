@@ -8,7 +8,7 @@ DESTDIR = ./bin/win64
 QT += core gui multimedia widgets qml quickwidgets quick multimediawidgets quickcontrols2
 CONFIG += debug
 DEFINES += _WINDOWS WIN64 QT_MULTIMEDIA_LIB QT_MULTIMEDIAWIDGETS_LIB QT_QML_LIB QT_QUICK_LIB QT_QUICKWIDGETS_LIB QT_QUICKCONTROLS2_LIB QT_WIDGETS_LIB
-INCLUDEPATH += ./../lib_vrinputemulator/include \
+INCLUDEPATH += ./../lib_vrmotioncompensation/include \
     $(BOOST_ROOT) \
     $(OPENVR_ROOT)/headers \
     ./../third-party/easylogging++ \

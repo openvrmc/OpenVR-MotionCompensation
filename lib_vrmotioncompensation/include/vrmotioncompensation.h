@@ -138,7 +138,7 @@ namespace vrmotioncompensation
 	class VRMotionCompensation
 	{
 	public:
-		VRMotionCompensation(const std::string& driverQueue = "driver_vrinputemulator.server_queue", const std::string& clientQueue = "driver_vrinputemulator.client_queue.");
+		VRMotionCompensation(const std::string& driverQueue = "driver_vrmotioncompensation.server_queue", const std::string& clientQueue = "driver_vrmotioncompensation.client_queue.");
 		~VRMotionCompensation();
 
 		void connect();
