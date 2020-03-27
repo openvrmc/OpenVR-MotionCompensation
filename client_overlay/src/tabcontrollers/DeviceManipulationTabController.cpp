@@ -3,7 +3,6 @@
 #include <QApplication>
 #include "../overlaycontroller.h"
 #include <openvr_math.h>
-#include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
 #include <chrono>
 
@@ -30,6 +29,7 @@ namespace motioncompensation
 		this->widget = widget;
 		try
 		{
+			//Get some infos about the found devices
 			for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
 			{
 				auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
@@ -41,10 +41,10 @@ namespace motioncompensation
 						info->openvrId = id;
 						info->deviceClass = deviceClass;
 						char buffer[vr::k_unMaxPropertyStringSize];
-						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
-						
-						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
 
+						//Get and save the serial number
+						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;						
+						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);						
 						if (pError == vr::TrackedProp_Success)
 						{
 							info->serial = std::string(buffer);
@@ -55,14 +55,19 @@ namespace motioncompensation
 							LOG(ERROR) << "Could not get serial of device " << id;
 						}
 
-						/*try {
+						//Get and save the current device mode
+						try
+						{
 							vrmotioncompensation::DeviceInfo info2;
 							parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-							info->getDeviceMode = info2.getDeviceMode;
-						} catch (std::exception& e) {
+							info->deviceMode = info2.deviceMode;
+						}
+						catch (std::exception& e)
+						{
 							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-						}*/
+						}
 
+						//Store the found info
 						deviceInfos.push_back(info);
 						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
 					}
@@ -88,15 +93,18 @@ namespace motioncompensation
 				unsigned i = 0;
 				for (auto info : deviceInfos)
 				{
+					//Has the device mode changed?
 					bool hasDeviceInfoChanged = updateDeviceInfo(i);
-					unsigned status = devicePoses[info->openvrId].bDeviceIsConnected ? 0 : 1;
 
-					if (info->deviceMode == 0 && info->deviceStatus != status)
+					//Has the connection status changed?
+					unsigned status = devicePoses[info->openvrId].bDeviceIsConnected ? 0 : 1;
+					if (info->deviceMode == vrmotioncompensation::MotionCompensationDeviceMode::Default && info->deviceStatus != status)
 					{
 						info->deviceStatus = status;
 						hasDeviceInfoChanged = true;
 					}
 
+					//Push changes to UI
 					if (hasDeviceInfoChanged)
 					{
 						emit deviceInfoChanged(i);
@@ -105,6 +113,7 @@ namespace motioncompensation
 					++i;
 				}
 
+				//Check if there is a new device (id start point is maxValidDeviceId + 1!)
 				bool newDeviceAdded = false;
 				for (uint32_t id = maxValidDeviceId + 1; id < vr::k_unMaxTrackedDeviceCount; ++id)
 				{
@@ -117,6 +126,8 @@ namespace motioncompensation
 							info->openvrId = id;
 							info->deviceClass = deviceClass;
 							char buffer[vr::k_unMaxPropertyStringSize];
+
+							//Get and save the serial number
 							vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
 							vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
 							if (pError == vr::TrackedProp_Success)
@@ -129,13 +140,17 @@ namespace motioncompensation
 								LOG(ERROR) << "Could not get serial of device " << id;
 							}
 
-							/*try {
+							//Get and save the current device mode
+							try
+							{
 								vrmotioncompensation::DeviceInfo info2;
 								parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-								info->getDeviceMode = info2.getDeviceMode;
-							} catch (std::exception& e) {
+								info->deviceMode = info2.deviceMode;
+							}
+							catch (std::exception& e)
+							{
 								LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-							}*/
+							}
 
 							deviceInfos.push_back(info);
 							LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
@@ -402,11 +417,23 @@ namespace motioncompensation
 			return false;
 		}
 
-		// ToDo:
-		// - Check if index is already a reference tracker
-		// - Check if RTindex is already a motion compensated device
-		// - Check that the compensated device is a HMD
-		// - Check that the reference tracker is not a HMD
+		if (deviceInfos[MCindex]->deviceClass != vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+		{
+			m_deviceModeErrorString = "\"Device\" is not a HMD!";
+			return false;
+		}
+
+		if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+		{
+			m_deviceModeErrorString = "\"Reference Tracker\" cannot be a HMD!";
+			return false;
+		}
+
+		if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
+		{
+			m_deviceModeErrorString = "\"Reference Tracker\" is invalid!";
+			return false;
+		}
 
 		try
 		{
@@ -531,7 +558,7 @@ namespace motioncompensation
 
 	bool DeviceManipulationTabController::updateDeviceInfo(unsigned index)
 	{
-		/*bool retval = false;
+		bool retval = false;
 
 		if (index < deviceInfos.size())
 		{
@@ -540,17 +567,18 @@ namespace motioncompensation
 				vrmotioncompensation::DeviceInfo info;
 
 				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[index]->openvrId, info);
-				if (deviceInfos[index]->getDeviceMode != info.getDeviceMode)
+				if (deviceInfos[index]->deviceMode != info.deviceMode)
 				{
-					deviceInfos[index]->getDeviceMode = info.getDeviceMode;
+					deviceInfos[index]->deviceMode = info.deviceMode;
 					retval = true;
 				}
-			} catch (std::exception& e)
+			}
+			catch (std::exception& e)
 			{
 				LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 			}
 		}
-		return retval;*/
+		return retval;
 		return false;
 	}
 } // namespace motioncompensation

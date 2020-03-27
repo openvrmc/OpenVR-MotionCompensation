@@ -4,6 +4,7 @@
 #include <memory>
 #include <openvr.h>
 #include <vrmotioncompensation.h>
+#include <vrmotioncompensation_types.h>
 
 class QQuickWindow;
 // application namespace
@@ -25,7 +26,7 @@ namespace motioncompensation
 		vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 		uint32_t openvrId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
-		int deviceMode = 0;						// 0: Default, 1: Motion Compensation
+		vrmotioncompensation::MotionCompensationDeviceMode deviceMode = vrmotioncompensation::MotionCompensationDeviceMode::Default;
 		uint32_t refDeviceId = 0;
 		uint32_t renderModelIndex = 0;
 		vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
