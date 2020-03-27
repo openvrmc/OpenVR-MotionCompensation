@@ -1,6 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.0
-import matzman666.inputemulator 1.0
+import ovrmc.motioncompensation 1.0
 
 TextField {
     property int _keyBoardUID: -1

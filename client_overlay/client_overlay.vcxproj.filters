@@ -46,5 +46,47 @@
     <None Include="bin\win64\res\qml\mainwidget.qml">
       <Filter>qml</Filter>
     </None>
+    <None Include="bin\win64\res\qml\DeviceRenderModelPage.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyComboBox.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyDialogOkCancelPopup.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyDialogOkPopup.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyOffsetGroupBox.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyPushButton.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyPushButton2.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyRangeSlider.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyResources.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MySlider.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyStackViewPage.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyText.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyTextField.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyToggleButton.qml">
+      <Filter>qml</Filter>
+    </None>
   </ItemGroup>
 </Project>

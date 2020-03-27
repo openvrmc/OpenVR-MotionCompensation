@@ -26,7 +26,7 @@
 #include "tabcontrollers/DeviceManipulationTabController.h"
 
 // application namespace
-namespace inputemulator
+namespace motioncompensation
 {
 	class OverlayController : public QObject
 	{
@@ -34,9 +34,9 @@ namespace inputemulator
 			Q_PROPERTY(bool desktopMode READ isDesktopMode)
 
 	public:
-		static constexpr const char* applicationKey = "matzman666.VRInputEmulator";
-		static constexpr const char* applicationName = "OpenVR Input Emulator";
-		static constexpr const char* applicationVersionString = "v1.3";
+		static constexpr const char* applicationKey = "OVRMC.VRMotionCompensation";
+		static constexpr const char* applicationName = "OpenVR Motion Compensation";
+		static constexpr const char* applicationVersionString = "v0.0.7";
 
 	private:
 		vr::VROverlayHandle_t m_ulOverlayHandle = vr::k_ulOverlayHandleInvalid;
@@ -55,7 +55,7 @@ namespace inputemulator
 		QPoint m_ptLastMouse;
 		Qt::MouseButtons m_lastMouseButtons = 0;
 
-		vrinputemulator::VRInputEmulator m_vrInputEmulator;
+		vrmotioncompensation::VRMotionCompensation m_vrMotionCompensation;
 
 		bool desktopMode;
 		bool noSound;
@@ -85,9 +85,9 @@ namespace inputemulator
 		void Init(QQmlEngine* qmlEngine);
 		void Shutdown();
 
-		vrinputemulator::VRInputEmulator& vrInputEmulator()
+		vrmotioncompensation::VRMotionCompensation& vrMotionCompensation()
 		{
-			return m_vrInputEmulator;
+			return m_vrMotionCompensation;
 		}
 
 		bool isDashboardVisible()
@@ -138,7 +138,7 @@ namespace inputemulator
 
 		static OverlayController* createInstance(bool desktopMode, bool noSound)
 		{
-			singleton.reset(new inputemulator::OverlayController(desktopMode, noSound));
+			singleton.reset(new motioncompensation::OverlayController(desktopMode, noSound));
 			return singleton.get();
 		}
 
@@ -153,4 +153,4 @@ namespace inputemulator
 		}
 	};
 
-} // namespace inputemulator
+} // namespace motioncompensation

@@ -1,0 +1,3 @@
+#pragma once
+
+#define VRMOTIONCOMPENSATION_EASYLOGGING 0

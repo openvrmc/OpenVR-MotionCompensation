@@ -10,7 +10,7 @@ message("You are running qmake on a generated .pro file. This may not work!")
 HEADERS += ./src/logging.h \
     ./src/tabcontrollers/DeviceManipulationTabController.h \
     ./src/overlaycontroller.h \
-    C:\Users\bonsi\Downloads\OpenVR-MC\openvr\headers\openvr.h
+    ./../openvr/headers/openvr.h
 SOURCES += ./Debug/moc_DeviceManipulationTabController.cpp \
     ./Debug/moc_overlaycontroller.cpp \
     ./src/tabcontrollers/DeviceManipulationTabController.cpp \
