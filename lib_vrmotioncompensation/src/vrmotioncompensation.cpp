@@ -6,7 +6,7 @@
 #include <config.h>
 
 
-#if VRINPUTEMULATOR_EASYLOGGING == 1
+#if VRMOTIONCOMPENSATION_EASYLOGGING == 1
 #include "logging.h";
 #define WRITELOG(level, txt) LOG(level) << txt;
 #else
