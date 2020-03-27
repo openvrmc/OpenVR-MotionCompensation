@@ -189,7 +189,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\win64\res\qml\DeviceManipulationPage.qml" />
-    <None Include="bin\win64\res\qml\DeviceRenderModelPage.qml" />
     <None Include="bin\win64\res\qml\mainwidget.qml" />
     <None Include="bin\win64\res\qml\MotionCompensationPage.qml" />
     <None Include="bin\win64\res\qml\MyComboBox.qml" />

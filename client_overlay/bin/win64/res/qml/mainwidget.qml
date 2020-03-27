@@ -14,11 +14,7 @@ Rectangle {
         stackView: mainView
     }
 
-    property MotionCompensationPage motionCompensationPage:  MotionCompensationPage {
-        stackView: mainView
-    }
-
-    property DeviceRenderModelPage deviceRenderModelPage:  DeviceRenderModelPage {
+	property MotionCompensationPage motionCompensationPage:  MotionCompensationPage {
         stackView: mainView
     }
 

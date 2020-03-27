@@ -226,7 +226,7 @@ namespace vrmotioncompensation
 
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
-										LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
+										LOG(ERROR) << "Error while setting device into default mode: Error code " << (int)resp.status;
 									}
 
 									if (resp.messageId != 0)
@@ -261,14 +261,27 @@ namespace vrmotioncompensation
 
 											if (serverDriver)
 											{
-												LOG(INFO) << "Setting driver into motion compensation mode";
+												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
+												{
+													LOG(INFO) << "Setting driver into motion compensation mode";
 												
-												//Activate motion compensation mode for specified device
-												MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
-												RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+													//Activate motion compensation mode for specified device
+													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
 
-												//Reset and set some vars for every device
-												serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker);
+													//Reset and set some vars for every device
+													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker);
+												}
+												else if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::Disabled)
+												{
+													LOG(INFO) << "Setting driver into default mode";
+
+													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+
+													//Reset and set some vars for every device
+													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled);
+												}
 
 												resp.status = ipc::ReplyStatus::Ok;
 											}
@@ -281,7 +294,7 @@ namespace vrmotioncompensation
 
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
-										LOG(ERROR) << "Error while updating device pose offset: Error code " << (int)resp.status;
+										LOG(ERROR) << "Error while setting device into motion compensation mode: Error code " << (int)resp.status;
 									}
 
 									if (resp.messageId != 0/* && resp.status != ipc::ReplyStatus::Ok*/)

@@ -23,54 +23,54 @@ namespace vrmotioncompensation
 				_motionCompensationRefPoseValid = false;
 				_motionCompensationZeroPoseValid = false;
 				_motionCompensationEnabled = true;
+
+				DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
+				DebugLogger.SetDebugNameV3("Ref Filter Pos", 1);
+
+				DebugLogger.SetDebugNameV3("Ref Raw PosVel", 2);
+				DebugLogger.SetDebugNameV3("Ref Filter PosVel", 3);
+
+				DebugLogger.SetDebugNameV3("Ref Raw PosAcc", 4);
+				DebugLogger.SetDebugNameV3("Ref Filter PosAcc", 5);
+
+				DebugLogger.SetDebugNameV3("Ref Raw RotVel", 6);
+				DebugLogger.SetDebugNameV3("Ref Filter RotVel", 7);
+
+				DebugLogger.SetDebugNameV3("Ref Raw RotAcc", 8);
+				DebugLogger.SetDebugNameV3("Ref Filter RotAcc", 9);
+
+				DebugLogger.SetDebugNameV3("HMD Raw Pos", 10);
+				DebugLogger.SetDebugNameV3("HMD MC Pos", 11);
+
+				DebugLogger.SetDebugNameV3("HMD Raw PosVel", 12);
+				DebugLogger.SetDebugNameV3("HMD MC PosVel", 13);
+
+				DebugLogger.SetDebugNameV3("HMD Raw PosAcc", 14);
+				DebugLogger.SetDebugNameV3("HMD MC PosAcc", 15);
+
+				DebugLogger.SetDebugNameV3("HMD Raw RotVel", 16);
+				DebugLogger.SetDebugNameV3("HMD MC RotVel", 17);
+
+				DebugLogger.SetDebugNameV3("HMD Raw RotAcc", 18);
+				DebugLogger.SetDebugNameV3("HMD MC RotAcc", 19);
+
+
+				DebugLogger.SetDebugNameQ4("Ref Raw Rot", 0);
+				DebugLogger.SetDebugNameQ4("Ref Filter Rot", 1);
+
+				DebugLogger.SetDebugNameQ4("HMD Raw Rot", 2);
+				DebugLogger.SetDebugNameQ4("HMD MC Rot", 3);
+
+				DebugLogger.SetLPFValue(LPF_Beta);
+
+				DebugLogger.Start();
 			}
 			else
 			{
 				_motionCompensationEnabled = false;
 			}
 
-			_motionCompensationMode = Mode;
-			
-			DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
-			DebugLogger.SetDebugNameV3("Ref Filter Pos", 1);
-
-			DebugLogger.SetDebugNameV3("Ref Raw PosVel", 2);
-			DebugLogger.SetDebugNameV3("Ref Filter PosVel", 3);
-
-			DebugLogger.SetDebugNameV3("Ref Raw PosAcc", 4);
-			DebugLogger.SetDebugNameV3("Ref Filter PosAcc", 5);
-
-			DebugLogger.SetDebugNameV3("Ref Raw RotVel", 6);
-			DebugLogger.SetDebugNameV3("Ref Filter RotVel", 7);
-
-			DebugLogger.SetDebugNameV3("Ref Raw RotAcc", 8);
-			DebugLogger.SetDebugNameV3("Ref Filter RotAcc", 9);
-
-			DebugLogger.SetDebugNameV3("HMD Raw Pos", 10);
-			DebugLogger.SetDebugNameV3("HMD MC Pos", 11);
-
-			DebugLogger.SetDebugNameV3("HMD Raw PosVel", 12);
-			DebugLogger.SetDebugNameV3("HMD MC PosVel", 13);
-
-			DebugLogger.SetDebugNameV3("HMD Raw PosAcc", 14);
-			DebugLogger.SetDebugNameV3("HMD MC PosAcc", 15);
-
-			DebugLogger.SetDebugNameV3("HMD Raw RotVel", 16);
-			DebugLogger.SetDebugNameV3("HMD MC RotVel", 17);
-
-			DebugLogger.SetDebugNameV3("HMD Raw RotAcc", 18);
-			DebugLogger.SetDebugNameV3("HMD MC RotAcc", 19);
-			
-
-			DebugLogger.SetDebugNameQ4("Ref Raw Rot", 0);
-			DebugLogger.SetDebugNameQ4("Ref Filter Rot", 1);
-
-			DebugLogger.SetDebugNameQ4("HMD Raw Rot", 2);
-			DebugLogger.SetDebugNameQ4("HMD MC Rot", 3);
-
-			DebugLogger.SetLPFValue(LPF_Beta);
-
-			DebugLogger.Start();
+			_motionCompensationMode = Mode;			
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()
