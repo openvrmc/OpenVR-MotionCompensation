@@ -20,7 +20,6 @@ namespace vrmotioncompensation
 			IPC_Ping,
 
 			DeviceManipulation_GetDeviceInfo,
-			DeviceManipulation_DefaultMode,
 			DeviceManipulation_MotionCompensationMode,
 			DeviceManipulation_SetMotionCompensationProperties
 
@@ -88,14 +87,6 @@ namespace vrmotioncompensation
 			uint32_t deviceId;
 		};
 
-		struct Request_DeviceManipulation_DefaultMode
-		{
-			uint32_t clientId;
-			uint32_t messageId;			// Used to associate with Reply
-			uint32_t MCdeviceId;		// Motion compensated device ID
-			uint32_t RTdeviceId;		// Reference tracker device ID
-		};
-
 		struct Request_DeviceManipulation_MotionCompensationMode
 		{
 			uint32_t clientId;
@@ -140,7 +131,6 @@ namespace vrmotioncompensation
 				Request_OpenVR_GenericClientMessage ovr_GenericClientMessage;
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
-				Request_DeviceManipulation_DefaultMode dm_DefaultMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
 				MsgUnion()
 				{

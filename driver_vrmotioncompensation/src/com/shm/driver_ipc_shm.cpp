@@ -183,59 +183,6 @@ namespace vrmotioncompensation
 								}
 								break;
 
-								case ipc::RequestType::DeviceManipulation_DefaultMode:
-								{
-									ipc::Reply resp(ipc::ReplyType::GenericReply);
-									resp.messageId = message.msg.dm_DefaultMode.messageId;
-
-									if (message.msg.dm_DefaultMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount && message.msg.dm_DefaultMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
-									{
-										resp.status = ipc::ReplyStatus::InvalidId;
-									}
-									else
-									{
-										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(message.msg.dm_DefaultMode.MCdeviceId);
-										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(message.msg.dm_DefaultMode.RTdeviceId);
-
-										if (!MCdevice || !RTdevice)
-										{
-											resp.status = ipc::ReplyStatus::NotFound;
-										}
-										else
-										{
-											auto serverDriver = ServerDriver::getInstance();
-
-											if (serverDriver)
-											{
-												LOG(INFO) << "Setting driver into default mode";
-
-												MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-												RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-
-												//Reset and set some vars for every device
-												serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled);
-
-												resp.status = ipc::ReplyStatus::Ok;
-											}
-											else
-											{
-												resp.status = ipc::ReplyStatus::UnknownError;
-											}
-										}										
-									}
-
-									if (resp.status != ipc::ReplyStatus::Ok)
-									{
-										LOG(ERROR) << "Error while setting device into default mode: Error code " << (int)resp.status;
-									}
-
-									if (resp.messageId != 0)
-									{
-										_this->sendReply(message.msg.dm_DefaultMode.clientId, resp);
-									}
-								}
-								break;
-
 								case ipc::RequestType::DeviceManipulation_MotionCompensationMode:
 								{
 									//Create reply message

@@ -422,8 +422,6 @@ namespace motioncompensation
 				LOG(TRACE) << "Sending Normal Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 				parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
-				//parent->vrMotionCompensation().setDeviceNormalMode(deviceInfos[MCindex]->openvrId);
-				//parent->vrMotionCompensation().setDeviceNormalMode(deviceInfos[RTindex]->openvrId);
 			}
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
