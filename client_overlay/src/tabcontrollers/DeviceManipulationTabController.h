@@ -25,12 +25,13 @@ namespace motioncompensation
 		std::string serial;
 		vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 		uint32_t openvrId = 0;
+		//int ArrayDeviceId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
 		vrmotioncompensation::MotionCompensationDeviceMode deviceMode = vrmotioncompensation::MotionCompensationDeviceMode::Default;
-		uint32_t refDeviceId = 0;
-		uint32_t renderModelIndex = 0;
+		//uint32_t refDeviceId = 0;
+		/*uint32_t renderModelIndex = 0;
 		vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
-		std::string renderModelOverlayName;
+		std::string renderModelOverlayName;*/
 	};
 
 	class DeviceManipulationTabController : public QObject
@@ -43,13 +44,13 @@ namespace motioncompensation
 
 		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;
 		uint32_t maxValidDeviceId = 0;
+		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
+		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
 
 		std::vector<DeviceManipulationProfile> deviceManipulationProfiles;
 
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
-		double motionCompensationKalmanProcessNoise = 0.1;
-		double motionCompensationKalmanObservationNoise = 0.1;
-		unsigned motionCompensationMovingAverageWindow = 3;
+		double LPFBeta = 0.2;
 
 		QString m_deviceModeErrorString;
 
@@ -59,27 +60,33 @@ namespace motioncompensation
 
 	public:
 		~DeviceManipulationTabController();
+
 		void initStage1();
+
 		void initStage2(OverlayController* parent, QQuickWindow* widget);
 
 		void eventLoopTick(vr::TrackedDevicePose_t* devicePoses);
+
+		bool SearchDevices(int StartID);
+
 		void handleEvent(const vr::VREvent_t& vrEvent);
 
 		Q_INVOKABLE unsigned getDeviceCount();
 		Q_INVOKABLE QString getDeviceSerial(unsigned index);
-		Q_INVOKABLE unsigned getDeviceId(unsigned index);
+		Q_INVOKABLE unsigned getOpenVRId(unsigned index);
 		Q_INVOKABLE int getDeviceClass(unsigned index);
 		Q_INVOKABLE int getDeviceState(unsigned index);
 		Q_INVOKABLE int getDeviceMode(unsigned index);
-		Q_INVOKABLE unsigned getMotionCompensationVelAccMode();
-		Q_INVOKABLE double getMotionCompensationKalmanProcessNoise();
-		Q_INVOKABLE double getMotionCompensationKalmanObservationNoise();
-		Q_INVOKABLE unsigned getMotionCompensationMovingAverageWindow();
+		Q_INVOKABLE double getLPFBeta();
+		Q_INVOKABLE void setTrackerArrayID(int deviceID, int ArrayID);
+		Q_INVOKABLE void setHMDArrayID(int deviceID, int ArrayID);
+		Q_INVOKABLE int getTrackerDeviceID(int ArrayID);
+		Q_INVOKABLE int getHMDDeviceID(int ArrayID);
 
-		void reloadDeviceManipulationSettings();
+		void reloadMotionCompensationSettings();
 		void reloadDeviceManipulationProfiles();
-		void saveDeviceManipulationSettings();
-		void saveDeviceManipulationProfiles();
+		void saveMotionCompensationSettings();
+		void saveDeviceManipulationProfiles();	
 
 		Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
 		Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);
@@ -88,6 +95,7 @@ namespace motioncompensation
 
 		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
 		Q_INVOKABLE bool setLPFBeta(double value);
+		Q_INVOKABLE bool sendLPFBeta();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 	public slots:
@@ -96,13 +104,9 @@ namespace motioncompensation
 		void deleteDeviceManipulationProfile(unsigned index);
 
 	signals:
+		//void loadComplete();
 		void deviceCountChanged(unsigned deviceCount);
 		void deviceInfoChanged(unsigned index);
-		void motionCompensationSettingsChanged();
 		void deviceManipulationProfilesChanged();
-		void motionCompensationVelAccModeChanged(unsigned mode);
-		void motionCompensationKalmanProcessNoiseChanged(double variance);
-		void motionCompensationKalmanObservationNoiseChanged(double variance);
-		void motionCompensationMovingAverageWindowChanged(unsigned window);
 	};
 } // namespace motioncompensation

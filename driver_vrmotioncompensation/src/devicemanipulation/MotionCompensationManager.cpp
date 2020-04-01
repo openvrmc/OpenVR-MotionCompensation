@@ -16,8 +16,11 @@ namespace vrmotioncompensation
 			DebugLogger.WriteFile();
 		}
 
-		void MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode)
+		void MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice)
 		{
+			MCdeviceID = MCdevice;
+			RTdeviceID = RTdevice;
+
 			if (Mode == MotionCompensationMode::ReferenceTracker)
 			{
 				_motionCompensationRefPoseValid = false;
@@ -71,6 +74,18 @@ namespace vrmotioncompensation
 			}
 
 			_motionCompensationMode = Mode;			
+		}
+
+		void MotionCompensationManager::setNewMotionCompensatedDevice(int MCdevice)
+		{
+			MCdeviceID = MCdevice;
+		}
+
+		void MotionCompensationManager::setNewReferenceTracker(int RTdevice)
+		{
+			RTdeviceID = RTdevice;
+			_motionCompensationRefPoseValid = false;
+			_motionCompensationZeroPoseValid = false;
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()

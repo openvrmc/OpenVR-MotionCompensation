@@ -51,15 +51,19 @@ MyStackViewPage
         dialogTitle: "Create New Profile"
         dialogWidth: 600
         dialogHeight: 400
-        dialogContentItem: ColumnLayout {
-            RowLayout {
+        dialogContentItem: ColumnLayout
+        {
+            RowLayout
+            {
                 Layout.topMargin: 16
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
-                MyText {
+                MyText
+                {
                     text: "Name: "
                 }
-                MyTextField {
+                MyTextField
+                {
                     id: deviceManipulationNewProfileName
                     color: "#cccccc"
                     text: ""
@@ -70,13 +74,15 @@ MyStackViewPage
                     }
                 }
             }
-            ColumnLayout {
+            ColumnLayout
+            {
                 Layout.topMargin: 16
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
             }
         }
-        onClosed: {
+        onClosed:
+        {
             if (okClicked)
             {
                 if (deviceManipulationNewProfileName.text == "")
@@ -101,19 +107,19 @@ MyStackViewPage
     {
         spacing: 18
 
-        //Device
+        //HMD
         RowLayout
         {
-            spacing: 18
+            spacing: 38
 
             MyText
             {
-                text: "Device:"
+                text: "HMD:"
             }
 
             MyComboBox
             {
-                id: deviceSelectionComboBox
+                id: hmdSelectionComboBox
                 Layout.maximumWidth: 799
                 Layout.minimumWidth: 799
                 Layout.preferredWidth: 799
@@ -123,26 +129,11 @@ MyStackViewPage
                 {
 					if (currentIndex >= 0)
                     {
-						DeviceManipulationTabController.updateDeviceInfo(currentIndex);
-						fetchDeviceInfo()
+						//DeviceManipulationTabController.updateDeviceInfo(currentIndex);
+						fetchHMDInfo()
                     }
                 }
             }
-
-            //How do identify a HMD?
-            /*MyPushButton
-            {
-                id: deviceIdentifyButton
-                enabled: deviceSelectionComboBox.currentIndex >= 0
-                Layout.preferredWidth: 194
-                text: "Identify"
-                onClicked:
-                {
-                    if (deviceSelectionComboBox.currentIndex >= 0)
-                    {
-                    }
-                }
-            }*/
         }
 
         //Status device
@@ -150,12 +141,14 @@ MyStackViewPage
         {
             spacing: 18
 
-            MyText {
+            MyText
+            {
                 text: "Status:"
             }
 
-            MyText {
-                id: deviceStatusText
+            MyText
+            {
+                id: hmdStatusText
                 text: ""
             }
         }
@@ -183,7 +176,7 @@ MyStackViewPage
                     if (currentIndex >= 0)
                     {
                         //DeviceManipulationTabController.updateDeviceInfo(currentIndex);
-                        //fetchDeviceInfo()
+                        fetchTrackerInfo()
                     }
                 }
             }
@@ -191,7 +184,7 @@ MyStackViewPage
             MyPushButton
             {
                 id: referenceTrackerIdentifyButton
-                enabled: deviceSelectionComboBox.currentIndex >= 0
+                enabled: hmdSelectionComboBox.currentIndex >= 0
                 Layout.preferredWidth: 194
                 text: "Identify"
                 onClicked:
@@ -209,11 +202,13 @@ MyStackViewPage
             spacing: 18
             Layout.bottomMargin: 16
 
-            MyText {
+            MyText
+            {
                 text: "Status:"
             }
 
-            MyText {
+            MyText
+            {
                 id: referenceTrackerStatusText
                 text: ""
             }
@@ -277,17 +272,17 @@ MyStackViewPage
                 function onInputEvent(input)
                 {
                     var val = parseFloat(input)
-                    if (!isNaN(val) && val >= 0.0)
+                    if (!isNaN(val)/* && val >= 0.0 && val <= 1.0*/)
                     {
                         if (!DeviceManipulationTabController.setLPFBeta(val.toFixed(4)))
                         {
                             deviceManipulationMessageDialog.showMessage("LPF Beta value", "Could not set new value: " + DeviceManipulationTabController.getDeviceModeErrorString())
                         }
                     }
-                    else
+                    /*else
                     {
                         lpfBetaInputField.text = DeviceManipulationTabController.setLPFBeta().toFixed(4)
-                    }
+                    }*/
                 }
             }
 
@@ -309,17 +304,14 @@ MyStackViewPage
                 text: "Apply"
                 onClicked:
                 {
-                    if (deviceSelectionComboBox.currentIndex != referenceTrackerSelectionComboBox.currentIndex)
+                    if (!DeviceManipulationTabController.setMotionCompensationMode(hmdSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked))
                     {
-                        if (!DeviceManipulationTabController.setMotionCompensationMode(deviceSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked))
-                        {
-                            deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode: " + DeviceManipulationTabController.getDeviceModeErrorString())
-                        }
+                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
-                    else
+                    if (!DeviceManipulationTabController.sendLPFBeta())
                     {
-                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "\"Device\" and \"Reference Tracker\" cannot be the same!")
-                    }                    
+                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send LPF Beta:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                    }
                 }
             }
         }
@@ -329,19 +321,23 @@ MyStackViewPage
 
         }*/
 
-        Item {
+        Item
+        {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
 
         //Profile
-        ColumnLayout {
+        ColumnLayout
+        {
             Layout.bottomMargin: 6
             spacing: 18
-            RowLayout {
+            RowLayout
+            {
                 spacing: 18
 
-                MyText {
+                MyText
+                {
                     text: "Profile:"
                 }
 
@@ -376,38 +372,47 @@ MyStackViewPage
                     text: "Apply"
                     onClicked:
                     {
-                        if (deviceManipulationProfileComboBox.currentIndex > 0 && deviceSelectionComboBox.currentIndex >= 0)
+                        if (deviceManipulationProfileComboBox.currentIndex > 0 && hmdSelectionComboBox.currentIndex >= 0)
                         {
-                            DeviceManipulationTabController.applyDeviceManipulationProfile(deviceManipulationProfileComboBox.currentIndex - 1, deviceSelectionComboBox.currentIndex);
+                            DeviceManipulationTabController.applyDeviceManipulationProfile(deviceManipulationProfileComboBox.currentIndex - 1, hmdSelectionComboBox.currentIndex);
                             deviceManipulationProfileComboBox.currentIndex = 0
                         }
                     }
                 }
             }
-            RowLayout {
+
+            RowLayout
+            {
                 spacing: 18
-                Item {
+                Item
+                {
                     Layout.fillWidth: true
                 }
-                MyPushButton {
+                MyPushButton
+                {
                     id: deviceManipulationDeleteProfileButton
                     enabled: false
                     Layout.preferredWidth: 200
                     text: "Delete Profile"
-                    onClicked: {
-                        if (deviceManipulationProfileComboBox.currentIndex > 0) {
+                    onClicked:
+                    {
+                        if (deviceManipulationProfileComboBox.currentIndex > 0)
+                        {
                             deviceManipulationDeleteProfileDialog.profileIndex = deviceManipulationProfileComboBox.currentIndex - 1
                             deviceManipulationDeleteProfileDialog.open()
                         }
                     }
                 }
-                MyPushButton {
+                MyPushButton
+                {
                     id: deviceManipulationNewProfileButton
                     Layout.preferredWidth: 200
                     text: "New Profile"
-                    onClicked: {
-                        if (deviceSelectionComboBox.currentIndex >= 0) {
-                            deviceManipulationNewProfileDialog.openPopup(deviceSelectionComboBox.currentIndex)
+                    onClicked:
+                    {
+                        if (hmdSelectionComboBox.currentIndex >= 0)
+                        {
+                            deviceManipulationNewProfileDialog.openPopup(hmdSelectionComboBox.currentIndex)
                         }
                     }
                 }
@@ -415,35 +420,45 @@ MyStackViewPage
         }
 
         //Version number
-        RowLayout {
+        RowLayout
+        {
             spacing: 18
-            Item {
+            Item
+            {
                 Layout.fillWidth: true
             }
-            MyText {
+            MyText
+            {
                 id: appVersionText
                 text: "v0.0"
             }
         }
 
 
-        Component.onCompleted: {
+        Component.onCompleted:
+        {
             appVersionText.text = OverlayController.getVersionString()
-            reloadDeviceManipulationProfiles()
+            lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            //reloadDeviceManipulationProfiles()
         }
 
-        Connections {
+        Connections
+        {
             target: DeviceManipulationTabController
-            onDeviceCountChanged: {
+            onDeviceCountChanged:
+            {
                 fetchDevices()
-                fetchDeviceInfo()
+                fetchHMDInfo()
             }
-            onDeviceInfoChanged: {
-                if (index == deviceSelectionComboBox.currentIndex) {
-                    fetchDeviceInfo()
+            onDeviceInfoChanged:
+            {
+                if (index == hmdSelectionComboBox.currentIndex)
+                {
+                    fetchHMDInfo()
                 }
             }
-            onDeviceManipulationProfilesChanged: {
+            onDeviceManipulationProfilesChanged:
+            {
                 reloadDeviceManipulationProfiles()
             }
         }
@@ -452,20 +467,29 @@ MyStackViewPage
 
     function fetchDevices()
     {
-        var devices = []
-        var oldIndex = deviceSelectionComboBox.currentIndex
+        var hmds = []
+        var tracker = []
+        var oldHMDIndex = hmdSelectionComboBox.currentIndex
+        var oldtrackerIndex = referenceTrackerSelectionComboBox.currentIndex
         var deviceCount = DeviceManipulationTabController.getDeviceCount()
+        var hmdCount = 0;
+        var trackerCount = 0;
 
+        //Collect all found devices
         for (var i = 0; i < deviceCount; i++)
         {
-            var deviceId = DeviceManipulationTabController.getDeviceId(i)
-            var deviceName = deviceId.toString() + ": "
+            var OpenVRId = DeviceManipulationTabController.getOpenVRId(i)
+            var deviceName = OpenVRId.toString() + ": "
             deviceName += DeviceManipulationTabController.getDeviceSerial(i)
             var deviceClass = DeviceManipulationTabController.getDeviceClass(i)
 
             if (deviceClass == 1)
             {
-                deviceName += " (HMD)"
+                deviceName += " (HMD)"                
+
+                hmds.push(deviceName)
+                DeviceManipulationTabController.setHMDArrayID(i, hmds.length - 1)
+                ++hmdCount
             }
             else if (deviceClass == 2)
             {
@@ -475,25 +499,46 @@ MyStackViewPage
             {
                 deviceName += " (Tracker)"
             }
-            else if (deviceClass == 4)
+
+            if (deviceClass == 2 || deviceClass == 3)
             {
-                deviceName += " (Base-Station)"
+                tracker.push(deviceName)
+                DeviceManipulationTabController.setTrackerArrayID(i, tracker.length - 1)
+                ++trackerCount
+            }
+        }
+
+        hmdSelectionComboBox.model = hmds
+        referenceTrackerSelectionComboBox.model = tracker
+
+        if (hmdCount < 1 || trackerCount < 1)
+        {   
+            //Empty comboboxes
+            if (hmdCount < 1)
+            {
+                hmdSelectionComboBox.currentIndex = -1
+
+                //Uncheck check box
+                enableMotionCompensationCheckBox.checkState = Qt.Unchecked
             }
             else
             {
-                deviceName += " (Unknown " + deviceClass.toString() + ")"
+                hmdSelectionComboBox.currentIndex = 0
+            }
+            
+            if (trackerCount < 1)
+            {
+                referenceTrackerSelectionComboBox.currentIndex = -1
+
+                //Uncheck check box
+                referenceTrackerInvisibleCheckBox.checkState = Qt.Unchecked
+            }
+            else
+            {
+                referenceTrackerSelectionComboBox.currentIndex = 0
             }
 
-            devices.push(deviceName)
-        }
-
-        deviceSelectionComboBox.model = devices
-        referenceTrackerSelectionComboBox.model = devices
-
-        if (deviceCount <= 0)
-        {
-            deviceSelectionComboBox.currentIndex = -1
-            enableMotionCompensationCheckBox.checkState = Qt.Unchecked
+            //Disable buttons
             deviceModeApplyButton.enabled = false
             referenceTrackerIdentifyButton.enabled = false
             deviceManipulationNewProfileButton.enabled = false
@@ -501,74 +546,156 @@ MyStackViewPage
         }
         else
         {
-            enableMotionCompensationCheckBox.checkState = Qt.Checked
+            //Enable buttons
             deviceModeApplyButton.enabled = true
             referenceTrackerIdentifyButton.enabled = true
             deviceManipulationNewProfileButton.enabled = true
             deviceManipulationProfileComboBox.enabled = true
 
-            if (oldIndex >= 0 && oldIndex < deviceCount)
+            //Select a valid index
+            if (oldHMDIndex >= 0 && oldHMDIndex < hmdCount)
             {
-                deviceSelectionComboBox.currentIndex = oldIndex
+                hmdSelectionComboBox.currentIndex = oldHMDIndex
             }
             else
             {
-                deviceSelectionComboBox.currentIndex = 0
+                hmdSelectionComboBox.currentIndex = 0
+            }
+
+            if (oldtrackerIndex >= 0 && oldtrackerIndex < trackerCount)
+            {
+                referenceTrackerSelectionComboBox.currentIndex = oldHMDIndex
+            }
+            else
+            {
+                referenceTrackerSelectionComboBox.currentIndex = 0
             }
         }
     }
 
-    function fetchDeviceInfo()
+    function fetchHMDInfo()
     {
-        var index = deviceSelectionComboBox.currentIndex
+        var index = hmdSelectionComboBox.currentIndex
 
         if (index >= 0)
         {
-            var deviceMode = DeviceManipulationTabController.getDeviceMode(index)
-            var deviceState = DeviceManipulationTabController.getDeviceState(index)
-            var deviceClass = DeviceManipulationTabController.getDeviceClass(index)
-            var statusText = ""
+            var deviceId = DeviceManipulationTabController.getHMDDeviceID(index)
+            var statusText = "Error getting status"
 
-            if (deviceMode == 0)        // default
-            {
-                enableMotionCompensationCheckBox.checked = false
+            if (deviceId >= 0)
+            {   
+                var deviceMode = DeviceManipulationTabController.getDeviceMode(deviceId)
+                var deviceState = DeviceManipulationTabController.getDeviceState(deviceId)
+                var deviceClass = DeviceManipulationTabController.getDeviceClass(deviceId)
 
-                if (deviceState == 0)
+                if (deviceClass != 1)       // Not a HMD
                 {
-                    statusText = "Default"
+                    statusText = "Warning! Selection is not a HMD";
                 }
-                else if (deviceState == 1)
+                else
+                {            
+                    if (deviceMode == 0)        // default
+                    {
+                        enableMotionCompensationCheckBox.checked = false
+
+                        if (deviceState == 0)
+                        {
+                            statusText = "Default"
+                        }
+                        else if (deviceState == 1)
+                        {
+                            statusText = "Default (Disconnected)"
+                        }
+                        else
+                        {
+                            statusText = "Default (Unknown state " + deviceState.toString() + ")"
+                        }
+                    }
+                    else if (deviceMode == 2)       // motion compensated
+                    {
+                        enableMotionCompensationCheckBox.checked = true
+
+                        if (deviceState == 0)
+                        {
+                            statusText = "Motion Compensated"
+                        }
+                        else if (deviceState == 1)
+                        {
+                            statusText = "Motion Compensated (Disconnected)"
+                        }
+                        else
+                        {
+                            statusText = "Motion Compensated (Unknown state " + deviceState.toString() + ")"
+                        }
+                    }
+                    else
+                    {
+                        statusText = "Unknown or invalid Mode " + deviceMode.toString()
+                    }
+                }
+            }
+            hmdStatusText.text = statusText
+        }
+    }
+
+    function fetchTrackerInfo()
+    {
+        var index = hmdSelectionComboBox.currentIndex
+
+        if (index >= 0)
+        {
+            var deviceId = DeviceManipulationTabController.getTrackerDeviceID(index)
+            var statusText = "Error getting status"
+
+            if (deviceId >= 0)
+            {
+                var deviceMode = DeviceManipulationTabController.getDeviceMode(deviceId)
+                var deviceState = DeviceManipulationTabController.getDeviceState(deviceId)
+                var deviceClass = DeviceManipulationTabController.getDeviceClass(deviceId)
+
+                if (deviceClass != 2 && deviceClass != 3)       // Not a tracked controller or generic tracker
                 {
-                    statusText = "Default (Disconnected)"
+                    statusText = "Warning! Selection is not a tracker. ClassID: " + deviceClass.toString();
                 }
                 else
                 {
-                    statusText = "Default (Unknown state " + deviceState.toString() + ")"
+                    if (deviceMode == 0)        // default
+                    {
+                        if (deviceState == 0)
+                        {
+                            statusText = "Default"
+                        }
+                        else if (deviceState == 1)
+                        {
+                            statusText = "Default (Disconnected)"
+                        }
+                        else
+                        {
+                            statusText = "Default (Unknown state " + deviceState.toString() + ")"
+                        }
+                    }
+                    else if (deviceMode == 1)       // reference tracker
+                    {
+                        if (deviceState == 0)
+                        {
+                            statusText = "Reference Tracker"
+                        }
+                        else if (deviceState == 1)
+                        {
+                            statusText = "Reference Tracker (Disconnected)"
+                        }
+                        else
+                        {
+                            statusText = "Reference Tracker (Unknown state " + deviceState.toString() + ")"
+                        }
+                    }
+                    else
+                    {
+                        statusText = "Unknown or invalid Mode " + deviceMode.toString()
+                    }
                 }
             }
-            else if (deviceMode == 1)       // motion compensated
-            {
-                enableMotionCompensationCheckBox.checked = true
-
-                if (deviceState == 0)
-                {
-                    statusText = "Motion Compensated"
-                }
-                else
-                {
-                    statusText = "Motion Compensated (Unknown state " + deviceState.toString() + ")"
-                }
-            }
-            else if (deviceMode == 2)       //reference tracker
-            {
-                enableMotionCompensationCheckBox.checked = false
-            }
-            else
-            {
-                statusText = "Unknown Mode " + deviceMode.toString()
-            }
-
-            deviceStatusText.text = statusText
+            referenceTrackerStatusText.text = statusText
         }
     }
 

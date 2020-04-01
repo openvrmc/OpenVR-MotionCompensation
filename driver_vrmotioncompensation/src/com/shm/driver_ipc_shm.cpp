@@ -189,7 +189,7 @@ namespace vrmotioncompensation
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
 									resp.messageId = message.msg.dm_MotionCompensationMode.messageId;
 
-									if (message.msg.dm_MotionCompensationMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount && message.msg.dm_MotionCompensationMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
+									if (message.msg.dm_MotionCompensationMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount || message.msg.dm_MotionCompensationMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
 									}
@@ -197,6 +197,9 @@ namespace vrmotioncompensation
 									{
 										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.MCdeviceId);
 										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.RTdeviceId);
+
+										int MCdeviceID = message.msg.dm_MotionCompensationMode.MCdeviceId;
+										int RTdeviceID = message.msg.dm_MotionCompensationMode.RTdeviceId;
 
 										if (!MCdevice || !RTdevice)
 										{
@@ -211,13 +214,43 @@ namespace vrmotioncompensation
 												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
 													LOG(INFO) << "Setting driver into motion compensation mode";
-												
-													//Activate motion compensation mode for specified device
-													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
-													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+													
+													//Check if an old device needs a mode change
+													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
+													{
+														//New MCdevice is different from old
+														if (serverDriver->motionCompensation().getMCdeviceID() != MCdeviceID)
+														{
+															//Set old MCdevice to default
+															DeviceManipulationHandle* OldMCdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getMCdeviceID());
+															OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-													//Reset and set some vars for every device
-													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker);
+															//Set new MCdevice to motion compensated
+															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+															serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
+														}														
+
+														//New RTdevice is different from old
+														if (serverDriver->motionCompensation().getRTdeviceID() != RTdeviceID)
+														{
+															//Set old RTdevice to default
+															DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
+															OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+
+															//Set new RTdevice to reference tracker
+															RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+															serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
+														}
+													}
+													else
+													{
+														//Activate motion compensation mode for specified device
+														MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+														RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+
+														//Set motion compensation mode
+														serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, MCdeviceID, RTdeviceID);
+													}
 												}
 												else if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::Disabled)
 												{
@@ -227,7 +260,7 @@ namespace vrmotioncompensation
 													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
 													//Reset and set some vars for every device
-													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled);
+													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled, -1, -1);
 												}
 
 												resp.status = ipc::ReplyStatus::Ok;

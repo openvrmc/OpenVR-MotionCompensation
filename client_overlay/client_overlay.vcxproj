@@ -160,9 +160,9 @@
     <ClCompile Include="Release\moc_overlaycontroller.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\tabcontrollers\DeviceManipulationTabController.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\overlaycontroller.cpp" />
+    <ClCompile Include="src\tabcontrollers\DeviceManipulationTabController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="src\tabcontrollers\DeviceManipulationTabController.h">
@@ -190,7 +190,6 @@
   <ItemGroup>
     <None Include="bin\win64\res\qml\DeviceManipulationPage.qml" />
     <None Include="bin\win64\res\qml\mainwidget.qml" />
-    <None Include="bin\win64\res\qml\MotionCompensationPage.qml" />
     <None Include="bin\win64\res\qml\MyComboBox.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkCancelPopup.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkPopup.qml" />
