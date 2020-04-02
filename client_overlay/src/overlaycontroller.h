@@ -37,7 +37,7 @@ namespace motioncompensation
 		//static constexpr const char* applicationKey = "OVRMC.VRMotionCompensation";
 		static constexpr const char* applicationKey = "matzman666.VRInputEmulator";
 		static constexpr const char* applicationName = "OpenVR Motion Compensation";
-		static constexpr const char* applicationVersionString = "v0.0.10";
+		static constexpr const char* applicationVersionString = "v0.1.0";
 
 	private:
 		vr::VROverlayHandle_t m_ulOverlayHandle = vr::k_ulOverlayHandleInvalid;
