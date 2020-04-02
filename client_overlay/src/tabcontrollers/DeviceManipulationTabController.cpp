@@ -322,19 +322,19 @@ namespace motioncompensation
 		return LPFBeta;
 	}
 
-	void DeviceManipulationTabController::setTrackerArrayID(int deviceID, int ArrayID)
+	void DeviceManipulationTabController::setTrackerArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
 		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
 	}
 
-	void DeviceManipulationTabController::setHMDArrayID(int deviceID, int ArrayID)
+	void DeviceManipulationTabController::setHMDArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
 		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
 	}
 
-	int DeviceManipulationTabController::getTrackerDeviceID(int ArrayID)
+	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
 	{
 		//Search for the device ID
 		auto search = TrackerArrayIdToDeviceId.find(ArrayID);
@@ -346,7 +346,7 @@ namespace motioncompensation
 		return -1;
 	}
 
-	int DeviceManipulationTabController::getHMDDeviceID(int ArrayID)
+	int DeviceManipulationTabController::getHMDDeviceID(unsigned ArrayID)
 	{
 		//Search for the device ID
 		auto search = HMDArrayIdToDeviceId.find(ArrayID);
@@ -356,6 +356,20 @@ namespace motioncompensation
 		}
 
 		return -1;
+	}
+
+	void DeviceManipulationTabController::increaseLPFBeta(double value)
+	{
+		LPFBeta += value;
+
+		if (LPFBeta > 1.0)
+		{
+			LPFBeta = 1.0;
+		}
+		else if (LPFBeta < 0.0)
+		{
+			LPFBeta = 0.0;
+		}
 	}
 
 	void DeviceManipulationTabController::reloadMotionCompensationSettings()
@@ -526,7 +540,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "setMotionCompensationMode device IDs, MCindex: " << MCindex << " RTindex: " << RTindex << " MaxValid ID:" << maxValidDeviceId;
+		LOG(DEBUG) << "setMotionCompensationMode device IDs, MCindex: " << MCindex << " RTindex: " << RTindex << " MaxValid ID: " << maxValidDeviceId;
 
 		if (MCindex == RTindex)
 		{
@@ -557,13 +571,13 @@ namespace motioncompensation
 			//Send new settings to the driver.dll
 			if (EnableMotionCompensation)
 			{
-				LOG(TRACE) << "Sending Motion Compensation Mode";
+				LOG(INFO) << "Sending Motion Compensation Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 				//parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
 			}
 			else
 			{
-				LOG(TRACE) << "Sending Normal Mode";
+				LOG(INFO) << "Sending Normal Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;				
 			}
 
@@ -615,7 +629,7 @@ namespace motioncompensation
 	{
 		try
 		{
-			LOG(TRACE) << "Sending LPF Beta value: " << LPFBeta;
+			LOG(INFO) << "Sending LPF Beta value: " << LPFBeta;
 			parent->vrMotionCompensation().setLPFBeta(LPFBeta);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)

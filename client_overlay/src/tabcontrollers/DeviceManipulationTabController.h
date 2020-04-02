@@ -25,13 +25,12 @@ namespace motioncompensation
 		std::string serial;
 		vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 		uint32_t openvrId = 0;
-		//int ArrayDeviceId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
 		vrmotioncompensation::MotionCompensationDeviceMode deviceMode = vrmotioncompensation::MotionCompensationDeviceMode::Default;
 		//uint32_t refDeviceId = 0;
-		/*uint32_t renderModelIndex = 0;
-		vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
-		std::string renderModelOverlayName;*/
+		//uint32_t renderModelIndex = 0;
+		//vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
+		//std::string renderModelOverlayName;
 	};
 
 	class DeviceManipulationTabController : public QObject
@@ -78,15 +77,16 @@ namespace motioncompensation
 		Q_INVOKABLE int getDeviceState(unsigned index);
 		Q_INVOKABLE int getDeviceMode(unsigned index);
 		Q_INVOKABLE double getLPFBeta();
-		Q_INVOKABLE void setTrackerArrayID(int deviceID, int ArrayID);
-		Q_INVOKABLE void setHMDArrayID(int deviceID, int ArrayID);
-		Q_INVOKABLE int getTrackerDeviceID(int ArrayID);
-		Q_INVOKABLE int getHMDDeviceID(int ArrayID);
+		Q_INVOKABLE void setTrackerArrayID(unsigned deviceID, unsigned ArrayID);
+		Q_INVOKABLE void setHMDArrayID(unsigned deviceID, unsigned ArrayID);
+		Q_INVOKABLE int getTrackerDeviceID(unsigned ArrayID);
+		Q_INVOKABLE int getHMDDeviceID(unsigned ArrayID);
+		Q_INVOKABLE void increaseLPFBeta(double value);
 
 		void reloadMotionCompensationSettings();
 		void reloadDeviceManipulationProfiles();
 		void saveMotionCompensationSettings();
-		void saveDeviceManipulationProfiles();	
+		void saveDeviceManipulationProfiles();
 
 		Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
 		Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);

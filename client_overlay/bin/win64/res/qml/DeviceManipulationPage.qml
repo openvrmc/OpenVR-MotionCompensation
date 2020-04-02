@@ -229,25 +229,6 @@ MyStackViewPage
             }
         }
 
-        //Reference Tracker Invisible checkbox
-        RowLayout
-        {
-        spacing: 18
-            MyText
-            {
-                text: "Reference Tracker Invisible:"
-            }
-
-            Item {
-                Layout.preferredWidth: 6
-            }
-
-            CheckBox
-            {
-                id: referenceTrackerInvisibleCheckBox
-            }
-        }
-
         //LPF Beta Value
         RowLayout
         {
@@ -265,6 +246,7 @@ MyStackViewPage
             {
                 id: lpfBetaInputField
                 text: "0.0000"
+                keyBoardUID: 10
                 Layout.preferredWidth: 140
                 Layout.leftMargin: 10
                 Layout.rightMargin: 10
@@ -272,17 +254,14 @@ MyStackViewPage
                 function onInputEvent(input)
                 {
                     var val = parseFloat(input)
-                    if (!isNaN(val)/* && val >= 0.0 && val <= 1.0*/)
+                    if (!isNaN(val))
                     {
                         if (!DeviceManipulationTabController.setLPFBeta(val.toFixed(4)))
                         {
                             deviceManipulationMessageDialog.showMessage("LPF Beta value", "Could not set new value: " + DeviceManipulationTabController.getDeviceModeErrorString())
                         }
                     }
-                    /*else
-                    {
-                        lpfBetaInputField.text = DeviceManipulationTabController.setLPFBeta().toFixed(4)
-                    }*/
+                    text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
                 }
             }
 
