@@ -3,16 +3,16 @@
 #include <openvr.h>
 #include <QtCore/QtCore>
 // because of incompatibilities with QtOpenGL and GLEW we need to cherry pick includes
-#include <QVector2D>
-#include <QMatrix4x4>
-#include <QVector>
-#include <QVector2D>
-#include <QVector3D>
+//#include <QVector2D>
+//#include <QMatrix4x4>
+//#include <QVector>
+//#include <QVector2D>
+//#include <QVector3D>
 #include <QObject>
 #include <QSettings>
 #include <QQmlEngine>
 #include <QtGui/QOpenGLContext>
-#include <QtWidgets/QGraphicsScene>
+//#include <QtWidgets/QGraphicsScene>
 #include <QOffscreenSurface>
 #include <QOpenGLFramebufferObject>
 #include <QQuickWindow>

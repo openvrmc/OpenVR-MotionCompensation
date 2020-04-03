@@ -193,16 +193,12 @@
     <None Include="bin\win64\res\qml\MyComboBox.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkCancelPopup.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkPopup.qml" />
-    <None Include="bin\win64\res\qml\MyOffsetGroupBox.qml" />
     <None Include="bin\win64\res\qml\MyPushButton.qml" />
     <None Include="bin\win64\res\qml\MyPushButton2.qml" />
-    <None Include="bin\win64\res\qml\MyRangeSlider.qml" />
     <None Include="bin\win64\res\qml\MyResources.qml" />
-    <None Include="bin\win64\res\qml\MySlider.qml" />
     <None Include="bin\win64\res\qml\MyStackViewPage.qml" />
     <None Include="bin\win64\res\qml\MyText.qml" />
     <None Include="bin\win64\res\qml\MyTextField.qml" />
-    <None Include="bin\win64\res\qml\MyToggleButton.qml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

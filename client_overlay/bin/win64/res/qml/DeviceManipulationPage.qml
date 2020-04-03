@@ -295,107 +295,10 @@ MyStackViewPage
             }
         }
 
-       /* RowLayout {
-            spacing: 18
-
-        }*/
-
         Item
         {
             Layout.fillWidth: true
             Layout.fillHeight: true
-        }
-
-        //Profile
-        ColumnLayout
-        {
-            Layout.bottomMargin: 6
-            spacing: 18
-            RowLayout
-            {
-                spacing: 18
-
-                MyText
-                {
-                    text: "Profile:"
-                }
-
-                MyComboBox
-                {
-                    id: deviceManipulationProfileComboBox
-                    Layout.maximumWidth: 799
-                    Layout.minimumWidth: 799
-                    Layout.preferredWidth: 799
-                    Layout.fillWidth: true
-                    model: [""]
-                    onCurrentIndexChanged:
-                    {
-                        if (currentIndex > 0)
-                        {
-                            deviceManipulationApplyProfileButton.enabled = true
-                            deviceManipulationDeleteProfileButton.enabled = true
-                        }
-                        else
-                        {
-                            deviceManipulationApplyProfileButton.enabled = false
-                            deviceManipulationDeleteProfileButton.enabled = false
-                        }
-                    }
-                }
-
-                MyPushButton
-                {
-                    id: deviceManipulationApplyProfileButton
-                    enabled: false
-                    Layout.preferredWidth: 200
-                    text: "Apply"
-                    onClicked:
-                    {
-                        if (deviceManipulationProfileComboBox.currentIndex > 0 && hmdSelectionComboBox.currentIndex >= 0)
-                        {
-                            DeviceManipulationTabController.applyDeviceManipulationProfile(deviceManipulationProfileComboBox.currentIndex - 1, hmdSelectionComboBox.currentIndex);
-                            deviceManipulationProfileComboBox.currentIndex = 0
-                        }
-                    }
-                }
-            }
-
-            RowLayout
-            {
-                spacing: 18
-                Item
-                {
-                    Layout.fillWidth: true
-                }
-                MyPushButton
-                {
-                    id: deviceManipulationDeleteProfileButton
-                    enabled: false
-                    Layout.preferredWidth: 200
-                    text: "Delete Profile"
-                    onClicked:
-                    {
-                        if (deviceManipulationProfileComboBox.currentIndex > 0)
-                        {
-                            deviceManipulationDeleteProfileDialog.profileIndex = deviceManipulationProfileComboBox.currentIndex - 1
-                            deviceManipulationDeleteProfileDialog.open()
-                        }
-                    }
-                }
-                MyPushButton
-                {
-                    id: deviceManipulationNewProfileButton
-                    Layout.preferredWidth: 200
-                    text: "New Profile"
-                    onClicked:
-                    {
-                        if (hmdSelectionComboBox.currentIndex >= 0)
-                        {
-                            deviceManipulationNewProfileDialog.openPopup(hmdSelectionComboBox.currentIndex)
-                        }
-                    }
-                }
-            }
         }
 
         //Version number
@@ -418,7 +321,6 @@ MyStackViewPage
         {
             appVersionText.text = OverlayController.getVersionString()
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
-            //reloadDeviceManipulationProfiles()
         }
 
         Connections
@@ -676,19 +578,5 @@ MyStackViewPage
             }
             referenceTrackerStatusText.text = statusText
         }
-    }
-
-    function reloadDeviceManipulationProfiles()
-    {
-        var profiles = [""]
-        var profileCount = DeviceManipulationTabController.getDeviceManipulationProfileCount()
-
-        for (var i = 0; i < profileCount; i++)
-        {
-            profiles.push(DeviceManipulationTabController.getDeviceManipulationProfileName(i))
-        }
-
-        deviceManipulationProfileComboBox.model = profiles
-        deviceManipulationProfileComboBox.currentIndex = 0
     }
 }

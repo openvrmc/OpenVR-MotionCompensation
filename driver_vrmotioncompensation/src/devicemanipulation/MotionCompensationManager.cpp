@@ -27,7 +27,7 @@ namespace vrmotioncompensation
 				_motionCompensationZeroPoseValid = false;
 				_motionCompensationEnabled = true;
 
-				DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
+				/*DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
 				DebugLogger.SetDebugNameV3("Ref Filter Pos", 1);
 
 				DebugLogger.SetDebugNameV3("Ref Raw PosVel", 2);
@@ -66,7 +66,7 @@ namespace vrmotioncompensation
 
 				DebugLogger.SetLPFValue(LPF_Beta);
 
-				DebugLogger.Start();
+				DebugLogger.Start();*/
 			}
 			else
 			{
@@ -102,7 +102,7 @@ namespace vrmotioncompensation
 			_motionCompensationZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
 			_motionCompensationZeroRot = tmpConj * pose.qRotation;
 
-			DebugLogger.SetZeroPos(_motionCompensationZeroPos, pose.vecPosition, _motionCompensationZeroRot, pose.qRotation);
+			//DebugLogger.SetZeroPos(_motionCompensationZeroPos, pose.vecPosition, _motionCompensationZeroRot, pose.qRotation);
 
 			_motionCompensationZeroPoseValid = true;
 		}
@@ -244,7 +244,7 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// Debug
 
-			DebugLogger.CountUp();
+			/*DebugLogger.CountUp();
 
 			DebugLogger.AddDebugData(pose.vecPosition, 0);
 			DebugLogger.AddDebugData(_Filter_vecPosition_3, 1);
@@ -264,14 +264,14 @@ namespace vrmotioncompensation
 			DebugLogger.AddDebugData(pose.qRotation, 0);
 			DebugLogger.AddDebugData(_Filter_rotPosition_3, 1);
 
-			DebugLogger.SetInSync(true);
+			DebugLogger.SetInSync(true);*/
 		}
 
 		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo)
 		{
 			if (_motionCompensationEnabled && _motionCompensationZeroPoseValid && _motionCompensationRefPoseValid)
 			{
-				if (DebugLogger.IsInSync())
+				/*if (DebugLogger.IsInSync())
 				{
 					DebugLogger.AddDebugData(pose.vecPosition, 10);
 
@@ -284,7 +284,7 @@ namespace vrmotioncompensation
 					DebugLogger.AddDebugData(pose.vecAngularAcceleration, 18);
 
 					DebugLogger.AddDebugData(pose.qRotation, 2);
-				}
+				}*/
 
 				// All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
 				// convert pose from driver space to app space
@@ -330,7 +330,7 @@ namespace vrmotioncompensation
 				pose.vecPosition[1] = adjPoseDriverPos.v[1];
 				pose.vecPosition[2] = adjPoseDriverPos.v[2];
 
-				if (DebugLogger.IsInSync())
+				/*if (DebugLogger.IsInSync())
 				{
 					DebugLogger.AddDebugData(pose.vecPosition, 11);
 
@@ -345,7 +345,7 @@ namespace vrmotioncompensation
 					DebugLogger.AddDebugData(pose.qRotation, 3);
 
 					DebugLogger.SetInSync(false);
-				}
+				}*/
 			}
 			return true;
 		}
