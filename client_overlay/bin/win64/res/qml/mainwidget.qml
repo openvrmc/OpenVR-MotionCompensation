@@ -11,7 +11,8 @@ Rectangle
     width: 1200
     height: 800
 
-    property DeviceManipulationPage devicePage: DeviceManipulationPage {
+    property DeviceManipulationPage devicePage: DeviceManipulationPage
+	{
         stackView: mainView
     }
 

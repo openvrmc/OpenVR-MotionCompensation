@@ -370,6 +370,8 @@ namespace motioncompensation
 		{
 			LPFBeta = 0.0;
 		}
+
+		emit settingChanged();
 	}
 
 	void DeviceManipulationTabController::reloadMotionCompensationSettings()

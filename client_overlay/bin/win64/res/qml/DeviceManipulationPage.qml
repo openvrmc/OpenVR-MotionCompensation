@@ -14,8 +14,6 @@ MyStackViewPage
     headerText: "OpenVR Motion Compensation"
     headerShowBackButton: false
 
-    property int deviceIndex: 0
-
     //Generic popup
     MyDialogOkPopup
     {
@@ -27,82 +25,6 @@ MyStackViewPage
             open()
         }
     }
-
-    //Profile delete
-    MyDialogOkCancelPopup
-    {
-        id: deviceManipulationDeleteProfileDialog
-        property int profileIndex: -1
-        dialogTitle: "Delete Profile"
-        dialogText: "Do you really want to delete this profile?"
-        onClosed:
-        {
-            if (okClicked)
-            {
-                DeviceManipulationTabController.deleteDeviceManipulationProfile(profileIndex)
-            }
-        }
-    }
-
-    //Profile popup
-    MyDialogOkCancelPopup
-    {
-        id: deviceManipulationNewProfileDialog
-        dialogTitle: "Create New Profile"
-        dialogWidth: 600
-        dialogHeight: 400
-        dialogContentItem: ColumnLayout
-        {
-            RowLayout
-            {
-                Layout.topMargin: 16
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-                MyText
-                {
-                    text: "Name: "
-                }
-                MyTextField
-                {
-                    id: deviceManipulationNewProfileName
-                    color: "#cccccc"
-                    text: ""
-                    Layout.fillWidth: true
-                    font.pointSize: 20
-                    function onInputEvent(input) {
-                        text = input
-                    }
-                }
-            }
-            ColumnLayout
-            {
-                Layout.topMargin: 16
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-            }
-        }
-        onClosed:
-        {
-            if (okClicked)
-            {
-                if (deviceManipulationNewProfileName.text == "")
-                {
-                    deviceManipulationMessageDialog.showMessage("Create New Profile", "ERROR: Empty profile name.")
-                }
-                else
-                {
-                    DeviceManipulationTabController.addDeviceManipulationProfile(deviceManipulationNewProfileName.text, deviceIndex, false, false)
-                }
-            }
-        }
-        function openPopup(device)
-        {
-            deviceManipulationNewProfileName.text = ""
-            deviceIndex = device
-            open()
-        }
-    }
-
     content: ColumnLayout
     {
         spacing: 18
@@ -265,6 +187,40 @@ MyStackViewPage
                 }
             }
 
+            Item
+            {
+                Layout.preferredWidth: 10
+            }
+
+            MyPushButton
+            {
+                id: lpfBetaIncreaseButton
+                Layout.preferredWidth: 45
+                enabled: false
+                text: "+"
+                onClicked:
+                {
+                    DeviceManipulationTabController.increaseLPFBeta(0.05);
+                }
+            }
+
+            Item
+            {
+                Layout.preferredWidth: 10
+            }
+
+            MyPushButton
+            {
+                id: lpfBetaDecreaseButton
+                Layout.preferredWidth: 45
+                enabled: false
+                text: "-"
+                onClicked:
+                {
+                    DeviceManipulationTabController.increaseLPFBeta(-0.05);
+                }
+            }
+
             MyText
             {
                 Layout.leftMargin: 40
@@ -312,7 +268,7 @@ MyStackViewPage
             MyText
             {
                 id: appVersionText
-                text: "v0.0"
+                text: "v0.0.0"
             }
         }
 
@@ -342,6 +298,10 @@ MyStackViewPage
             {
                 reloadDeviceManipulationProfiles()
             }
+            onSettingChanged:
+            {
+                lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            }
         }
 
     }
@@ -359,8 +319,8 @@ MyStackViewPage
         //Collect all found devices
         for (var i = 0; i < deviceCount; i++)
         {
-            var OpenVRId = DeviceManipulationTabController.getOpenVRId(i)
-            var deviceName = OpenVRId.toString() + ": "
+            var openVRId = DeviceManipulationTabController.getOpenVRId(i)
+            var deviceName = openVRId.toString() + ": "
             deviceName += DeviceManipulationTabController.getDeviceSerial(i)
             var deviceClass = DeviceManipulationTabController.getDeviceClass(i)
 
@@ -410,9 +370,6 @@ MyStackViewPage
             if (trackerCount < 1)
             {
                 referenceTrackerSelectionComboBox.currentIndex = -1
-
-                //Uncheck check box
-                referenceTrackerInvisibleCheckBox.checkState = Qt.Unchecked
             }
             else
             {
@@ -422,16 +379,16 @@ MyStackViewPage
             //Disable buttons
             deviceModeApplyButton.enabled = false
             referenceTrackerIdentifyButton.enabled = false
-            deviceManipulationNewProfileButton.enabled = false
-            deviceManipulationProfileComboBox.enabled = false
+            lpfBetaIncreaseButton.enabled = false
+            lpfBetaDecreaseButton.enabled = false
         }
         else
         {
             //Enable buttons
             deviceModeApplyButton.enabled = true
             referenceTrackerIdentifyButton.enabled = true
-            deviceManipulationNewProfileButton.enabled = true
-            deviceManipulationProfileComboBox.enabled = true
+            lpfBetaIncreaseButton.enabled = true
+            lpfBetaDecreaseButton.enabled = true
 
             //Select a valid index
             if (oldHMDIndex >= 0 && oldHMDIndex < hmdCount)

@@ -1,19 +1,19 @@
 #include "overlaycontroller.h"
-//#include <QOpenGLFramebufferObjectFormat>
-//#include <QOpenGLPaintDevice>
-//#include <QPainter>
-//#include <QQuickView>
+//#include <QOpenGLFramebufferObjectFormat>//
+//#include <QOpenGLPaintDevice>//
+//#include <QPainter>//
+//#include <QQuickView>//
 #include <QApplication>
-//#include <QQmlEngine>
+//#include <QQmlEngine>//
 #include <QQmlContext>
-//#include <QtWidgets/QWidget>
-//#include <QMouseEvent>
-//#include <QtWidgets/QGraphicsSceneMouseEvent>
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QGraphicsEllipseItem>
+//#include <QtWidgets/QWidget>//
+//#include <QMouseEvent>//
+//#include <QtWidgets/QGraphicsSceneMouseEvent>//
+//#include <QtWidgets/QApplication>//
+//#include <QtWidgets/QGraphicsEllipseItem>//
 #include <QOpenGLExtraFunctions>
-//#include <QCursor>
-//#include <QProcess>
+//#include <QCursor>//
+//#include <QProcess>//
 #include <QMessageBox>
 #include <exception>
 #include <iostream>
@@ -22,7 +22,7 @@
 #include "logging.h"
 #include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
-//#include <locale>
+//#include <locale>//
 #include <codecvt>
 
 

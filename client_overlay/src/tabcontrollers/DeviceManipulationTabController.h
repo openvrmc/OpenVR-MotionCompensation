@@ -107,6 +107,7 @@ namespace motioncompensation
 		//void loadComplete();
 		void deviceCountChanged(unsigned deviceCount);
 		void deviceInfoChanged(unsigned index);
+		void settingChanged();
 		void deviceManipulationProfilesChanged();
 	};
 } // namespace motioncompensation
