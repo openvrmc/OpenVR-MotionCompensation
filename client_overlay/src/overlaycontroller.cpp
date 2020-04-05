@@ -1,19 +1,19 @@
 #include "overlaycontroller.h"
-#include <QOpenGLFramebufferObjectFormat>
-#include <QOpenGLPaintDevice>
-#include <QPainter>
-#include <QQuickView>
+//#include <QOpenGLFramebufferObjectFormat>//
+//#include <QOpenGLPaintDevice>//
+//#include <QPainter>//
+//#include <QQuickView>//
 #include <QApplication>
-#include <QQmlEngine>
+//#include <QQmlEngine>//
 #include <QQmlContext>
-#include <QtWidgets/QWidget>
-#include <QMouseEvent>
-#include <QtWidgets/QGraphicsSceneMouseEvent>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsEllipseItem>
+//#include <QtWidgets/QWidget>//
+//#include <QMouseEvent>//
+//#include <QtWidgets/QGraphicsSceneMouseEvent>//
+//#include <QtWidgets/QApplication>//
+//#include <QtWidgets/QGraphicsEllipseItem>//
 #include <QOpenGLExtraFunctions>
-#include <QCursor>
-#include <QProcess>
+//#include <QCursor>//
+//#include <QProcess>//
 #include <QMessageBox>
 #include <exception>
 #include <iostream>
@@ -22,7 +22,7 @@
 #include "logging.h"
 #include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
-#include <locale>
+//#include <locale>//
 #include <codecvt>
 
 
@@ -586,6 +586,7 @@ namespace motioncompensation
 				char keyboardBuffer[1024];
 				vr::VROverlay()->GetKeyboardText(keyboardBuffer, 1024);
 				emit keyBoardInputSignal(QString(keyboardBuffer), vrEvent.data.keyboard.uUserValue);
+				LOG(TRACE) << "VREvent_KeyboardDone";
 			}
 			break;
 
@@ -648,6 +649,31 @@ namespace motioncompensation
 	void OverlayController::showKeyboard(QString existingText, unsigned long userValue)
 	{
 		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
+
+		// Fix copied from https://github.com/OpenVR-Advanced-Settings/OpenVR-AdvancedSettings/blob/master/src/overlaycontroller.cpp
+		auto m_trackingUniverse = vr::VRCompositor()->GetTrackingSpace();
+
+		vr::EVROverlayError overlayerror;
+
+		// System Overlay Key
+		const auto systemOverlayKey = std::string("system.systemui");
+		vr::VROverlayHandle_t systemOverlayHandle;
+		overlayerror = vr::VROverlay()->FindOverlay(systemOverlayKey.c_str(), &systemOverlayHandle);
+
+		if (overlayerror != vr::VROverlayError_None)
+		{
+			return;
+			LOG(ERROR) << "Could not find system.systemui overlay";
+		}
+
+		// Move the keyboard a bit below the Steam UI
+		vr::HmdMatrix34_t overlayPos;
+		vr::VROverlay()->GetOverlayTransformAbsolute(systemOverlayHandle, &m_trackingUniverse, &overlayPos);
+		overlayPos.m[1][3] = overlayPos.m[1][3] - 1.0f;
+
+		vr::VROverlay()->SetKeyboardTransformAbsolute(m_trackingUniverse, &overlayPos);
+
+		LOG(TRACE) << "Showing Keyboard";
 	}
 
 	void OverlayController::playActivationSound()

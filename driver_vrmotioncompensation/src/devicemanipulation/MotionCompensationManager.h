@@ -29,7 +29,16 @@ namespace vrmotioncompensation
 			
 			void WriteDebugData();
 
-			void setMotionCompensationMode(MotionCompensationMode Mode);
+			void setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
+
+			void setNewMotionCompensatedDevice(int MCdevice);
+
+			void setNewReferenceTracker(int RTdevice);
+
+			MotionCompensationMode getMotionCompensationMode()
+			{
+				return _motionCompensationMode;
+			}
 
 			void setLPFBeta(double NewBeta)
 			{
@@ -39,6 +48,16 @@ namespace vrmotioncompensation
 			double getLPFBeta()
 			{
 				return LPF_Beta;
+			}
+
+			int getMCdeviceID()
+			{
+				return MCdeviceID;
+			}
+
+			int getRTdeviceID()
+			{
+				return RTdeviceID;
 			}
 
 			bool _isMotionCompensationZeroPoseValid();
@@ -65,6 +84,9 @@ namespace vrmotioncompensation
 
 		private:
 			ServerDriver* m_parent;
+
+			int MCdeviceID = -1;
+			int RTdeviceID = -1;
 
 			Debugger DebugLogger;
 
@@ -96,7 +118,8 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t _motionCompensationRefRotVel;
 			vr::HmdVector3d_t _motionCompensationRefRotAcc;
 
-			bool _motionCompensationRefPoseValid = false;
+			bool _RefPoseValid = false;
+			int _RefPoseValidCounter = 0;
 		};
 	}
 }

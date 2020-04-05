@@ -61,7 +61,6 @@ namespace vrmotioncompensation
 		_this->_ipcThreadRunning = false;
 	}
 
-
 	VRMotionCompensation::VRMotionCompensation(const std::string& serverQueue, const std::string& clientQueue) : _ipcServerQueueName(serverQueue), _ipcClientQueueName(clientQueue)
 	{
 	}
@@ -258,26 +257,37 @@ namespace vrmotioncompensation
 	{
 		if (_ipcServerQueue)
 		{
-			ipc::Request message(ipc::RequestType::DeviceManipulation_GetDeviceInfo);
+			//Create message
+			ipc::Request message(ipc::RequestType::DeviceManipulation_GetDeviceInfo);			
 			memset(&message.msg, 0, sizeof(message.msg));
 			message.msg.ovr_GenericDeviceIdMessage.clientId = m_clientId;
 			message.msg.ovr_GenericDeviceIdMessage.deviceId = deviceId;
+
+			//Create random message ID
 			uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
 			message.msg.ovr_GenericDeviceIdMessage.messageId = messageId;
+
+			//Allocate memory for the reply
 			std::promise<ipc::Reply> respPromise;
 			auto respFuture = respPromise.get_future();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
 				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
+
+			//Send message
 			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+
 			auto resp = respFuture.get();
 			{
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
 				_ipcPromiseMap.erase(messageId);
 			}
+
+			//If there was an error, notify the user
 			std::stringstream ss;
 			ss << "Error while getting device info: ";
+
 			if (resp.status == ipc::ReplyStatus::Ok)
 			{
 				info.deviceId = resp.msg.dm_deviceInfo.deviceId;
@@ -298,66 +308,6 @@ namespace vrmotioncompensation
 			{
 				ss << "Error code " << (int)resp.status;
 				throw vrmotioncompensation_exception(ss.str());
-			}
-		}
-		else
-		{
-			throw vrmotioncompensation_connectionerror("No active connection.");
-		}
-	}
-
-	void VRMotionCompensation::setDeviceNormalMode(uint32_t deviceId, bool modal)
-	{
-		if (_ipcServerQueue)
-		{
-			ipc::Request message(ipc::RequestType::DeviceManipulation_DefaultMode);
-			memset(&message.msg, 0, sizeof(message.msg));
-			message.msg.ovr_GenericDeviceIdMessage.clientId = m_clientId;
-			message.msg.ovr_GenericDeviceIdMessage.messageId = 0;
-			message.msg.ovr_GenericDeviceIdMessage.deviceId = deviceId;
-			if (modal)
-			{
-				//Create random message ID
-				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
-
-				//Allocate memory for the reply
-				std::promise<ipc::Reply> respPromise;
-				auto respFuture = respPromise.get_future();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
-				}
-
-				//Send message
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				auto resp = respFuture.get();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.erase(messageId);
-				}
-
-				//If there was an error, notify the user
-				std::stringstream ss;
-				ss << "Error while setting normal mode: ";
-				if (resp.status == ipc::ReplyStatus::InvalidId)
-				{
-					ss << "Invalid device id";
-					throw vrmotioncompensation_invalidid(ss.str());
-				}
-				else if (resp.status == ipc::ReplyStatus::NotFound)
-				{
-					ss << "Device not found";
-					throw vrmotioncompensation_notfound(ss.str());
-				}
-				else if (resp.status != ipc::ReplyStatus::Ok)
-				{
-					ss << "Error code " << (int)resp.status;
-					throw vrmotioncompensation_exception(ss.str());
-				}
-			}
-			else
-			{
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
 			}
 		}
 		else

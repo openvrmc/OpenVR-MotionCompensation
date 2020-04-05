@@ -3,16 +3,16 @@
 #include <openvr.h>
 #include <QtCore/QtCore>
 // because of incompatibilities with QtOpenGL and GLEW we need to cherry pick includes
-#include <QVector2D>
-#include <QMatrix4x4>
-#include <QVector>
-#include <QVector2D>
-#include <QVector3D>
+//#include <QVector2D>//
+//#include <QMatrix4x4>//
+//#include <QVector>//
+//#include <QVector2D>//
+//#include <QVector3D>//
 #include <QObject>
 #include <QSettings>
 #include <QQmlEngine>
 #include <QtGui/QOpenGLContext>
-#include <QtWidgets/QGraphicsScene>
+//#include <QtWidgets/QGraphicsScene>//
 #include <QOffscreenSurface>
 #include <QOpenGLFramebufferObject>
 #include <QQuickWindow>
@@ -34,9 +34,10 @@ namespace motioncompensation
 			Q_PROPERTY(bool desktopMode READ isDesktopMode)
 
 	public:
-		static constexpr const char* applicationKey = "OVRMC.VRMotionCompensation";
+		static constexpr const char* applicationKey = "ovrmc.VRMotionCompensation";
+		//static constexpr const char* applicationKey = "matzman666.VRInputEmulator";
 		static constexpr const char* applicationName = "OpenVR Motion Compensation";
-		static constexpr const char* applicationVersionString = "v0.0.7";
+		static constexpr const char* applicationVersionString = "v0.1.1";
 
 	private:
 		vr::VROverlayHandle_t m_ulOverlayHandle = vr::k_ulOverlayHandleInvalid;

@@ -147,8 +147,7 @@ namespace vrmotioncompensation
 
 		void ping(bool modal = true, bool enableReply = false);
 
-		void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);
-		void setDeviceNormalMode(uint32_t deviceId, bool modal = true);
+		void getDeviceInfo(uint32_t deviceId, DeviceInfo& info);;
 
 		void setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode = MotionCompensationMode::Disabled, bool modal = true);
 
