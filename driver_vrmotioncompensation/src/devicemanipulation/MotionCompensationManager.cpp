@@ -23,7 +23,7 @@ namespace vrmotioncompensation
 
 			if (Mode == MotionCompensationMode::ReferenceTracker)
 			{
-				_motionCompensationRefPoseValid = false;
+				_RefPoseValid = false;
 				_motionCompensationZeroPoseValid = false;
 				_motionCompensationEnabled = true;
 
@@ -84,7 +84,7 @@ namespace vrmotioncompensation
 		void MotionCompensationManager::setNewReferenceTracker(int RTdevice)
 		{
 			RTdeviceID = RTdevice;
-			_motionCompensationRefPoseValid = false;
+			_RefPoseValid = false;
 			_motionCompensationZeroPoseValid = false;
 		}
 
@@ -232,13 +232,16 @@ namespace vrmotioncompensation
 
 			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);			
 			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
-
-			// Acceleration is not needed
-			//_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
-			//_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
 			
-			//Position is valid (only needed for the first frame)
-			_motionCompensationRefPoseValid = true;
+			// Wait 10 frames before setting reference pose to valid
+			if (_RefPoseValidCounter > 10)
+			{
+				_RefPoseValid = true;
+			}
+			else
+			{
+				_RefPoseValidCounter++;
+			}			
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
@@ -269,7 +272,7 @@ namespace vrmotioncompensation
 
 		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo)
 		{
-			if (_motionCompensationEnabled && _motionCompensationZeroPoseValid && _motionCompensationRefPoseValid)
+			if (_motionCompensationEnabled && _motionCompensationZeroPoseValid && _RefPoseValid)
 			{
 				/*if (DebugLogger.IsInSync())
 				{
@@ -297,31 +300,18 @@ namespace vrmotioncompensation
 				vr::HmdQuaternion_t compensatedPoseWorldRot = _motionCompensationRefRotInv * poseWorldRot;
 
 				// Translate the motion ref vel/acc values into driver space and directly subtract them
-				if (_motionCompensationRefPoseValid)
-				{
-					vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
-					vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
+				vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
+				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
-					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosVel);
-					pose.vecVelocity[0] -= tmpPosVel.v[0];
-					pose.vecVelocity[1] -= tmpPosVel.v[1];
-					pose.vecVelocity[2] -= tmpPosVel.v[2];
+				vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosVel);
+				pose.vecVelocity[0] -= tmpPosVel.v[0];
+				pose.vecVelocity[1] -= tmpPosVel.v[1];
+				pose.vecVelocity[2] -= tmpPosVel.v[2];
 
-					/*vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosAcc);
-					pose.vecAcceleration[0] -= tmpPosAcc.v[0];
-					pose.vecAcceleration[1] -= tmpPosAcc.v[1];
-					pose.vecAcceleration[2] -= tmpPosAcc.v[2];*/
-
-					vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotVel);
-					pose.vecAngularVelocity[0] -= tmpRotVel.v[0];
-					pose.vecAngularVelocity[1] -= tmpRotVel.v[1];
-					pose.vecAngularVelocity[2] -= tmpRotVel.v[2];
-
-					/*vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotAcc);
-					pose.vecAngularAcceleration[0] -= tmpRotAcc.v[0];
-					pose.vecAngularAcceleration[1] -= tmpRotAcc.v[1];
-					pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];*/
-				}
+				vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotVel);
+				pose.vecAngularVelocity[0] -= tmpRotVel.v[0];
+				pose.vecAngularVelocity[1] -= tmpRotVel.v[1];
+				pose.vecAngularVelocity[2] -= tmpRotVel.v[2];
 
 				// convert back to driver space
 				pose.qRotation = pose.qWorldFromDriverRotation * compensatedPoseWorldRot;

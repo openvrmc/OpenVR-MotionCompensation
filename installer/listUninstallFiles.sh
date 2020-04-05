@@ -4,7 +4,7 @@
 # Dont't forget to set OUTPUTFILE to a path that is writeable
 
 OUTPUTFILE=./installed_files.txt
-INSTALLDIR="/c/Program Files/OpenVR-MotionCompensation/"
+INSTALLDIR="/c/Program Files/OpenVR-MotionCompensation"
 
 # Get command line arguments
 if [ $# -eq 1 ]; then

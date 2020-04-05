@@ -1,7 +1,7 @@
 {
 	"source" : "builtin",
 	"applications": [{
-		"app_key": "matzman666.VRInputEmulator",
+		"app_key": "ovrmc.VRMotionCompensation",
 		"launch_type": "binary",
 		"binary_path_windows": "OpenVR-MotionCompensationOverlay.exe",
 		"is_dashboard_overlay": true,

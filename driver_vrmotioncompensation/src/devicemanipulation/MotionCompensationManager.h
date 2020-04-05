@@ -118,7 +118,8 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t _motionCompensationRefRotVel;
 			vr::HmdVector3d_t _motionCompensationRefRotAcc;
 
-			bool _motionCompensationRefPoseValid = false;
+			bool _RefPoseValid = false;
+			int _RefPoseValidCounter = 0;
 		};
 	}
 }
