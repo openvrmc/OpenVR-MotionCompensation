@@ -58,7 +58,7 @@ Continuous and heavy vibration will affect the IMU performance, causing noticabl
 See the wiki
 
 ## Building
-1. Open *'VRInputEmulator.sln'* in Visual Studio 2019.
+1. Open *'VRMotionCompensation.sln'* in Visual Studio 2019.
 2. Build Solution
 
 # License
