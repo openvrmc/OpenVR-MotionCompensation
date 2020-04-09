@@ -29,60 +29,6 @@ namespace motioncompensation
 		this->widget = widget;
 
 		SearchDevices(0);
-		/*try
-		{
-			//Get some infos about the found devices
-			for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
-			{
-				auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
-				if (deviceClass != vr::TrackedDeviceClass_Invalid)
-				{
-					if (deviceClass == vr::TrackedDeviceClass_HMD || deviceClass == vr::TrackedDeviceClass_Controller || deviceClass == vr::TrackedDeviceClass_GenericTracker)
-					{
-						auto info = std::make_shared<DeviceInfo>();
-						info->openvrId = id;
-						info->deviceClass = deviceClass;
-						char buffer[vr::k_unMaxPropertyStringSize];
-
-						//Get and save the serial number
-						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;						
-						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);						
-						if (pError == vr::TrackedProp_Success)
-						{
-							info->serial = std::string(buffer);
-						}
-						else
-						{
-							info->serial = std::string("<unknown serial>");
-							LOG(ERROR) << "Could not get serial of device " << id;
-						}
-
-						//Get and save the current device mode
-						try
-						{
-							vrmotioncompensation::DeviceInfo info2;
-							parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-							info->deviceMode = info2.deviceMode;
-						}
-						catch (std::exception& e)
-						{
-							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-						}
-
-						//Store the found info
-						deviceInfos.push_back(info);
-						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
-					}
-					maxValidDeviceId = id;
-				}
-			}
-
-			emit deviceCountChanged((unsigned)deviceInfos.size());
-		}
-		catch (const std::exception & e)
-		{
-			LOG(ERROR) << "Could not get device infos: " << e.what();
-		}*/
 	}
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
@@ -117,57 +63,6 @@ namespace motioncompensation
 				}
 
 				SearchDevices(maxValidDeviceId + 1);
-
-				//Check if there is a new device (id start point is maxValidDeviceId + 1!)
-				/*bool newDeviceAdded = false;
-				for (uint32_t id = maxValidDeviceId + 1; id < vr::k_unMaxTrackedDeviceCount; ++id)
-				{
-					auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
-					if (deviceClass != vr::TrackedDeviceClass_Invalid)
-					{
-						if (deviceClass == vr::TrackedDeviceClass_Controller || deviceClass == vr::TrackedDeviceClass_GenericTracker)
-						{
-							auto info = std::make_shared<DeviceInfo>();
-							info->openvrId = id;
-							info->deviceClass = deviceClass;
-							char buffer[vr::k_unMaxPropertyStringSize];
-
-							//Get and save the serial number
-							vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
-							vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
-							if (pError == vr::TrackedProp_Success)
-							{
-								info->serial = std::string(buffer);
-							}
-							else
-							{
-								info->serial = std::string("<unknown serial>");
-								LOG(ERROR) << "Could not get serial of device " << id;
-							}
-
-							//Get and save the current device mode
-							try
-							{
-								vrmotioncompensation::DeviceInfo info2;
-								parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-								info->deviceMode = info2.deviceMode;
-							}
-							catch (std::exception& e)
-							{
-								LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-							}
-
-							deviceInfos.push_back(info);
-							LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
-							newDeviceAdded = true;
-						}
-						maxValidDeviceId = id;
-					}
-				}
-				if (newDeviceAdded)
-				{
-					emit deviceCountChanged((unsigned)deviceInfos.size());
-				}*/
 			}
 		}
 		else
