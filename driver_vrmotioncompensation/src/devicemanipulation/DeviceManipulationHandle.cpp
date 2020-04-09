@@ -35,9 +35,11 @@ namespace vrmotioncompensation
 					{						
 						m_motionCompensationManager._setMotionCompensationZeroPose(newPose);
 					}
-
-					//Update reference tracker position
-					m_motionCompensationManager._updateMotionCompensationRefPose(newPose);
+					else
+					{
+						//Update reference tracker position
+						m_motionCompensationManager._updateMotionCompensationRefPose(newPose);
+					}
 				}
 			}
 			else if (m_deviceMode == MotionCompensationDeviceMode::MotionCompensated)

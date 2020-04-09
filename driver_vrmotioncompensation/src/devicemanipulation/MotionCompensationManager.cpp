@@ -232,7 +232,7 @@ namespace vrmotioncompensation
 
 			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);			
 			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
-			
+
 			// Wait 10 frames before setting reference pose to valid
 			if (_RefPoseValidCounter > 10)
 			{
