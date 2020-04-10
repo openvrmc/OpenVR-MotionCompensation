@@ -412,8 +412,6 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "setMotionCompensationMode Array IDs, MCindex: " << MCindex << " RTindex: " << RTindex;
-
 		//Search for the device ID
 		auto search = TrackerArrayIdToDeviceId.find(RTindex);
 		if (search != TrackerArrayIdToDeviceId.end())
@@ -437,7 +435,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "setMotionCompensationMode device IDs, MCindex: " << MCindex << " RTindex: " << RTindex << " MaxValid ID: " << maxValidDeviceId;
+		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << " RTindex: " << RTindex << " out of a maximum of: " << maxValidDeviceId;
 
 		if (MCindex == RTindex)
 		{
@@ -616,7 +614,7 @@ namespace motioncompensation
 		{
 			try
 			{
-				LOG(INFO) << "Sending debug mode, max data points: " << MaxDebugPoints;
+				LOG(INFO) << "Sending debug mode (Status: " << newLoggerStatus << "), max data points: " << MaxDebugPoints;
 				parent->vrMotionCompensation().startDebugLogger(MaxDebugPoints, enable);
 			}
 			catch (vrmotioncompensation::vrmotioncompensation_exception& e)
