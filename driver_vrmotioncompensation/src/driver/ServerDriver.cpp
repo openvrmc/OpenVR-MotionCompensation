@@ -100,7 +100,7 @@ namespace vrmotioncompensation
 
 		void ServerDriver::Cleanup()
 		{
-			//m_motionCompensation.WriteDebugData();
+			m_motionCompensation.StopDebugData();
 
 			LOG(TRACE) << "ServerDriver::Cleanup()";
 			_driverContextHooks.reset();

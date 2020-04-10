@@ -4,7 +4,7 @@
 //#include <QPainter>//
 //#include <QQuickView>//
 #include <QApplication>
-//#include <QQmlEngine>//
+#include <QQmlEngine>//
 #include <QQmlContext>
 //#include <QtWidgets/QWidget>//
 //#include <QMouseEvent>//

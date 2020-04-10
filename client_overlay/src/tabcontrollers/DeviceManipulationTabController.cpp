@@ -577,6 +577,94 @@ namespace motioncompensation
 		return true;
 	}
 
+	bool DeviceManipulationTabController::setDebugMode(unsigned MaxDebugPoints, bool TestForStandby)
+	{
+		bool enable = false;
+		QString newButtonText = "";
+		int newLoggerStatus = 0;
+		int TempDebugDataPoints = MaxDebugPoints;
+
+		// Queue new debug logger state
+		if (TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 1)
+		{
+			enable = true;
+			newLoggerStatus = 2;
+			newButtonText = "Stop logging";
+			TempDebugDataPoints = DebugDataPoints;
+		}
+		else if (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
+		{
+			newLoggerStatus = 1;
+			newButtonText = "Standby...";
+		}
+		else if ((motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
+				 (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
+		{
+			enable = false;
+			newLoggerStatus = 0;
+			newButtonText = "Start logging";
+		}
+		else if (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
+		{
+			enable = true;
+			newLoggerStatus = 2;
+			newButtonText = "Stop logging";
+		}
+
+		// Only send new state when logger is not in standby mode
+		if (newLoggerStatus != 1)
+		{
+			try
+			{
+				LOG(INFO) << "Sending debug mode, max data points: " << MaxDebugPoints;
+				parent->vrMotionCompensation().startDebugLogger(MaxDebugPoints, enable);
+			}
+			catch (vrmotioncompensation::vrmotioncompensation_exception& e)
+			{
+				switch (e.errorcode)
+				{
+					case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+					{
+						m_deviceModeErrorString = "Not an error";
+					} break;
+					case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
+					{
+						m_deviceModeErrorString = "MC must be running to\nstart the debug logger";
+					} break;
+					default:
+					{
+						m_deviceModeErrorString = "Unknown error";
+					} break;
+
+					LOG(ERROR) << "Exception caught while sending debug mode: " << e.what();
+
+					return false;
+				}
+			}
+			catch (std::exception& e)
+			{
+				m_deviceModeErrorString = "Unknown exception";
+				LOG(ERROR) << "Exception caught while sending debug mode: " << e.what();
+
+				return false;
+			}
+		}
+
+		// If send was successful or not needed, apply state
+		DebugDataPoints = TempDebugDataPoints;
+		DebugLoggerStatus = newLoggerStatus;
+		debugModeButtonString = newButtonText;
+
+		emit debugModeChanged();
+
+		return true;
+	}
+
+	QString DeviceManipulationTabController::getDebugModeButtonText()
+	{
+		return debugModeButtonString;
+	}
+
 	QString DeviceManipulationTabController::getDeviceModeErrorString()
 	{
 		return m_deviceModeErrorString;

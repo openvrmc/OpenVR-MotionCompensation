@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
 #include <memory>
 #include <openvr.h>
 #include <vrmotioncompensation.h>
@@ -51,6 +52,11 @@ namespace motioncompensation
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
 
+		//bool DebugLoggerEnabled = false;
+		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
+		int DebugDataPoints = 0;
+		QString debugModeButtonString;
+
 		QString m_deviceModeErrorString;
 
 		unsigned settingsUpdateCounter = 0;
@@ -94,7 +100,9 @@ namespace motioncompensation
 		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
 
 		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
-		Q_INVOKABLE bool setLPFBeta(double value);
+		Q_INVOKABLE bool setLPFBeta(double value);		
+		Q_INVOKABLE bool setDebugMode(unsigned MaxDebugPoints, bool TestForStandby);
+		Q_INVOKABLE QString getDebugModeButtonText();
 		Q_INVOKABLE bool sendLPFBeta();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
@@ -109,5 +117,6 @@ namespace motioncompensation
 		void deviceInfoChanged(unsigned index);
 		void settingChanged();
 		void deviceManipulationProfilesChanged();
+		void debugModeChanged();
 	};
 } // namespace motioncompensation

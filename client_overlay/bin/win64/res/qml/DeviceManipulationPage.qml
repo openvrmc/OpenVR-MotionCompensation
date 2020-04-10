@@ -235,6 +235,7 @@ MyStackViewPage
             {
                 id: deviceModeApplyButton
                 Layout.preferredWidth: 200
+                Layout.bottomMargin: 35
                 enabled: false
                 text: "Apply"
                 onClicked:
@@ -246,6 +247,40 @@ MyStackViewPage
                     if (!DeviceManipulationTabController.sendLPFBeta())
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send LPF Beta:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                    }
+
+                    DeviceManipulationTabController.setDebugMode(0, true)
+                }
+            }
+        }
+
+        //Debug Mode
+        RowLayout
+        {
+            spacing: 18
+
+            MyText
+            {
+                text: "Debug Logger"
+            }
+        }
+
+        //Enable debug logger:
+        RowLayout
+        {
+        spacing: 16
+
+        MyPushButton
+            {
+                id: debugLoggerButton
+                Layout.preferredWidth: 250
+                text: "Start logging"
+                onClicked:
+                {
+                    var value = 10000
+                    if (!DeviceManipulationTabController.setDebugMode(value, false))
+                    {
+                        deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
                 }
             }
@@ -301,6 +336,10 @@ MyStackViewPage
             onSettingChanged:
             {
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            }
+            onDebugModeChanged:
+            {
+                debugLoggerButton.text = DeviceManipulationTabController.getDebugModeButtonText()
             }
         }
 

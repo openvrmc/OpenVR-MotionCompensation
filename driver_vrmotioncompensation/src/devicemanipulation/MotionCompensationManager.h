@@ -29,6 +29,12 @@ namespace vrmotioncompensation
 			
 			void WriteDebugData();
 
+			void InitDebugData();
+
+			bool StartDebugData(int MaxDataPoints);
+
+			void StopDebugData();
+
 			void setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
 
 			void setNewMotionCompensatedDevice(int MCdevice);

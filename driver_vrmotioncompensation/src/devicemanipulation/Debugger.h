@@ -16,7 +16,7 @@ namespace vrmotioncompensation
 			struct DebugDataV3_t
 			{
 				std::string Name;
-				vr::HmdVector3d_t Data[10000];
+				std::vector<vr::HmdVector3d_t> Data;
 				bool InUse;
 
 				DebugDataV3_t()
@@ -29,7 +29,7 @@ namespace vrmotioncompensation
 			struct DebugDataQ4_t
 			{
 				std::string Name;
-				vr::HmdQuaternion_t Data[10000];
+				std::vector<vr::HmdQuaternion_t> Data;
 				bool InUse;
 
 				DebugDataQ4_t()
@@ -60,12 +60,14 @@ namespace vrmotioncompensation
 				}
 			};
 
-		public:
-			
-		
+		public:		
 			Debugger();
 
-			void Start();
+			void Start(int MaxDataPoints);
+
+			void Stop();
+
+			bool IsRunning();
 
 			void CountUp();
 
@@ -91,6 +93,7 @@ namespace vrmotioncompensation
 
 		private:
 			int DebugCounter = 0;
+			int MaxDebugValues = 10000;
 			DebugDataV3_t DebugDataV3[20];
 			DebugDataQ4_t DebugDataQ4[5];
 			vr::HmdVector3d_t vZeroPos;
@@ -100,10 +103,11 @@ namespace vrmotioncompensation
 			double LPFValue;
 
 			timer<boost::chrono::high_resolution_clock> DebugTimer;
-			double DebugTiming[10000];
+			std::vector<double> DebugTiming;
 
 			bool DebuggerRunning = false;
 			bool InSync = false;
+			bool WroteToFile = false;
 		};
 	}
 }
