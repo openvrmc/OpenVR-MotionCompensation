@@ -28,10 +28,6 @@ namespace motioncompensation
 		uint32_t openvrId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
 		vrmotioncompensation::MotionCompensationDeviceMode deviceMode = vrmotioncompensation::MotionCompensationDeviceMode::Default;
-		//uint32_t refDeviceId = 0;
-		//uint32_t renderModelIndex = 0;
-		//vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
-		//std::string renderModelOverlayName;
 	};
 
 	class DeviceManipulationTabController : public QObject
@@ -52,7 +48,6 @@ namespace motioncompensation
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
 
-		//bool DebugLoggerEnabled = false;
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
 		QString debugModeButtonString;
 
@@ -89,12 +84,7 @@ namespace motioncompensation
 		Q_INVOKABLE void increaseLPFBeta(double value);
 
 		void reloadMotionCompensationSettings();
-		void reloadDeviceManipulationProfiles();
 		void saveMotionCompensationSettings();
-		void saveDeviceManipulationProfiles();
-
-		Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
-		Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);
 
 		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
 
@@ -106,9 +96,6 @@ namespace motioncompensation
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 	public slots:
-		void addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping);
-		void applyDeviceManipulationProfile(unsigned index, unsigned deviceIndex);
-		void deleteDeviceManipulationProfile(unsigned index);
 
 	signals:
 		//void loadComplete();

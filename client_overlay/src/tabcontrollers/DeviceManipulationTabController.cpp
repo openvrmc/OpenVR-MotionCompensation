@@ -19,7 +19,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::initStage1()
 	{
-		reloadDeviceManipulationProfiles();
+		//reloadDeviceManipulationProfiles();
 		reloadMotionCompensationSettings();
 	}
 
@@ -141,10 +141,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::handleEvent(const vr::VREvent_t&)
 	{
-		/*switch (vrEvent.eventType) {
-			default:
-				break;
-		}*/
+
 	}
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()
@@ -273,127 +270,20 @@ namespace motioncompensation
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		motionCompensationMode = (vrmotioncompensation::MotionCompensationMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
 		LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
 		settings->endGroup();
-	}
 
-	void DeviceManipulationTabController::reloadDeviceManipulationProfiles()
-	{
-		deviceManipulationProfiles.clear();
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		auto profileCount = settings->beginReadArray("deviceManipulationProfiles");
-		for (int i = 0; i < profileCount; i++)
-		{
-			settings->setArrayIndex(i);
-			deviceManipulationProfiles.emplace_back();
-			auto& entry = deviceManipulationProfiles[i];
-			entry.profileName = settings->value("profileName").toString().toStdString();
-		}
-		settings->endArray();
-		settings->endGroup();
+		LOG(INFO) << "Loading Data; LPF Beta: " << LPFBeta;
 	}
 
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
 	{
+		LOG(INFO) << "Saving Data; LPF Beta: " << LPFBeta;
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		settings->setValue("motionCompensationVelAccMode", (unsigned)motionCompensationMode);
 		settings->setValue("motionCompensationLPFBeta", LPFBeta);
 		settings->endGroup();
 		settings->sync();
-	}
-
-	void DeviceManipulationTabController::saveDeviceManipulationProfiles()
-	{
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		settings->beginWriteArray("deviceManipulationProfiles");
-		unsigned i = 0;
-
-		for (auto& p : deviceManipulationProfiles)
-		{
-			settings->setArrayIndex(i);
-			settings->setValue("profileName", QString::fromStdString(p.profileName));
-		}
-		settings->endArray();
-		settings->endGroup();
-		settings->sync();
-	}
-
-	unsigned DeviceManipulationTabController::getDeviceManipulationProfileCount()
-	{
-		return (unsigned)deviceManipulationProfiles.size();
-	}
-
-	QString DeviceManipulationTabController::getDeviceManipulationProfileName(unsigned index)
-	{
-		if (index >= deviceManipulationProfiles.size())
-		{
-			return QString();
-		}
-		else
-		{
-			return QString::fromStdString(deviceManipulationProfiles[index].profileName);
-		}
-	}
-
-	void DeviceManipulationTabController::addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping)
-	{
-		if (deviceIndex >= deviceInfos.size())
-		{
-			return;
-		}
-
-		auto device = deviceInfos[deviceIndex];
-		DeviceManipulationProfile* profile = nullptr;
-		for (auto& p : deviceManipulationProfiles)
-		{
-			if (p.profileName.compare(name.toStdString()) == 0)
-			{
-				profile = &p;
-				break;
-			}
-		}
-
-		if (!profile)
-		{
-			auto i = deviceManipulationProfiles.size();
-			deviceManipulationProfiles.emplace_back();
-			profile = &deviceManipulationProfiles[i];
-		}
-
-		profile->profileName = name.toStdString();
-		saveDeviceManipulationProfiles();
-		OverlayController::appSettings()->sync();
-		emit deviceManipulationProfilesChanged();
-	}
-
-	void DeviceManipulationTabController::applyDeviceManipulationProfile(unsigned index, unsigned deviceIndex)
-	{
-		if (index < deviceManipulationProfiles.size())
-		{
-			if (deviceIndex >= deviceInfos.size())
-			{
-				return;
-			}
-			auto device = deviceInfos[deviceIndex];
-			auto& profile = deviceManipulationProfiles[index];
-			emit deviceInfoChanged(deviceIndex);
-		}
-	}
-
-	void DeviceManipulationTabController::deleteDeviceManipulationProfile(unsigned index)
-	{
-		if (index < deviceManipulationProfiles.size())
-		{
-			auto pos = deviceManipulationProfiles.begin() + index;
-			deviceManipulationProfiles.erase(pos);
-			saveDeviceManipulationProfiles();
-			OverlayController::appSettings()->sync();
-			emit deviceManipulationProfilesChanged();
-		}
 	}
 
 	// Enables or disables the motion compensation for the selected device
@@ -468,7 +358,6 @@ namespace motioncompensation
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
-				//parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
 			}
 			else
 			{
@@ -510,6 +399,8 @@ namespace motioncompensation
 
 			return false;
 		}
+
+		saveMotionCompensationSettings();
 
 		/*if (notify)
 		{

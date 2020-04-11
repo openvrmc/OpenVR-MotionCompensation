@@ -330,10 +330,6 @@ MyStackViewPage
                     fetchHMDInfo()
                 }
             }
-            onDeviceManipulationProfilesChanged:
-            {
-                reloadDeviceManipulationProfiles()
-            }
             onSettingChanged:
             {
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
