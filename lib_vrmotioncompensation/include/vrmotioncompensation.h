@@ -153,7 +153,7 @@ namespace vrmotioncompensation
 
 		void setLPFBeta(double value, bool modal = true);
 
-		void startDebugLogger(int MaxDatapoints, bool enable, bool modal = true);
+		void startDebugLogger(bool enable, bool modal = true);
 
 	private:
 		std::recursive_mutex _mutex;

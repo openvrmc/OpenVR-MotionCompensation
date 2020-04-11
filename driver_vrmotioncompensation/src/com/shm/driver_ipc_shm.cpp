@@ -322,7 +322,7 @@ namespace vrmotioncompensation
 									{
 										if (message.msg.dl_Settings.enabled)
 										{
-											if (!serverDriver->motionCompensation().StartDebugData(message.msg.dl_Settings.MaxDebugPoints))
+											if (!serverDriver->motionCompensation().StartDebugData())
 											{
 												LOG(INFO) << "Could not start debug logger: Motion Compensation must be enabled";
 												resp.status = ipc::ReplyStatus::InvalidId;

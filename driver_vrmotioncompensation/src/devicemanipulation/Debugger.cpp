@@ -12,24 +12,9 @@ namespace vrmotioncompensation
 
 		}
 
-		void Debugger::Start(int MaxDataPoints)
+		void Debugger::Start()
 		{
-			MaxDebugValues = MaxDataPoints;
-
 			DebugCounter = 0;
-
-			for (int i = 0; i < 20; i++)
-			{
-				DebugDataV3[i].Data.clear();
-			}
-
-			for (int i = 0; i < 5; i++)
-			{
-				DebugDataQ4[i].Data.clear();
-			}
-
-			DebugTiming.clear();
-
 			WroteToFile = false;
 			DebuggerRunning = true;
 			DebugTimer.start();
@@ -55,12 +40,7 @@ namespace vrmotioncompensation
 					{
 						if (DebugDataV3[i].InUse)
 						{
-							if (DebugDataV3[i].Data.size() < DebugCounter)
-							{
-								DebugDataV3[i].Data.push_back(DebugDataV3[i].Data[DebugDataV3[i].Data.size() - 1]);
-							}
-
-							/*if (DebugDataV3[i].Data[DebugCounter].v[0] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[0] != 0.0)
+							if (DebugDataV3[i].Data[DebugCounter].v[0] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[0] != 0.0)
 							{
 								DebugDataV3[i].Data[DebugCounter].v[0] = DebugDataV3[i].Data[DebugCounter - 1].v[0];
 							}
@@ -73,7 +53,7 @@ namespace vrmotioncompensation
 							if (DebugDataV3[i].Data[DebugCounter].v[2] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[2] != 0.0)
 							{
 								DebugDataV3[i].Data[DebugCounter].v[2] = DebugDataV3[i].Data[DebugCounter - 1].v[2];
-							}*/
+							}
 						}
 					}
 
@@ -81,12 +61,7 @@ namespace vrmotioncompensation
 					{
 						if (DebugDataQ4[i].InUse)
 						{
-							if (DebugDataQ4[i].Data.size() < DebugCounter)
-							{
-								DebugDataQ4[i].Data.push_back(DebugDataQ4[i].Data[DebugDataQ4[i].Data.size() - 1]);
-							}
-
-							/*if (DebugDataQ4[i].Data[DebugCounter].w == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].w != 0.0)
+							if (DebugDataQ4[i].Data[DebugCounter].w == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].w != 0.0)
 							{
 								DebugDataQ4[i].Data[DebugCounter].w = DebugDataQ4[i].Data[DebugCounter - 1].w;
 							}
@@ -104,12 +79,14 @@ namespace vrmotioncompensation
 							if (DebugDataQ4[i].Data[DebugCounter].z == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].z != 0.0)
 							{
 								DebugDataQ4[i].Data[DebugCounter].z = DebugDataQ4[i].Data[DebugCounter - 1].z;
-							}*/
+							}
 						}
 					}				
 				}
 
-				if (DebugCounter >= MaxDebugValues)
+				DebugTiming[DebugCounter] = DebugTimer.seconds();
+
+				if (DebugCounter >= 10000)
 				{
 					DebuggerRunning = false;
 				}
@@ -117,8 +94,6 @@ namespace vrmotioncompensation
 				{
 					DebugCounter++;
 				}
-
-				DebugTiming.push_back(DebugTimer.seconds());
 			}
 		}
 
@@ -126,7 +101,9 @@ namespace vrmotioncompensation
 		{
 			if (DebuggerRunning)
 			{
-				DebugDataV3[ID].Data.push_back(Data);
+				DebugDataV3[ID].Data[DebugCounter].v[0] = Data.v[0];
+				DebugDataV3[ID].Data[DebugCounter].v[1] = Data.v[1];
+				DebugDataV3[ID].Data[DebugCounter].v[2] = Data.v[2];
 			}			
 		}
 
@@ -134,7 +111,10 @@ namespace vrmotioncompensation
 		{
 			if (DebuggerRunning)
 			{
-				DebugDataQ4[ID].Data.push_back(Data);
+				DebugDataQ4[ID].Data[DebugCounter].w = Data.w;
+				DebugDataQ4[ID].Data[DebugCounter].x = Data.x;
+				DebugDataQ4[ID].Data[DebugCounter].y = Data.y;
+				DebugDataQ4[ID].Data[DebugCounter].z = Data.z;
 			}			
 		}
 
@@ -142,8 +122,9 @@ namespace vrmotioncompensation
 		{
 			if (DebuggerRunning)
 			{
-				vr::HmdVector3d_t temp = { Data[0], Data[1], Data[2] };
-				DebugDataV3[ID].Data.push_back(temp);
+				DebugDataV3[ID].Data[DebugCounter].v[0] = Data[0];
+				DebugDataV3[ID].Data[DebugCounter].v[1] = Data[1];
+				DebugDataV3[ID].Data[DebugCounter].v[2] = Data[2];
 			}
 		}
 
@@ -188,29 +169,6 @@ namespace vrmotioncompensation
 		{
 			if (!WroteToFile)
 			{		
-				int minData = DebugCounter;
-
-				for (int i = 0; i < 5; i++)
-				{
-					if (DebugDataQ4[i].InUse && DebugDataQ4[i].Data.size() < minData)
-					{
-						minData = DebugDataQ4[i].Data.size();
-					}
-				}
-
-				for (int i = 0; i < 20; i++)
-				{
-					if (DebugDataQ4[i].InUse && DebugDataV3[i].Data.size() < minData)
-					{
-						minData = DebugDataV3[i].Data.size();
-					}
-				}
-
-				if (DebugTiming.size() < minData)
-				{
-					minData = DebugTiming.size();
-				}
-				
 				std::ofstream DebugFile;
 				DebugFile.open("MotionData.txt");
 
@@ -245,7 +203,7 @@ namespace vrmotioncompensation
 				DebugFile << std::endl;
 
 				//Write data
-				for (int i = 0; i < minData; i++)
+				for (int i = 0; i < DebugCounter; i++)
 				{
 					DebugFile << DebugTiming[i] << ";";
 				

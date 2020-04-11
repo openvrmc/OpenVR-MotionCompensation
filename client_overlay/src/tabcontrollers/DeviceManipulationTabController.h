@@ -54,7 +54,6 @@ namespace motioncompensation
 
 		//bool DebugLoggerEnabled = false;
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
-		int DebugDataPoints = 0;
 		QString debugModeButtonString;
 
 		QString m_deviceModeErrorString;
@@ -101,7 +100,7 @@ namespace motioncompensation
 
 		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
 		Q_INVOKABLE bool setLPFBeta(double value);		
-		Q_INVOKABLE bool setDebugMode(unsigned MaxDebugPoints, bool TestForStandby);
+		Q_INVOKABLE bool setDebugMode(bool TestForStandby);
 		Q_INVOKABLE QString getDebugModeButtonText();
 		Q_INVOKABLE bool sendLPFBeta();
 		Q_INVOKABLE QString getDeviceModeErrorString();

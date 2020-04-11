@@ -575,12 +575,11 @@ namespace motioncompensation
 		return true;
 	}
 
-	bool DeviceManipulationTabController::setDebugMode(unsigned MaxDebugPoints, bool TestForStandby)
+	bool DeviceManipulationTabController::setDebugMode(bool TestForStandby)
 	{
 		bool enable = false;
 		QString newButtonText = "";
 		int newLoggerStatus = 0;
-		int TempDebugDataPoints = MaxDebugPoints;
 
 		// Queue new debug logger state
 		if (TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 1)
@@ -588,21 +587,25 @@ namespace motioncompensation
 			enable = true;
 			newLoggerStatus = 2;
 			newButtonText = "Stop logging";
-			TempDebugDataPoints = DebugDataPoints;
 		}
-		else if (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
+		else if (TestForStandby)
+		{
+			// return from function if standby mode was not active
+			return true;
+		}
+		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
 		{
 			newLoggerStatus = 1;
 			newButtonText = "Standby...";
 		}
-		else if ((motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
-				 (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
+		else if ((!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
+				 (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
 		{
 			enable = false;
 			newLoggerStatus = 0;
 			newButtonText = "Start logging";
 		}
-		else if (motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
+		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
 		{
 			enable = true;
 			newLoggerStatus = 2;
@@ -614,8 +617,8 @@ namespace motioncompensation
 		{
 			try
 			{
-				LOG(INFO) << "Sending debug mode (Status: " << newLoggerStatus << "), max data points: " << MaxDebugPoints;
-				parent->vrMotionCompensation().startDebugLogger(MaxDebugPoints, enable);
+				LOG(INFO) << "Sending debug mode (Status: " << newLoggerStatus << ")";
+				parent->vrMotionCompensation().startDebugLogger(enable);
 			}
 			catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 			{
@@ -649,7 +652,6 @@ namespace motioncompensation
 		}
 
 		// If send was successful or not needed, apply state
-		DebugDataPoints = TempDebugDataPoints;
 		DebugLoggerStatus = newLoggerStatus;
 		debugModeButtonString = newButtonText;
 

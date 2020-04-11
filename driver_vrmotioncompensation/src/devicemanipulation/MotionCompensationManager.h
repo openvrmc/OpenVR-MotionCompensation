@@ -31,7 +31,7 @@ namespace vrmotioncompensation
 
 			void InitDebugData();
 
-			bool StartDebugData(int MaxDataPoints);
+			bool StartDebugData();
 
 			void StopDebugData();
 

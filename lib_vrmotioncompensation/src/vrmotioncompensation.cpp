@@ -440,7 +440,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::startDebugLogger(int MaxDatapoints, bool enable, bool modal)
+	void VRMotionCompensation::startDebugLogger(bool enable, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
@@ -449,7 +449,6 @@ namespace vrmotioncompensation
 			memset(&message.msg, 0, sizeof(message.msg));
 			message.msg.dl_Settings.clientId = m_clientId;
 			message.msg.dl_Settings.messageId = 0;
-			message.msg.dl_Settings.MaxDebugPoints = MaxDatapoints;
 			message.msg.dl_Settings.enabled = enable;
 
 			if (modal)

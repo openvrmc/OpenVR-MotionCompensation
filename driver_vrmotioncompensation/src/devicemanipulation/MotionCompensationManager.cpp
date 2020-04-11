@@ -58,12 +58,12 @@ namespace vrmotioncompensation
 			DebugLogger.SetLPFValue(LPF_Beta);
 		}
 
-		bool MotionCompensationManager::StartDebugData(int MaxDataPoints)
+		bool MotionCompensationManager::StartDebugData()
 		{
 			if (_motionCompensationMode == MotionCompensationMode::ReferenceTracker && !DebugLogger.IsRunning())
 			{
 				InitDebugData();
-				DebugLogger.Start(MaxDataPoints);
+				DebugLogger.Start();
 				return true;
 			}
 

@@ -248,8 +248,10 @@ MyStackViewPage
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send LPF Beta:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
-
-                    DeviceManipulationTabController.setDebugMode(0, true)
+                    if (!DeviceManipulationTabController.setDebugMode(true))
+                    {
+                        deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                    }
                 }
             }
         }
@@ -277,8 +279,7 @@ MyStackViewPage
                 text: "Start logging"
                 onClicked:
                 {
-                    var value = 10000
-                    if (!DeviceManipulationTabController.setDebugMode(value, false))
+                    if (!DeviceManipulationTabController.setDebugMode(false))
                     {
                         deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
