@@ -408,6 +408,13 @@ namespace vrmotioncompensation
 			vr::HmdQuaternion_t qr;
 
 			double dotproduct = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
+			
+			// if q1 and q2 are the same, we can return either of the values
+			if (dotproduct >= 1.0 || dotproduct <= -1.0)
+			{
+				return q1;
+			}
+			
 			double theta, st, sut, sout, coeff1, coeff2;
 
 			// algorithm adapted from Shoemake's paper
