@@ -1,9 +1,6 @@
 #include "ServerDriver.h"
 #include "../devicemanipulation/DeviceManipulationHandle.h"
 
-#include <iostream>
-#include <fstream>
-
 namespace vrmotioncompensation
 {
 	namespace driver
