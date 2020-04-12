@@ -1,4 +1,5 @@
 #include "Debugger.h"
+#include "../logging.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,8 +13,15 @@ namespace vrmotioncompensation
 
 		}
 
+		Debugger::~Debugger()
+		{
+
+		}
+
 		void Debugger::Start()
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			DebugCounter = 0;
 			WroteToFile = false;
 			DebuggerRunning = true;
@@ -22,6 +30,8 @@ namespace vrmotioncompensation
 
 		void Debugger::Stop()
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			DebuggerRunning = false;
 		}
 
@@ -32,6 +42,8 @@ namespace vrmotioncompensation
 
 		void Debugger::CountUp()
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			if (DebuggerRunning)
 			{
 				if (DebugCounter > 1)
@@ -99,6 +111,8 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(vr::HmdVector3d_t Data, int ID)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			if (DebuggerRunning)
 			{
 				DebugDataV3[ID].Data[DebugCounter].v[0] = Data.v[0];
@@ -109,6 +123,8 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(vr::HmdQuaternion_t Data, int ID)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			if (DebuggerRunning)
 			{
 				DebugDataQ4[ID].Data[DebugCounter].w = Data.w;
@@ -120,6 +136,8 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(const double Data[3], int ID)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			if (DebuggerRunning)
 			{
 				DebugDataV3[ID].Data[DebugCounter].v[0] = Data[0];
@@ -135,23 +153,31 @@ namespace vrmotioncompensation
 
 		void Debugger::SetInSync(bool Sync)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			InSync = Sync;
 		}
 
 		void Debugger::SetDebugNameQ4(std::string Name, int ID)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			DebugDataQ4[ID].Name = Name;
 			DebugDataQ4[ID].InUse = true;
 		}
 
 		void Debugger::SetDebugNameV3(std::string Name, int ID)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			DebugDataV3[ID].Name = Name;
 			DebugDataV3[ID].InUse = true;
 		}
 
 		void Debugger::SetZeroPos(vr::HmdVector3d_t vPos, const double vPosRaw[3], vr::HmdQuaternion_t qPos, vr::HmdQuaternion_t qPosRaw)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			vZeroPos = vPos;
 			vZeroPosRaw.v[0] = vPosRaw[0];
 			vZeroPosRaw.v[1] = vPosRaw[1];
@@ -162,78 +188,89 @@ namespace vrmotioncompensation
 
 		void Debugger::SetLPFValue(double value)
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			LPFValue = value;
 		}
 
 		void Debugger::WriteFile()
 		{
+			std::lock_guard<std::mutex> lockGuard(mut);
+
 			if (!WroteToFile)
-			{		
+			{
 				std::ofstream DebugFile;
 				DebugFile.open("MotionData.txt");
 
-				//Write ZeroPos and filter setting
-				DebugFile << "ZeroPos X;" << vZeroPos.v[0] << ";Y;" << vZeroPos.v[1] << ";Z;" << vZeroPos.v[2] << ";";
-				DebugFile << "ZeroPosRaw X;" << vZeroPosRaw.v[0] << ";Y;" << vZeroPosRaw.v[1] << ";Z;" << vZeroPosRaw.v[2] << ";";
-				DebugFile << "ZeroPos w;" << qZeroPos.w << ";x;" << qZeroPos.x << ";y;" << qZeroPos.y << ";t;" << qZeroPos.z << ";";
-				DebugFile << "ZeroPosRaw w;" << qZeroPosRaw.w << ";x;" << qZeroPosRaw.x << ";y;" << qZeroPosRaw.y << ";z;" << qZeroPosRaw.z << ";";
-				DebugFile << "LPF Beta;" << LPFValue << ";";
-				DebugFile << std::endl;
-
-				//Write title
-				DebugFile << "Time;";
-
-				//Quaternions
-				for (int i = 0; i < 5; i++)
+				if (!DebugFile.bad())
 				{
-					if (DebugDataQ4[i].InUse)
-					{
-						DebugFile << DebugDataQ4[i].Name << " w;" << "x;" << "y;" << "z;";
-					}
-				}
-
-				//Vectors
-				for (int i = 0; i < 20; i++)
-				{
-					if (DebugDataV3[i].InUse)
-					{
-						DebugFile << DebugDataV3[i].Name << " X;" << "Y;" << "Z;";
-					}
-				}
-				DebugFile << std::endl;
-
-				//Write data
-				for (int i = 0; i < DebugCounter; i++)
-				{
-					DebugFile << DebugTiming[i] << ";";
-				
-					for (int j = 0; j < 5; j++)
-					{
-						if (DebugDataQ4[j].InUse)
-						{
-							DebugFile << DebugDataQ4[j].Data[i].w << ";";
-							DebugFile << DebugDataQ4[j].Data[i].x << ";";
-							DebugFile << DebugDataQ4[j].Data[i].y << ";";
-							DebugFile << DebugDataQ4[j].Data[i].z << ";";
-						}
-					}
-				
-					for (int j = 0; j < 20; j++)
-					{
-						if (DebugDataV3[j].InUse)
-						{
-							DebugFile << DebugDataV3[j].Data[i].v[0] << ";";
-							DebugFile << DebugDataV3[j].Data[i].v[1] << ";";
-							DebugFile << DebugDataV3[j].Data[i].v[2] << ";";
-						}
-					}
-
+					//Write ZeroPos and filter setting
+					DebugFile << "ZeroPos X;" << vZeroPos.v[0] << ";Y;" << vZeroPos.v[1] << ";Z;" << vZeroPos.v[2] << ";";
+					DebugFile << "ZeroPosRaw X;" << vZeroPosRaw.v[0] << ";Y;" << vZeroPosRaw.v[1] << ";Z;" << vZeroPosRaw.v[2] << ";";
+					DebugFile << "ZeroPos w;" << qZeroPos.w << ";x;" << qZeroPos.x << ";y;" << qZeroPos.y << ";t;" << qZeroPos.z << ";";
+					DebugFile << "ZeroPosRaw w;" << qZeroPosRaw.w << ";x;" << qZeroPosRaw.x << ";y;" << qZeroPosRaw.y << ";z;" << qZeroPosRaw.z << ";";
+					DebugFile << "LPF Beta;" << LPFValue << ";";
 					DebugFile << std::endl;
+
+					//Write title
+					DebugFile << "Time;";
+
+					//Quaternions
+					for (int i = 0; i < 5; i++)
+					{
+						if (DebugDataQ4[i].InUse)
+						{
+							DebugFile << DebugDataQ4[i].Name << " w;" << "x;" << "y;" << "z;";
+						}
+					}
+
+					//Vectors
+					for (int i = 0; i < 20; i++)
+					{
+						if (DebugDataV3[i].InUse)
+						{
+							DebugFile << DebugDataV3[i].Name << " X;" << "Y;" << "Z;";
+						}
+					}
+					DebugFile << std::endl;
+
+					//Write data
+					for (int i = 0; i < DebugCounter; i++)
+					{
+						DebugFile << DebugTiming[i] << ";";
+				
+						for (int j = 0; j < 5; j++)
+						{
+							if (DebugDataQ4[j].InUse)
+							{
+								DebugFile << DebugDataQ4[j].Data[i].w << ";";
+								DebugFile << DebugDataQ4[j].Data[i].x << ";";
+								DebugFile << DebugDataQ4[j].Data[i].y << ";";
+								DebugFile << DebugDataQ4[j].Data[i].z << ";";
+							}
+						}
+				
+						for (int j = 0; j < 20; j++)
+						{
+							if (DebugDataV3[j].InUse)
+							{
+								DebugFile << DebugDataV3[j].Data[i].v[0] << ";";
+								DebugFile << DebugDataV3[j].Data[i].v[1] << ";";
+								DebugFile << DebugDataV3[j].Data[i].v[2] << ";";
+							}
+						}
+
+						DebugFile << std::endl;
+					}
+
+					DebugFile.close();
+
+					WroteToFile = true;
 				}
-
-				DebugFile.close();
-
-				WroteToFile = true;
+				else
+				{
+					LOG(ERROR) << "Could not write debug log";
+				}
 			}
 		}
 	}

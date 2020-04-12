@@ -62,6 +62,7 @@ namespace vrmotioncompensation
 
 		public:		
 			Debugger();
+			~Debugger();
 
 			void Start();
 
@@ -107,6 +108,8 @@ namespace vrmotioncompensation
 			bool DebuggerRunning = false;
 			bool InSync = false;
 			bool WroteToFile = false;
+
+			std::mutex mut;
 		};
 	}
 }

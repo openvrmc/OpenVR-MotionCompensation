@@ -72,11 +72,8 @@ namespace vrmotioncompensation
 
 		void MotionCompensationManager::StopDebugData()
 		{
-			if (DebugLogger.IsRunning())
-			{
-				DebugLogger.Stop();
-				WriteDebugData();
-			}
+			DebugLogger.Stop();
+			WriteDebugData();
 		}
 
 		void MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice)
@@ -87,8 +84,9 @@ namespace vrmotioncompensation
 			if (Mode == MotionCompensationMode::ReferenceTracker)
 			{
 				_RefPoseValid = false;
+				_RefPoseValidCounter = 0;
 				_motionCompensationZeroPoseValid = false;
-				_motionCompensationEnabled = true;
+				_motionCompensationEnabled = true;				
 			}
 			else
 			{
