@@ -86,14 +86,14 @@ namespace vrmotioncompensation
 				_RefPoseValid = false;
 				_RefPoseValidCounter = 0;
 				_motionCompensationZeroPoseValid = false;
-				_motionCompensationEnabled = true;				
+				_motionCompensationEnabled = true;
 			}
 			else
 			{
 				_motionCompensationEnabled = false;
 			}
 
-			_motionCompensationMode = Mode;			
+			_motionCompensationMode = Mode;
 		}
 
 		void MotionCompensationManager::setNewMotionCompensatedDevice(int MCdevice)
@@ -133,8 +133,6 @@ namespace vrmotioncompensation
 			// "True acceleration is highly volatile, so it's not really reasonable to
 			// extrapolate much from it anyway.  Passing it as 0 from any driver should
 			// be fine."
-			// A test showed that both acceleration values are 0. So we can ignore them for motion compensation.
-			// This may change with different devices.
 
 			// Line 832:
 			// "The tradeoff here is that setting a valid velocity causes the controllers
@@ -143,7 +141,7 @@ namespace vrmotioncompensation
 			// by disabling velocity (which effectively disables prediction for rendering)."
 			// That means that we have to calculate the velocity to not interfere with the prediction for rendering
 
-			// It appears that Acceleration values are never used in any device.
+			// Oculus devices do use acceleration. It also seems that the HMD uses theses values for render-prediction
 
 			// Position
 			// Add a simple low pass filter
@@ -295,7 +293,7 @@ namespace vrmotioncompensation
 			// Debug End
 		}
 
-		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo)
+		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose)
 		{
 			if (_motionCompensationEnabled && _motionCompensationZeroPoseValid && _RefPoseValid)
 			{

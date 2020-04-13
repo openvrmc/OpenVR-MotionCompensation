@@ -47,7 +47,7 @@ namespace vrmotioncompensation
 				//Check if the pose is valid to prevent unwanted jitter and movement
 				if (newPose.poseIsValid && newPose.result == vr::TrackingResult_Running_OK)
 				{
-					m_motionCompensationManager._applyMotionCompensation(newPose, this);
+					m_motionCompensationManager._applyMotionCompensation(newPose);
 				}
 			}
 

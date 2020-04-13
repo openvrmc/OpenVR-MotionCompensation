@@ -72,7 +72,7 @@ namespace vrmotioncompensation
 			
 			void _updateMotionCompensationRefPose(const vr::DriverPose_t& pose);
 			
-			bool _applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo);
+			bool _applyMotionCompensation(vr::DriverPose_t& pose);
 
 			void runFrame();
 
