@@ -47,12 +47,12 @@ namespace motioncompensation
 		{ 36, "Axis4" },
 	};
 
-	std::vector<std::pair<std::string, WORD>> OverlayController::_keyboardVirtualCodes = {
+	/*std::vector<std::pair<std::string, WORD>> OverlayController::_keyboardVirtualCodes = {
 		{ "<None>", 0x00 },
 		/*{ "Left Mouse Button", VK_LBUTTON },
 		{ "Right Mouse Button", VK_RBUTTON },
 		{ "Middle Mouse Button", VK_MBUTTON },*/
-		{ "Backspace", VK_BACK },
+		/*{ "Backspace", VK_BACK },
 		{ "Tab", VK_TAB },
 		{ "Clear", VK_CLEAR },
 		{ "Enter", VK_RETURN },
@@ -170,7 +170,7 @@ namespace motioncompensation
 		{ "-", VK_OEM_MINUS },
 		{ ",", VK_OEM_COMMA },
 		{ ".", VK_OEM_PERIOD },
-	};
+	};*/
 
 	/* These key codes have different meaning depending on the active keyboard layout, or may not exist at all */
 	std::vector<WORD> OverlayController::_keyboardVaryingVirtualCodes = {

@@ -177,13 +177,12 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// Velocity and acceleration
 			// Convert velocity and acceleration values into app space and undo device rotation
-			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
-			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
-
-			vr::HmdVector3d_t Filter_VecVelocity;
+			
+			// The code below causes image artifacts. This seems to be the wrong approach.
+			vr::HmdVector3d_t Filter_VecVelocity = { 0, 0, 0 };
 
 			// Calculate the difference between the smoothed and the raw position to adjust the velocity
-			if (pose.vecPosition[0] != (double)0.0)
+			/*if (pose.vecPosition[0] != (double)0.0)
 			{
 				Filter_VecVelocity.v[0] = pose.vecVelocity[0] * (_Filter_vecPosition_3.v[0] / pose.vecPosition[0]);
 			}
@@ -208,15 +207,14 @@ namespace vrmotioncompensation
 			else
 			{
 				Filter_VecVelocity.v[2] = pose.vecVelocity[2];
-			}
-
-
-			vr::HmdVector3d_t RotEulerRaw = ToEulerAngles(pose.qRotation);
-			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_2);
+			}*/
 			
-			vr::HmdVector3d_t Filter_vecAngularVelocity;
+			//Angular velocity
+			vr::HmdVector3d_t Filter_vecAngularVelocity = { 0, 0, 0 };
+			/*vr::HmdVector3d_t RotEulerRaw = ToEulerAngles(pose.qRotation);
+			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_2);*/
 
-			if (RotEulerRaw.v[0] != (double)0.0)
+			/*if (RotEulerRaw.v[0] != (double)0.0)
 			{
 				Filter_vecAngularVelocity.v[0] = pose.vecAngularVelocity[0] * (1 - (AngleDifference(RotEulerRaw.v[0], RotEulerFilter.v[0]) / RotEulerRaw.v[0]));
 			}
@@ -243,9 +241,57 @@ namespace vrmotioncompensation
 				Filter_vecAngularVelocity.v[2] = pose.vecAngularVelocity[2];
 			}
 
+			if (pose.vecPosition[0] != (double)0.0)
+			{
+				Filter_VecVelocity.v[0] = pose.vecVelocity[0] * (_Filter_vecPosition_3.v[0] / pose.vecPosition[0]);
+			}
+			else
+			{
+				Filter_VecVelocity.v[0] = pose.vecVelocity[0];
+			}*/
 
-			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);			
-			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
+			// Acceleration
+			// ToDo: Calculate Acceleration based on velocity
+			vr::HmdVector3d_t Filter_VecAcceleration = { 0, 0, 0 };
+
+			/*if (pose.vecVelocity[0] != (double)0.0)
+			{
+				Filter_VecAcceleration.v[0] = pose.vecAcceleration[0] * (Filter_VecVelocity.v[0] / pose.vecVelocity[0]);
+			}
+			else
+			{
+				Filter_VecAcceleration.v[0] = pose.vecAcceleration[0];
+			}
+
+			if (pose.vecVelocity[1] != (double)0.0)
+			{
+				Filter_VecAcceleration.v[1] = pose.vecAcceleration[1] * (Filter_VecVelocity.v[1] / pose.vecVelocity[1]);
+			}
+			else
+			{
+				Filter_VecAcceleration.v[1] = pose.vecVelocity[1];
+			}
+
+			if (pose.vecVelocity[2] != (double)0.0)
+			{
+				Filter_VecAcceleration.v[2] = pose.vecVelocity[2] * (Filter_VecVelocity.v[2] / pose.vecVelocity[2]);
+			}
+			else
+			{
+				Filter_VecAcceleration.v[2] = pose.vecVelocity[2];
+			}*/
+
+			// Convert velocity and acceleration values into app space and undo device rotation
+			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
+			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
+
+			//_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);			
+			//_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
+			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecVelocity[0], pose.vecVelocity[1], pose.vecVelocity[2] });
+			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
+
+			_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
+			_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
 
 			// Wait 10 frames before setting reference pose to valid
 			if (_RefPoseValidCounter > 100)
@@ -331,6 +377,16 @@ namespace vrmotioncompensation
 				pose.vecAngularVelocity[0] -= tmpRotVel.v[0];
 				pose.vecAngularVelocity[1] -= tmpRotVel.v[1];
 				pose.vecAngularVelocity[2] -= tmpRotVel.v[2];
+
+				vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosAcc);
+				pose.vecAcceleration[0] -= tmpPosAcc.v[0];
+				pose.vecAcceleration[1] -= tmpPosAcc.v[1];
+				pose.vecAcceleration[2] -= tmpPosAcc.v[2];
+
+				vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotAcc);
+				pose.vecAngularAcceleration[0] -= tmpRotAcc.v[0];
+				pose.vecAngularAcceleration[1] -= tmpRotAcc.v[1];
+				pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];
 
 				// convert back to driver space
 				pose.qRotation = pose.qWorldFromDriverRotation * compensatedPoseWorldRot;

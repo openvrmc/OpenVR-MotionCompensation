@@ -26,6 +26,7 @@ namespace vrmotioncompensation
 			WroteToFile = false;
 			DebuggerRunning = true;
 			DebugTimer.start();
+			LOG(DEBUG) << "Logger started";
 		}
 
 		void Debugger::Stop()
@@ -33,6 +34,8 @@ namespace vrmotioncompensation
 			std::lock_guard<std::mutex> lockGuard(mut);
 
 			DebuggerRunning = false;
+
+			LOG(DEBUG) << "Logger stopped";
 		}
 
 		bool Debugger::IsRunning()
@@ -195,15 +198,19 @@ namespace vrmotioncompensation
 
 		void Debugger::WriteFile()
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::mutex> lockGuard(mut);			
 
 			if (!WroteToFile)
 			{
+				LOG(DEBUG) << "Trying to write debug file...";
+
 				std::ofstream DebugFile;
 				DebugFile.open("MotionData.txt");
 
 				if (!DebugFile.bad())
 				{
+					LOG(DEBUG) << "Writing " << DebugCounter << " debug points of data";
+
 					//Write ZeroPos and filter setting
 					DebugFile << "ZeroPos X;" << vZeroPos.v[0] << ";Y;" << vZeroPos.v[1] << ";Z;" << vZeroPos.v[2] << ";";
 					DebugFile << "ZeroPosRaw X;" << vZeroPosRaw.v[0] << ";Y;" << vZeroPosRaw.v[1] << ";Z;" << vZeroPosRaw.v[2] << ";";

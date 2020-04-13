@@ -19,7 +19,6 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::initStage1()
 	{
-		//reloadDeviceManipulationProfiles();
 		reloadMotionCompensationSettings();
 	}
 
@@ -217,13 +216,13 @@ namespace motioncompensation
 	void DeviceManipulationTabController::setTrackerArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
+		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
 	}
 
 	void DeviceManipulationTabController::setHMDArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
+		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
 	}
 
 	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
@@ -325,7 +324,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << " RTindex: " << RTindex << " out of a maximum of: " << maxValidDeviceId;
+		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << ", RTindex: " << RTindex << " out of a maximum of: " << maxValidDeviceId;
 
 		if (MCindex == RTindex)
 		{
