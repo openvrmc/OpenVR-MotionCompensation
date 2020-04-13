@@ -68,7 +68,7 @@ namespace motioncompensation
 		QSoundEffect focusChangedSoundEffect;
 
 		static std::map<int, const char*> _openVRButtonNames;
-		static std::vector<std::pair<std::string, WORD>> _keyboardVirtualCodes;
+		//static std::vector<std::pair<std::string, WORD>> _keyboardVirtualCodes;
 		static std::vector<WORD> _keyboardVaryingVirtualCodes;
 
 	public: // I know it's an ugly hack to make them public to enable external access, but I am too lazy to implement getters.

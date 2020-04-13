@@ -208,6 +208,8 @@ namespace motioncompensation
 			throw std::runtime_error(std::string("Failed to initialize OpenVR: ") + std::string(vr::VR_GetVRInitErrorAsEnglishDescription(initError)));
 		}
 
+		LOG(INFO) << "OpenVR Motion Compensation Version: " << applicationVersionString;
+
 		static char rchBuffer[1024];
 		uint32_t unRequiredSize;
 		std::cout << vr::VR_GetRuntimePath(rchBuffer, sizeof(rchBuffer), &unRequiredSize);
@@ -220,7 +222,7 @@ namespace motioncompensation
 		LOG(INFO) << "sizeof(ipc::Reply::msg) = " << sizeof(vrmotioncompensation::ipc::Reply::msg);
 
 		/* Handle keyboard layout dependent virtual key codes */
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		/*std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 		for (auto vc : _keyboardVaryingVirtualCodes)
 		{
 			auto raw = MapVirtualKey(vc, MAPVK_VK_TO_CHAR);
@@ -230,7 +232,7 @@ namespace motioncompensation
 				std::string name = converter.to_bytes(std::wstring(1, lc));
 				_keyboardVirtualCodes.push_back({ name, vc });
 			}
-		}
+		}*/
 
 		QString activationSoundFile = m_runtimePathUrl.toLocalFile().append("/content/panorama/sounds/activation.wav");
 		QFileInfo activationSoundFileInfo(activationSoundFile);
