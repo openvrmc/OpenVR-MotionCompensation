@@ -168,12 +168,8 @@ namespace vrmotioncompensation
 			// 2nd stage
 			_Filter_rotPosition_2 = lowPassFilterQuaternion(_Filter_rotPosition_1, _Filter_rotPosition_2);
 
-			// 3rd stage
-			//_Filter_rotPosition_3 = lowPassFilterQuaternion(_Filter_rotPosition_2, _Filter_rotPosition_3);
-			_Filter_rotPosition_3 = _Filter_rotPosition_2;
-
 			// calculate orientation difference and its inverse
-			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition_3;
+			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition_2;
 			_motionCompensationRefRot = poseWorldRot * vrmath::quaternionConjugate(_motionCompensationZeroRot);
 			_motionCompensationRefRotInv = vrmath::quaternionConjugate(_motionCompensationRefRot);
 
@@ -181,7 +177,7 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// Velocity and acceleration
 			// Convert velocity and acceleration values into app space and undo device rotation
-			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_3);
+			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
 			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
 			vr::HmdVector3d_t Filter_VecVelocity;
@@ -216,7 +212,7 @@ namespace vrmotioncompensation
 
 
 			vr::HmdVector3d_t RotEulerRaw = ToEulerAngles(pose.qRotation);
-			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_3);
+			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_2);
 			
 			vr::HmdVector3d_t Filter_vecAngularVelocity;
 
@@ -284,7 +280,7 @@ namespace vrmotioncompensation
 				DebugLogger.AddDebugData(_motionCompensationRefRotAcc, 9);
 
 				DebugLogger.AddDebugData(pose.qRotation, 0);
-				DebugLogger.AddDebugData(_Filter_rotPosition_3, 1);
+				DebugLogger.AddDebugData(_Filter_rotPosition_2, 1);
 
 				DebugLogger.SetInSync(true);
 			}

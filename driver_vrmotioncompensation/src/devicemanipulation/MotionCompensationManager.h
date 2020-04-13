@@ -119,7 +119,6 @@ namespace vrmotioncompensation
 			vr::HmdQuaternion_t _motionCompensationRefRotInv = { 1, 0, 0, 0 };
 			vr::HmdQuaternion_t _Filter_rotPosition_1 = { 1, 0, 0, 0 };
 			vr::HmdQuaternion_t _Filter_rotPosition_2 = { 1, 0, 0, 0 };
-			vr::HmdQuaternion_t _Filter_rotPosition_3 = { 1, 0, 0, 0 };
 
 			vr::HmdVector3d_t _motionCompensationRefRotVel = { 0, 0, 0 };
 			vr::HmdVector3d_t _motionCompensationRefRotAcc = { 0, 0, 0 };
