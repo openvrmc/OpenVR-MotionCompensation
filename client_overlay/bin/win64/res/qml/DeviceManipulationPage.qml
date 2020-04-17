@@ -108,6 +108,7 @@ MyStackViewPage
                 id: referenceTrackerIdentifyButton
                 enabled: hmdSelectionComboBox.currentIndex >= 0
                 Layout.preferredWidth: 194
+                enabled: false
                 text: "Identify"
                 onClicked:
                 {
@@ -277,6 +278,7 @@ MyStackViewPage
                 id: debugLoggerButton
                 Layout.preferredWidth: 250
                 text: "Start logging"
+                enabled: false          // Set to "true" (without the " " ) to enable debug logger
                 onClicked:
                 {
                     if (!DeviceManipulationTabController.setDebugMode(false))
