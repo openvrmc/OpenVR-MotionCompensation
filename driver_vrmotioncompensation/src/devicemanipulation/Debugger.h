@@ -109,7 +109,7 @@ namespace vrmotioncompensation
 			bool InSync = false;
 			bool WroteToFile = false;
 
-			std::mutex mut;
+			std::recursive_mutex _mut;
 		};
 	}
 }

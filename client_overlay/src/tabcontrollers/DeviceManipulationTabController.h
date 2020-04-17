@@ -14,13 +14,6 @@ namespace motioncompensation
 	// forward declaration
 	class OverlayController;
 
-	struct DeviceManipulationProfile
-	{
-		std::string profileName;
-		int deviceMode = 0;
-		int motionCompensationMode = 0;
-	};
-
 	struct DeviceInfo
 	{
 		std::string serial;
@@ -42,8 +35,6 @@ namespace motioncompensation
 		uint32_t maxValidDeviceId = 0;
 		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
 		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
-
-		std::vector<DeviceManipulationProfile> deviceManipulationProfiles;
 
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
@@ -102,7 +93,6 @@ namespace motioncompensation
 		void deviceCountChanged(unsigned deviceCount);
 		void deviceInfoChanged(unsigned index);
 		void settingChanged();
-		void deviceManipulationProfilesChanged();
 		void debugModeChanged();
 	};
 } // namespace motioncompensation

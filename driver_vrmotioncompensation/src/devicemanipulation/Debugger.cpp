@@ -20,7 +20,7 @@ namespace vrmotioncompensation
 
 		void Debugger::Start()
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			DebugCounter = 0;
 			WroteToFile = false;
@@ -31,7 +31,7 @@ namespace vrmotioncompensation
 
 		void Debugger::Stop()
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			DebuggerRunning = false;
 
@@ -45,7 +45,7 @@ namespace vrmotioncompensation
 
 		void Debugger::CountUp()
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			if (DebuggerRunning)
 			{
@@ -114,7 +114,7 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(vr::HmdVector3d_t Data, int ID)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			if (DebuggerRunning)
 			{
@@ -126,7 +126,7 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(vr::HmdQuaternion_t Data, int ID)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			if (DebuggerRunning)
 			{
@@ -139,7 +139,7 @@ namespace vrmotioncompensation
 
 		void Debugger::AddDebugData(const double Data[3], int ID)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			if (DebuggerRunning)
 			{
@@ -156,14 +156,14 @@ namespace vrmotioncompensation
 
 		void Debugger::SetInSync(bool Sync)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			InSync = Sync;
 		}
 
 		void Debugger::SetDebugNameQ4(std::string Name, int ID)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			DebugDataQ4[ID].Name = Name;
 			DebugDataQ4[ID].InUse = true;
@@ -171,7 +171,7 @@ namespace vrmotioncompensation
 
 		void Debugger::SetDebugNameV3(std::string Name, int ID)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			DebugDataV3[ID].Name = Name;
 			DebugDataV3[ID].InUse = true;
@@ -179,7 +179,7 @@ namespace vrmotioncompensation
 
 		void Debugger::SetZeroPos(vr::HmdVector3d_t vPos, const double vPosRaw[3], vr::HmdQuaternion_t qPos, vr::HmdQuaternion_t qPosRaw)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			vZeroPos = vPos;
 			vZeroPosRaw.v[0] = vPosRaw[0];
@@ -191,14 +191,14 @@ namespace vrmotioncompensation
 
 		void Debugger::SetLPFValue(double value)
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			LPFValue = value;
 		}
 
 		void Debugger::WriteFile()
 		{
-			std::lock_guard<std::mutex> lockGuard(mut);			
+			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
 			if (!WroteToFile)
 			{
