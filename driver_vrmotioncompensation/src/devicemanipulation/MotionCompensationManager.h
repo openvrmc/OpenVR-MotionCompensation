@@ -8,7 +8,7 @@
 
 #include <boost/timer/timer.hpp>
 #include <boost/chrono/chrono.hpp>
-#include <chrono\system_clocks.hpp>
+#include <boost/chrono/system_clocks.hpp>
 
 // driver namespace
 namespace vrmotioncompensation
