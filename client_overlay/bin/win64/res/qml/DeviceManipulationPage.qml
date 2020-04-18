@@ -108,7 +108,6 @@ MyStackViewPage
                 id: referenceTrackerIdentifyButton
                 enabled: hmdSelectionComboBox.currentIndex >= 0
                 Layout.preferredWidth: 194
-                enabled: false
                 text: "Identify"
                 onClicked:
                 {
