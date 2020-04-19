@@ -3,8 +3,8 @@
 # Execute this script in the root folder of the install dir
 # Dont't forget to set OUTPUTFILE to a path that is writeable
 
-OUTPUTFILE=./installed_files.txt
-INSTALLDIR="/c/Program Files/OpenVR-MotionCompensation"
+OUTPUTFILE="/d/Programmierung/VR/OpenVR-MC/installer/installed_files.txt"
+INSTALLDIR="./"
 
 # Get command line arguments
 if [ $# -eq 1 ]; then
