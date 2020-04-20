@@ -145,14 +145,24 @@ namespace vrmotioncompensation
 
 			// Position
 			// Add a simple low pass filter
-			// 1st stage
-			_Filter_vecPosition_1 = LPF(pose.vecPosition, _Filter_vecPosition_1);
 
-			// 2nd stage
-			_Filter_vecPosition_2 = LPF(_Filter_vecPosition_1, _Filter_vecPosition_2);
+			if (LPF_Beta < 1.0)
+			{
+				// 1st stage
+				_Filter_vecPosition_1 = LPF(pose.vecPosition, _Filter_vecPosition_1);
 
-			// 3rd stage
-			_Filter_vecPosition_3 = LPF(_Filter_vecPosition_2, _Filter_vecPosition_3);
+				// 2nd stage
+				_Filter_vecPosition_2 = LPF(_Filter_vecPosition_1, _Filter_vecPosition_2);
+
+				// 3rd stage
+				_Filter_vecPosition_3 = LPF(_Filter_vecPosition_2, _Filter_vecPosition_3);
+			}
+			else
+			{
+				_Filter_vecPosition_3.v[0] = pose.vecPosition[0];
+				_Filter_vecPosition_3.v[1] = pose.vecPosition[1];
+				_Filter_vecPosition_3.v[2] = pose.vecPosition[2];
+			}
 
 			// convert pose from driver space to app space
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
@@ -161,12 +171,19 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
 			// Rotation
-			// Add a simple low pass filter
-			// 1st stage
-			_Filter_rotPosition_1 = lowPassFilterQuaternion(pose.qRotation, _Filter_rotPosition_1);
+			if (LPF_Beta < 1.0)
+			{
+				// Add a simple low pass filter
+				// 1st stage
+				_Filter_rotPosition_1 = lowPassFilterQuaternion(pose.qRotation, _Filter_rotPosition_1);
 
-			// 2nd stage
-			_Filter_rotPosition_2 = lowPassFilterQuaternion(_Filter_rotPosition_1, _Filter_rotPosition_2);
+				// 2nd stage
+				_Filter_rotPosition_2 = lowPassFilterQuaternion(_Filter_rotPosition_1, _Filter_rotPosition_2);
+			}
+			else
+			{
+				_Filter_rotPosition_2 = pose.qRotation;
+			}
 
 			// calculate orientation difference and its inverse
 			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition_2;
