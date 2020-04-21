@@ -78,6 +78,8 @@ namespace vrmotioncompensation
 
 			double vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3]);
 
+			double MotionCompensationManager::LPF(const double RawData, double SmoothData);
+
 			vr::HmdVector3d_t LPF(const double RawData[3], vr::HmdVector3d_t SmoothData);
 
 			vr::HmdVector3d_t LPF(vr::HmdVector3d_t RawData, vr::HmdVector3d_t SmoothData);

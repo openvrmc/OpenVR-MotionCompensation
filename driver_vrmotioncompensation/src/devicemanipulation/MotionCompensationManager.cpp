@@ -146,16 +146,23 @@ namespace vrmotioncompensation
 			// Position
 			// Add a simple low pass filter
 
+			vr::HmdVector3d_t oldFilterValue;
+			oldFilterValue.v[0] = _Filter_vecPosition_1.v[0];
+			oldFilterValue.v[1] = _Filter_vecPosition_1.v[1];
+			oldFilterValue.v[2] = _Filter_vecPosition_1.v[2];
+
 			if (LPF_Beta < 1.0)
 			{
 				// 1st stage
-				_Filter_vecPosition_1 = LPF(pose.vecPosition, _Filter_vecPosition_1);
+				_Filter_vecPosition_1.v[0] = 2 * LPF(pose.vecPosition[0], oldFilterValue.v[0]) -  LPF(LPF(pose.vecPosition[0], oldFilterValue.v[0]), oldFilterValue.v[0]);
+				_Filter_vecPosition_1.v[1] = 2 * LPF(pose.vecPosition[1], oldFilterValue.v[1]) - LPF(LPF(pose.vecPosition[1], oldFilterValue.v[1]), oldFilterValue.v[1]);
+				_Filter_vecPosition_1.v[2] = 2 * LPF(pose.vecPosition[2], oldFilterValue.v[2]) - LPF(LPF(pose.vecPosition[2], oldFilterValue.v[2]), oldFilterValue.v[2]);
 
 				// 2nd stage
-				_Filter_vecPosition_2 = LPF(_Filter_vecPosition_1, _Filter_vecPosition_2);
+				//_Filter_vecPosition_2 = LPF(_Filter_vecPosition_1, _Filter_vecPosition_2);
 
 				// 3rd stage
-				_Filter_vecPosition_3 = LPF(_Filter_vecPosition_2, _Filter_vecPosition_3);
+				//_Filter_vecPosition_3 = LPF(_Filter_vecPosition_2, _Filter_vecPosition_3);
 			}
 			else
 			{
@@ -362,6 +369,15 @@ namespace vrmotioncompensation
 			}
 
 			return NewVelocity;
+		}
+
+		//Low Pass Filter for 3d Vectors
+		double MotionCompensationManager::LPF(const double RawData, double OldFilteredData)
+		{
+			const double alpha = 2.0 / (1.0 + 5);
+			return OldFilteredData + alpha * (RawData - OldFilteredData);
+			//return OldFilteredData += alpha * (RawData - OldFilteredData);
+			//return OldFilteredData - (LPF_Beta * (OldFilteredData - RawData));
 		}
 
 		//Low Pass Filter for 3d Vectors
