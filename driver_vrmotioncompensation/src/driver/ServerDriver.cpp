@@ -11,7 +11,7 @@ namespace vrmotioncompensation
 		ServerDriver::ServerDriver() : m_motionCompensation(this)
 		{
 			singleton = this;
-			memset(_openvrIdToDeviceManipulationHandleMap, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
+			memset(_openvrIdDeviceManipulationHandle, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
 		}
 
 		ServerDriver::~ServerDriver()
@@ -21,9 +21,9 @@ namespace vrmotioncompensation
 
 		bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize)
 		{
-			if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid())
+			if (_openvrIdDeviceManipulationHandle[unWhichDevice] && _openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
 			{
-				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
+				return _openvrIdDeviceManipulationHandle[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
 			}
 
 			return true;
@@ -53,7 +53,7 @@ namespace vrmotioncompensation
 			{
 				auto handle = i->second;
 				handle->setOpenvrId(unObjectId);
-				_openvrIdToDeviceManipulationHandleMap[unObjectId] = handle.get();
+				_openvrIdDeviceManipulationHandle[unObjectId] = handle.get();
 
 				LOG(INFO) << "Successfully added device " << handle->serialNumber() << " (OpenVR Id: " << handle->openvrId() << ")";
 			}
@@ -97,11 +97,10 @@ namespace vrmotioncompensation
 
 		void ServerDriver::Cleanup()
 		{
-			m_motionCompensation.StopDebugData();
-
 			LOG(TRACE) << "ServerDriver::Cleanup()";
 			_driverContextHooks.reset();
 			MH_Uninitialize();
+			m_motionCompensation.StopDebugData();
 			shmCommunicator.shutdown();
 			VR_CLEANUP_SERVER_DRIVER_CONTEXT();
 		}
@@ -117,18 +116,18 @@ namespace vrmotioncompensation
 
 			std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
 
-			if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid())
+			if (_openvrIdDeviceManipulationHandle[unWhichDevice] && _openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
 			{
-				return _openvrIdToDeviceManipulationHandleMap[unWhichDevice];
+				return _openvrIdDeviceManipulationHandle[unWhichDevice];
 			}
 
 			return nullptr;
 		}
 
-		void ServerDriver::sendReplySetMotionCompensationMode(bool success)
+		/*void ServerDriver::sendReplySetMotionCompensationMode(bool success)
 		{
 			shmCommunicator.sendReplySetMotionCompensationMode(success);
-		}
+		}*/
 
 	} // end namespace driver
 } // end namespace vrmotioncompensation

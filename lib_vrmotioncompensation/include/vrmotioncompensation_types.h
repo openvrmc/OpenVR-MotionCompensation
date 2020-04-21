@@ -20,10 +20,9 @@ namespace vrmotioncompensation
 
 	struct DeviceInfo
 	{
-		uint32_t deviceId;
+		uint32_t OpenVRId;
 		vr::ETrackedDeviceClass deviceClass;
 		MotionCompensationDeviceMode deviceMode;
-		uint32_t refDeviceId;
 	};
 
 } // end namespace vrmotioncompensation

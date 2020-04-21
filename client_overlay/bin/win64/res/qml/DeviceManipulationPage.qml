@@ -200,7 +200,7 @@ MyStackViewPage
                 text: "+"
                 onClicked:
                 {
-                    DeviceManipulationTabController.increaseLPFBeta(0.05);
+                    DeviceManipulationTabController.increaseLPFBeta(0.01);
                 }
             }
 
@@ -217,7 +217,7 @@ MyStackViewPage
                 text: "-"
                 onClicked:
                 {
-                    DeviceManipulationTabController.increaseLPFBeta(-0.05);
+                    DeviceManipulationTabController.increaseLPFBeta(-0.01);
                 }
             }
 

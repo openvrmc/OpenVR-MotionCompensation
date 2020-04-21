@@ -76,6 +76,8 @@ namespace vrmotioncompensation
 
 			void runFrame();
 
+			double vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3]);
+
 			vr::HmdVector3d_t LPF(const double RawData[3], vr::HmdVector3d_t SmoothData);
 
 			vr::HmdVector3d_t LPF(vr::HmdVector3d_t RawData, vr::HmdVector3d_t SmoothData);
@@ -111,6 +113,7 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t _Filter_vecPosition_1 = { 0, 0, 0 };
 			vr::HmdVector3d_t _Filter_vecPosition_2 = { 0, 0, 0 };
 			vr::HmdVector3d_t _Filter_vecPosition_3 = { 0, 0, 0 };
+			vr::HmdVector3d_t _LastPoseRAW = { 0, 0, 0 };
 
 			vr::HmdVector3d_t _motionCompensationRefPosVel = { 0, 0, 0 };
 			vr::HmdVector3d_t _motionCompensationRefPosAcc = { 0, 0, 0 };

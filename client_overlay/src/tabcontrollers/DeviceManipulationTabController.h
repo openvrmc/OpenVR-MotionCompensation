@@ -6,6 +6,7 @@
 #include <openvr.h>
 #include <vrmotioncompensation.h>
 #include <vrmotioncompensation_types.h>
+#include <vector>
 
 class QQuickWindow;
 // application namespace
@@ -16,7 +17,7 @@ namespace motioncompensation
 
 	struct DeviceInfo
 	{
-		std::string serial;
+		std::string serial = "";
 		vr::ETrackedDeviceClass deviceClass = vr::TrackedDeviceClass_Invalid;
 		uint32_t openvrId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
@@ -32,7 +33,6 @@ namespace motioncompensation
 		QQuickWindow* widget;
 
 		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;
-		uint32_t maxValidDeviceId = 0;
 		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
 		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
 
@@ -57,7 +57,7 @@ namespace motioncompensation
 
 		void eventLoopTick(vr::TrackedDevicePose_t* devicePoses);
 
-		bool SearchDevices(int StartID);
+		bool SearchDevices();
 
 		void handleEvent(const vr::VREvent_t& vrEvent);
 
@@ -89,8 +89,7 @@ namespace motioncompensation
 	public slots:
 
 	signals:
-		//void loadComplete();
-		void deviceCountChanged(unsigned deviceCount);
+		void deviceCountChanged();
 		void deviceInfoChanged(unsigned index);
 		void settingChanged();
 		void debugModeChanged();

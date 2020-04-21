@@ -253,7 +253,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::getDeviceInfo(uint32_t deviceId, DeviceInfo& info)
+	void VRMotionCompensation::getDeviceInfo(uint32_t OpenVRId, DeviceInfo& info)
 	{
 		if (_ipcServerQueue)
 		{
@@ -261,7 +261,7 @@ namespace vrmotioncompensation
 			ipc::Request message(ipc::RequestType::DeviceManipulation_GetDeviceInfo);			
 			memset(&message.msg, 0, sizeof(message.msg));
 			message.msg.ovr_GenericDeviceIdMessage.clientId = m_clientId;
-			message.msg.ovr_GenericDeviceIdMessage.deviceId = deviceId;
+			message.msg.ovr_GenericDeviceIdMessage.OpenVRId = OpenVRId;
 
 			//Create random message ID
 			uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
@@ -290,20 +290,24 @@ namespace vrmotioncompensation
 
 			if (resp.status == ipc::ReplyStatus::Ok)
 			{
-				info.deviceId = resp.msg.dm_deviceInfo.deviceId;
+				info.OpenVRId = resp.msg.dm_deviceInfo.OpenVRId;
 				info.deviceClass = resp.msg.dm_deviceInfo.deviceClass;
 				info.deviceMode = resp.msg.dm_deviceInfo.deviceMode;
+			}
+			else if (resp.status == ipc::ReplyStatus::NotFound)
+			{
+				info.deviceClass = resp.msg.dm_deviceInfo.deviceClass;
 			}
 			else if (resp.status == ipc::ReplyStatus::InvalidId)
 			{
 				ss << "Invalid device id";
 				throw vrmotioncompensation_invalidid(ss.str());
 			}
-			else if (resp.status == ipc::ReplyStatus::NotFound)
+			/*else if (resp.status == ipc::ReplyStatus::NotFound)
 			{
 				ss << "Device not found";
 				throw vrmotioncompensation_notfound(ss.str());
-			}
+			}*/
 			else if (resp.status != ipc::ReplyStatus::Ok)
 			{
 				ss << "Error code " << (int)resp.status;

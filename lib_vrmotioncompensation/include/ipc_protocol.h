@@ -79,7 +79,7 @@ namespace vrmotioncompensation
 		{
 			uint32_t clientId;
 			uint32_t messageId;			// Used to associate with Reply
-			uint32_t deviceId;
+			uint32_t OpenVRId;
 		};
 
 		struct Request_DeviceManipulation_MotionCompensationMode
@@ -155,7 +155,7 @@ namespace vrmotioncompensation
 
 		struct Reply_DeviceManipulation_GetDeviceInfo
 		{
-			uint32_t deviceId;
+			uint32_t OpenVRId;
 			vr::ETrackedDeviceClass deviceClass;
 			MotionCompensationDeviceMode deviceMode;
 		};

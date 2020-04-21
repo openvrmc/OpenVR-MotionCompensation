@@ -193,20 +193,23 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
 			// Velocity and acceleration
-			// Convert velocity and acceleration values into app space and undo device rotation
-			
-			// The old code caused image artifacts. Code was removed for cleaner code
-			// Vars a left here for the debug logger to be consistent 
-
 			vr::HmdVector3d_t Filter_VecVelocity = { 0, 0, 0 };
-			vr::HmdVector3d_t Filter_vecAngularVelocity = { 0, 0, 0 };
+			/*Filter_VecVelocity.v[0] = vecVelocityDif(0, pose.vecPosition, pose.vecVelocity);
+			Filter_VecVelocity.v[1] = vecVelocityDif(1, pose.vecPosition, pose.vecVelocity);
+			Filter_VecVelocity.v[2] = vecVelocityDif(2, pose.vecPosition, pose.vecVelocity);*/
+
 			vr::HmdVector3d_t Filter_VecAcceleration = { 0, 0, 0 };
+
+			
+			vr::HmdVector3d_t Filter_vecAngularVelocity = { 0, 0, 0 };
+			
 
 			// Convert velocity and acceleration values into app space and undo device rotation
 			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
 			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
 			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecVelocity[0], pose.vecVelocity[1], pose.vecVelocity[2] });
+			//_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
 			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
 
 			_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
@@ -221,6 +224,10 @@ namespace vrmotioncompensation
 			{
 				_RefPoseValidCounter++;
 			}			
+
+			_LastPoseRAW.v[0] = pose.vecPosition[0];
+			_LastPoseRAW.v[1] = pose.vecPosition[1];
+			_LastPoseRAW.v[2] = pose.vecPosition[2];
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
@@ -337,6 +344,24 @@ namespace vrmotioncompensation
 		void MotionCompensationManager::runFrame()
 		{
 
+		}
+
+		double MotionCompensationManager::vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3])
+		{
+			// NewVelocity = RawVelocity * ((FilterPose - LastPoseRaw) / (RawPose - LastPoseRaw))
+
+			double NewVelocity = 0.0;
+
+			if (vecPosition[i] - _LastPoseRAW.v[i] != 0)
+			{
+				NewVelocity = vecVelocity[i] * ((std::abs(_Filter_vecPosition_3.v[i] - _LastPoseRAW.v[i])) / std::abs((vecPosition[i] - _LastPoseRAW.v[i])));
+			}
+			else
+			{
+				NewVelocity = vecVelocity[i];
+			}
+
+			return NewVelocity;
 		}
 
 		//Low Pass Filter for 3d Vectors

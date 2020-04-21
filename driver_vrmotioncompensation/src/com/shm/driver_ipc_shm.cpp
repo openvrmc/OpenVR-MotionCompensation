@@ -28,7 +28,7 @@ namespace vrmotioncompensation
 			}
 		}
 
-		void IpcShmCommunicator::sendReplySetMotionCompensationMode(bool success)
+		/*void IpcShmCommunicator::sendReplySetMotionCompensationMode(bool success)
 		{
 			if (_setMotionCompensationMessageId != 0)
 			{
@@ -47,7 +47,7 @@ namespace vrmotioncompensation
 				sendReply(_setMotionCompensationClientId, resp);
 			}
 			_setMotionCompensationMessageId = 0;
-		}
+		}*/
 
 		void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver* driver)
 		{
@@ -151,30 +151,31 @@ namespace vrmotioncompensation
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
 									resp.messageId = message.msg.ovr_GenericDeviceIdMessage.messageId;
 
-									if (message.msg.ovr_GenericDeviceIdMessage.deviceId >= vr::k_unMaxTrackedDeviceCount)
+									if (message.msg.ovr_GenericDeviceIdMessage.OpenVRId >= vr::k_unMaxTrackedDeviceCount)
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
 									}
 									else
 									{
-										DeviceManipulationHandle* info = driver->getDeviceManipulationHandleById(message.msg.ovr_GenericDeviceIdMessage.deviceId);
+										DeviceManipulationHandle* info = driver->getDeviceManipulationHandleById(message.msg.ovr_GenericDeviceIdMessage.OpenVRId);
 										if (!info)
 										{
 											resp.status = ipc::ReplyStatus::NotFound;
+											resp.msg.dm_deviceInfo.deviceClass = vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid;
 										}
 										else
 										{
 											resp.status = ipc::ReplyStatus::Ok;
-											resp.msg.dm_deviceInfo.deviceId = message.msg.ovr_GenericDeviceIdMessage.deviceId;
+											resp.msg.dm_deviceInfo.OpenVRId = message.msg.ovr_GenericDeviceIdMessage.OpenVRId;
 											resp.msg.dm_deviceInfo.deviceMode = info->getDeviceMode();
 											resp.msg.dm_deviceInfo.deviceClass = info->deviceClass();
 										}
 									}
 
-									if (resp.status != ipc::ReplyStatus::Ok)
+									/*if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while getting device info: Error code " << (int)resp.status;
-									}
+									}*/
 
 									if (resp.messageId != 0)
 									{

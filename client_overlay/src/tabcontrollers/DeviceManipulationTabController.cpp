@@ -27,7 +27,15 @@ namespace motioncompensation
 		this->parent = parent;
 		this->widget = widget;
 
-		SearchDevices(0);
+		//Fill the array with default data
+		for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i)
+		{
+			deviceInfos.push_back(std::make_shared<DeviceInfo>());
+		}
+
+		LOG(DEBUG) << "deviceInfos size: " << deviceInfos.size();
+
+		SearchDevices();
 	}
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
@@ -61,7 +69,7 @@ namespace motioncompensation
 					++i;
 				}
 
-				SearchDevices(maxValidDeviceId + 1);
+				SearchDevices();
 			}
 		}
 		else
@@ -70,17 +78,18 @@ namespace motioncompensation
 		}
 	}
 
-	bool DeviceManipulationTabController::SearchDevices(int StartID)
+	bool DeviceManipulationTabController::SearchDevices()
 	{
 		bool newDeviceAdded = false;
 
 		try
 		{
-			//Get some infos about the found devices
-			for (uint32_t id = StartID; id < vr::k_unMaxTrackedDeviceCount; ++id)
+			// Get some infos about the found devices
+			for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
 			{
 				auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
-				if (deviceClass != vr::TrackedDeviceClass_Invalid)
+
+				if (deviceClass != vr::TrackedDeviceClass_Invalid && deviceInfos[id]->deviceClass == vr::TrackedDeviceClass_Invalid)
 				{
 					if (deviceClass == vr::TrackedDeviceClass_HMD || deviceClass == vr::TrackedDeviceClass_Controller || deviceClass == vr::TrackedDeviceClass_GenericTracker)
 					{
@@ -115,19 +124,20 @@ namespace motioncompensation
 						}
 
 						//Store the found info
-						deviceInfos.push_back(info);
+						deviceInfos[id] = info;
 						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
 
 						newDeviceAdded = true;
 					}
-
-					maxValidDeviceId = id;
 				}
 			}
 
 			if (newDeviceAdded)
 			{
-				emit deviceCountChanged((unsigned)deviceInfos.size());
+				// Remove all map entries
+				TrackerArrayIdToDeviceId.clear();
+				HMDArrayIdToDeviceId.clear();
+				emit deviceCountChanged();
 			}
 		}
 		catch (const std::exception& e)
@@ -213,16 +223,16 @@ namespace motioncompensation
 		return LPFBeta;
 	}
 
-	void DeviceManipulationTabController::setTrackerArrayID(unsigned deviceID, unsigned ArrayID)
+	void DeviceManipulationTabController::setTrackerArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
-		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
+		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
+		LOG(DEBUG) << "Set Tracker Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
 
-	void DeviceManipulationTabController::setHMDArrayID(unsigned deviceID, unsigned ArrayID)
+	void DeviceManipulationTabController::setHMDArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
-		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
+		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
+		LOG(DEBUG) << "Set HMD Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
 
 	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
@@ -324,7 +334,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << ", RTindex: " << RTindex << " out of a maximum of: " << maxValidDeviceId;
+		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << ", RTindex: " << RTindex;
 
 		if (MCindex == RTindex)
 		{
