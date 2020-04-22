@@ -46,6 +46,8 @@ namespace vrmotioncompensation
 				return _motionCompensationMode;
 			}
 
+			void setAlpha(double samples);
+
 			void setLPFBeta(double NewBeta)
 			{
 				LPF_Beta = NewBeta;
@@ -78,7 +80,7 @@ namespace vrmotioncompensation
 
 			double vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3]);
 
-			double MotionCompensationManager::LPF(const double RawData, double SmoothData);
+			double MotionCompensationManager::EMA(const double RawData, int Axis);
 
 			vr::HmdVector3d_t LPF(const double RawData[3], vr::HmdVector3d_t SmoothData);
 
@@ -101,6 +103,8 @@ namespace vrmotioncompensation
 			Debugger DebugLogger;
 
 			double LPF_Beta = 0.2;
+			double _alpha = -1.0;
+			uint32_t _samples = 100;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
@@ -113,8 +117,11 @@ namespace vrmotioncompensation
 			// Reference position
 			vr::HmdVector3d_t _motionCompensationRefPos = { 0, 0, 0 };
 			vr::HmdVector3d_t _Filter_vecPosition_1 = { 0, 0, 0 };
-			vr::HmdVector3d_t _Filter_vecPosition_2 = { 0, 0, 0 };
-			vr::HmdVector3d_t _Filter_vecPosition_3 = { 0, 0, 0 };
+			vr::HmdVector3d_t _FilterOld_vecPosition_1 = { 0, 0, 0 };
+			vr::HmdVector3d_t _FilterOld_vecPosition_2 = { 0, 0, 0 };
+
+			//vr::HmdVector3d_t _Filter_vecPosition_2 = { 0, 0, 0 };
+			//vr::HmdVector3d_t _Filter_vecPosition_3 = { 0, 0, 0 };
 			vr::HmdVector3d_t _LastPoseRAW = { 0, 0, 0 };
 
 			vr::HmdVector3d_t _motionCompensationRefPosVel = { 0, 0, 0 };

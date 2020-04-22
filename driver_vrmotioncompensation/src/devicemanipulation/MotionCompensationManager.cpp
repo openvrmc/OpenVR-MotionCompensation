@@ -87,6 +87,8 @@ namespace vrmotioncompensation
 				_RefPoseValidCounter = 0;
 				_motionCompensationZeroPoseValid = false;
 				_motionCompensationEnabled = true;
+				
+				setAlpha(_samples);
 			}
 			else
 			{
@@ -106,6 +108,12 @@ namespace vrmotioncompensation
 			RTdeviceID = RTdevice;
 			_RefPoseValid = false;
 			_motionCompensationZeroPoseValid = false;
+		}
+
+		void MotionCompensationManager::setAlpha(double samples)
+		{
+			_samples = samples;
+			_alpha = 2.0 / (1.0 + samples);
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()
@@ -144,36 +152,23 @@ namespace vrmotioncompensation
 			// Oculus devices do use acceleration. It also seems that the HMD uses theses values for render-prediction
 
 			// Position
-			// Add a simple low pass filter
-
-			vr::HmdVector3d_t oldFilterValue;
-			oldFilterValue.v[0] = _Filter_vecPosition_1.v[0];
-			oldFilterValue.v[1] = _Filter_vecPosition_1.v[1];
-			oldFilterValue.v[2] = _Filter_vecPosition_1.v[2];
-
-			if (LPF_Beta < 1.0)
+			// Add a exponential median average filter
+			if (_samples >= 100)
 			{
-				// 1st stage
-				_Filter_vecPosition_1.v[0] = 2 * LPF(pose.vecPosition[0], oldFilterValue.v[0]) -  LPF(LPF(pose.vecPosition[0], oldFilterValue.v[0]), oldFilterValue.v[0]);
-				_Filter_vecPosition_1.v[1] = 2 * LPF(pose.vecPosition[1], oldFilterValue.v[1]) - LPF(LPF(pose.vecPosition[1], oldFilterValue.v[1]), oldFilterValue.v[1]);
-				_Filter_vecPosition_1.v[2] = 2 * LPF(pose.vecPosition[2], oldFilterValue.v[2]) - LPF(LPF(pose.vecPosition[2], oldFilterValue.v[2]), oldFilterValue.v[2]);
-
-				// 2nd stage
-				//_Filter_vecPosition_2 = LPF(_Filter_vecPosition_1, _Filter_vecPosition_2);
-
-				// 3rd stage
-				//_Filter_vecPosition_3 = LPF(_Filter_vecPosition_2, _Filter_vecPosition_3);
+				_Filter_vecPosition_1.v[0] = EMA(pose.vecPosition[0], 0);
+				_Filter_vecPosition_1.v[1] = EMA(pose.vecPosition[1], 1);
+				_Filter_vecPosition_1.v[2] = EMA(pose.vecPosition[2], 2);
 			}
 			else
 			{
-				_Filter_vecPosition_3.v[0] = pose.vecPosition[0];
-				_Filter_vecPosition_3.v[1] = pose.vecPosition[1];
-				_Filter_vecPosition_3.v[2] = pose.vecPosition[2];
+				_Filter_vecPosition_1.v[0] = pose.vecPosition[0];
+				_Filter_vecPosition_1.v[1] = pose.vecPosition[1];
+				_Filter_vecPosition_1.v[2] = pose.vecPosition[2];
 			}
 
 			// convert pose from driver space to app space
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
-			_motionCompensationRefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _Filter_vecPosition_3, true) - pose.vecWorldFromDriverTranslation;
+			_motionCompensationRefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _Filter_vecPosition_1, true) - pose.vecWorldFromDriverTranslation;
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
@@ -244,7 +239,7 @@ namespace vrmotioncompensation
 				DebugLogger.CountUp();
 
 				DebugLogger.AddDebugData(pose.vecPosition, 0);
-				DebugLogger.AddDebugData(_Filter_vecPosition_3, 1);
+				DebugLogger.AddDebugData(_Filter_vecPosition_1, 1);
 
 				DebugLogger.AddDebugData(pose.vecVelocity, 2);
 				DebugLogger.AddDebugData(Filter_VecVelocity, 3);
@@ -372,12 +367,11 @@ namespace vrmotioncompensation
 		}
 
 		//Low Pass Filter for 3d Vectors
-		double MotionCompensationManager::LPF(const double RawData, double OldFilteredData)
-		{
-			const double alpha = 2.0 / (1.0 + 5);
-			return OldFilteredData + alpha * (RawData - OldFilteredData);
-			//return OldFilteredData += alpha * (RawData - OldFilteredData);
-			//return OldFilteredData - (LPF_Beta * (OldFilteredData - RawData));
+		double MotionCompensationManager::EMA(const double RawData, int Axis)
+		{			
+			_FilterOld_vecPosition_1.v[Axis] += _alpha * (RawData - _FilterOld_vecPosition_1.v[Axis]);
+			_FilterOld_vecPosition_2.v[Axis] += _alpha * (_FilterOld_vecPosition_1.v[Axis] - _FilterOld_vecPosition_2.v[Axis]);
+			return 2 * _FilterOld_vecPosition_1.v[Axis] - _FilterOld_vecPosition_2.v[Axis];
 		}
 
 		//Low Pass Filter for 3d Vectors
