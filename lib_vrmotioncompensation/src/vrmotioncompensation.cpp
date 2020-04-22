@@ -439,4 +439,66 @@ namespace vrmotioncompensation
 			throw vrmotioncompensation_connectionerror("No active connection.");
 		}
 	}
+
+	void VRMotionCompensation::startDebugLogger(bool enable, bool modal)
+	{
+		if (_ipcServerQueue)
+		{
+			//Create message
+			ipc::Request message(ipc::RequestType::DebugLogger_Settings);
+			memset(&message.msg, 0, sizeof(message.msg));
+			message.msg.dl_Settings.clientId = m_clientId;
+			message.msg.dl_Settings.messageId = 0;
+			message.msg.dl_Settings.enabled = enable;
+
+			if (modal)
+			{
+				//Create random message ID
+				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
+				message.msg.dl_Settings.messageId = messageId;
+
+				//Allocate memory for the reply
+				std::promise<ipc::Reply> respPromise;
+				auto respFuture = respPromise.get_future();
+				{
+					std::lock_guard<std::recursive_mutex> lock(_mutex);
+					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
+				}
+
+				//Send message
+				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+				WRITELOG(INFO, "DL message created sending to driver" << std::endl);
+
+				auto resp = respFuture.get();
+				{
+					std::lock_guard<std::recursive_mutex> lock(_mutex);
+					_ipcPromiseMap.erase(messageId);
+				}
+
+				//If there was an error, notify the user
+				std::stringstream ss;
+				ss << "Error while starting debug logger: ";
+
+				if (resp.status == ipc::ReplyStatus::InvalidId)
+				{
+					ss << "MC must be running";
+					throw vrmotioncompensation_invalidid(ss.str(), (int)resp.status);
+				}
+				else if (resp.status != ipc::ReplyStatus::Ok)
+				{
+					ss << "Error code " << (int)resp.status;
+					throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
+				}
+			}
+			else
+			{
+				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+				WRITELOG(INFO, "DL message created sending to driver" << std::endl);
+			}
+		}
+		else
+		{
+			throw vrmotioncompensation_connectionerror("No active connection.");
+		}
+	}
 } // end namespace vrmotioncompensation

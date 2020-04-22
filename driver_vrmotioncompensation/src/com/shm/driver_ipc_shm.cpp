@@ -313,6 +313,51 @@ namespace vrmotioncompensation
 								}
 								break;
 
+								case ipc::RequestType::DebugLogger_Settings:
+								{
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dl_Settings.messageId;
+									auto serverDriver = ServerDriver::getInstance();
+									if (serverDriver)
+									{
+										if (message.msg.dl_Settings.enabled)
+										{
+											if (!serverDriver->motionCompensation().StartDebugData())
+											{
+												LOG(INFO) << "Could not start debug logger: Motion Compensation must be enabled";
+												resp.status = ipc::ReplyStatus::InvalidId;
+											}
+											else
+											{
+												LOG(INFO) << "Debug logger enabled";
+												LOG(INFO) << "Max debug data points = " << message.msg.dl_Settings.MaxDebugPoints;
+												resp.status = ipc::ReplyStatus::Ok;
+											}	
+										}
+										else
+										{
+											LOG(INFO) << "Debug logger disabled";
+											serverDriver->motionCompensation().StopDebugData();
+											resp.status = ipc::ReplyStatus::Ok;
+										}
+									}
+									else
+									{
+										resp.status = ipc::ReplyStatus::UnknownError;
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while starting debug logger: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dl_Settings.clientId, resp);
+									}
+								}
+								break;
+
 								default:
 									LOG(ERROR) << "Error in ipc server receive loop: Unknown message type (" << (int)message.type << ")";
 									break;

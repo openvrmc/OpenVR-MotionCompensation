@@ -18,24 +18,19 @@ namespace vrmotioncompensation
 			IPC_ClientConnect,
 			IPC_ClientDisconnect,
 			IPC_Ping,
-
 			DeviceManipulation_GetDeviceInfo,
 			DeviceManipulation_MotionCompensationMode,
-			DeviceManipulation_SetMotionCompensationProperties
-
+			DeviceManipulation_SetMotionCompensationProperties,
+			DebugLogger_Settings,
 		};
 
 		enum class ReplyType : uint32_t
 		{
 			None,
-
 			IPC_ClientConnect,
 			IPC_Ping,
-
 			GenericReply,
-
 			DeviceManipulation_GetDeviceInfo
-
 		};
 
 		enum class ReplyStatus : uint32_t
@@ -77,13 +72,13 @@ namespace vrmotioncompensation
 		struct Request_OpenVR_GenericClientMessage
 		{
 			uint32_t clientId;
-			uint32_t messageId; // Used to associate with Reply
+			uint32_t messageId;			// Used to associate with Reply
 		};
 
 		struct Request_OpenVR_GenericDeviceIdMessage
 		{
 			uint32_t clientId;
-			uint32_t messageId; // Used to associate with Reply
+			uint32_t messageId;			// Used to associate with Reply
 			uint32_t deviceId;
 		};
 
@@ -99,8 +94,16 @@ namespace vrmotioncompensation
 		struct Request_DeviceManipulation_SetMotionCompensationProperties
 		{
 			uint32_t clientId;
-			uint32_t messageId; // Used to associate with Reply
+			uint32_t messageId;			// Used to associate with Reply
 			double LPFBeta;
+		};
+
+		struct Request_DebugLogger_Settings
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+			uint32_t MaxDebugPoints;
+			bool enabled;
 		};
 
 		struct Request
@@ -132,6 +135,7 @@ namespace vrmotioncompensation
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
+				Request_DebugLogger_Settings dl_Settings;
 				MsgUnion()
 				{
 				}

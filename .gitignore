@@ -353,18 +353,12 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 *.rc
-/client_cli_zscaler/client_cli_zscaler.vcxproj.filters
 /.tmp.drivedownload
 /client_overlay/bin/VC_redist.x64.exe
 /zzCopyFiles.bat
 /startdesktopmode.bat.lnk
-/Old MotionCompensationManager cpp.txt
-/Notizen.txt
-/DeviceIDs.txt
-/DebugLog Coordinates.txt
 /Mainwindow.png
 /Hotfix
-/installer/OVRMC_v0_3.exe
 /zzHotfixCopy.bat
 /installer/old Installer
-/installer/OpenVR-MotionCompensation010.exe
+/installer/binary

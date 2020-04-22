@@ -2,17 +2,10 @@
 
 #include <openvr.h>
 #include <QtCore/QtCore>
-// because of incompatibilities with QtOpenGL and GLEW we need to cherry pick includes
-//#include <QVector2D>//
-//#include <QMatrix4x4>//
-//#include <QVector>//
-//#include <QVector2D>//
-//#include <QVector3D>//
 #include <QObject>
 #include <QSettings>
 #include <QQmlEngine>
 #include <QtGui/QOpenGLContext>
-//#include <QtWidgets/QGraphicsScene>//
 #include <QOffscreenSurface>
 #include <QOpenGLFramebufferObject>
 #include <QQuickWindow>
@@ -35,9 +28,8 @@ namespace motioncompensation
 
 	public:
 		static constexpr const char* applicationKey = "ovrmc.VRMotionCompensation";
-		//static constexpr const char* applicationKey = "matzman666.VRInputEmulator";
 		static constexpr const char* applicationName = "OpenVR Motion Compensation";
-		static constexpr const char* applicationVersionString = "v0.1.1";
+		static constexpr const char* applicationVersionString = "v0.2.0";
 
 	private:
 		vr::VROverlayHandle_t m_ulOverlayHandle = vr::k_ulOverlayHandleInvalid;
@@ -67,10 +59,6 @@ namespace motioncompensation
 
 		QSoundEffect activationSoundEffect;
 		QSoundEffect focusChangedSoundEffect;
-
-		static std::map<int, const char*> _openVRButtonNames;
-		static std::vector<std::pair<std::string, WORD>> _keyboardVirtualCodes;
-		static std::vector<WORD> _keyboardVaryingVirtualCodes;
 
 	public: // I know it's an ugly hack to make them public to enable external access, but I am too lazy to implement getters.
 		DeviceManipulationTabController deviceManipulationTabController;
@@ -105,14 +93,10 @@ namespace motioncompensation
 
 		Q_INVOKABLE QString getVersionString();
 		Q_INVOKABLE QUrl getVRRuntimePathUrl();
-
 		Q_INVOKABLE bool soundDisabled();
-
-		Q_INVOKABLE unsigned getNewUniqueNumber();
 
 		const vr::VROverlayHandle_t& overlayHandle();
 		const vr::VROverlayHandle_t& overlayThumbnailHandle();
-		bool getOverlayTexture(vr::Texture_t& texture);
 
 	public slots:
 		void renderOverlay();

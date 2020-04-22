@@ -12,7 +12,7 @@
 
 	;Name and file
 	Name "OpenVR Motion Compensation"
-	OutFile "OpenVR-MotionCompensation.exe"
+	OutFile "binary\OpenVR-MotionCompensation.exe"
 	
 	;Default installation folder
 	InstallDir "$PROGRAMFILES64\OpenVR-MotionCompensation"

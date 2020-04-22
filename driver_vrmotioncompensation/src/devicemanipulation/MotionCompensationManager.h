@@ -29,6 +29,12 @@ namespace vrmotioncompensation
 			
 			void WriteDebugData();
 
+			void InitDebugData();
+
+			bool StartDebugData();
+
+			void StopDebugData();
+
 			void setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
 
 			void setNewMotionCompensatedDevice(int MCdevice);
@@ -66,7 +72,7 @@ namespace vrmotioncompensation
 			
 			void _updateMotionCompensationRefPose(const vr::DriverPose_t& pose);
 			
-			bool _applyMotionCompensation(vr::DriverPose_t& pose, DeviceManipulationHandle* deviceInfo);
+			bool _applyMotionCompensation(vr::DriverPose_t& pose);
 
 			void runFrame();
 
@@ -96,27 +102,26 @@ namespace vrmotioncompensation
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
 			
 			// Zero position
-			vr::HmdVector3d_t _motionCompensationZeroPos;
-			vr::HmdQuaternion_t _motionCompensationZeroRot;
+			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };;
+			vr::HmdQuaternion_t _motionCompensationZeroRot = { 1, 0, 0, 0 };;
 			bool _motionCompensationZeroPoseValid = false;
 			
 			// Reference position
-			vr::HmdVector3d_t _motionCompensationRefPos;
-			vr::HmdVector3d_t _Filter_vecPosition_1;
-			vr::HmdVector3d_t _Filter_vecPosition_2;
-			vr::HmdVector3d_t _Filter_vecPosition_3;
+			vr::HmdVector3d_t _motionCompensationRefPos = { 0, 0, 0 };
+			vr::HmdVector3d_t _Filter_vecPosition_1 = { 0, 0, 0 };
+			vr::HmdVector3d_t _Filter_vecPosition_2 = { 0, 0, 0 };
+			vr::HmdVector3d_t _Filter_vecPosition_3 = { 0, 0, 0 };
 
-			vr::HmdVector3d_t _motionCompensationRefPosVel;
-			vr::HmdVector3d_t _motionCompensationRefPosAcc;
+			vr::HmdVector3d_t _motionCompensationRefPosVel = { 0, 0, 0 };
+			vr::HmdVector3d_t _motionCompensationRefPosAcc = { 0, 0, 0 };
 
-			vr::HmdQuaternion_t _motionCompensationRefRot;
-			vr::HmdQuaternion_t _motionCompensationRefRotInv;
-			vr::HmdQuaternion_t _Filter_rotPosition_1;
-			vr::HmdQuaternion_t _Filter_rotPosition_2;
-			vr::HmdQuaternion_t _Filter_rotPosition_3;
+			vr::HmdQuaternion_t _motionCompensationRefRot = { 1, 0, 0, 0 };
+			vr::HmdQuaternion_t _motionCompensationRefRotInv = { 1, 0, 0, 0 };
+			vr::HmdQuaternion_t _Filter_rotPosition_1 = { 1, 0, 0, 0 };
+			vr::HmdQuaternion_t _Filter_rotPosition_2 = { 1, 0, 0, 0 };
 
-			vr::HmdVector3d_t _motionCompensationRefRotVel;
-			vr::HmdVector3d_t _motionCompensationRefRotAcc;
+			vr::HmdVector3d_t _motionCompensationRefRotVel = { 0, 0, 0 };
+			vr::HmdVector3d_t _motionCompensationRefRotAcc = { 0, 0, 0 };
 
 			bool _RefPoseValid = false;
 			int _RefPoseValidCounter = 0;

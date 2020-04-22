@@ -1,19 +1,18 @@
 ![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.63-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
 
-# DO NOT USE THIS OR EXPECT ANYTHING AS A USER
+# Beta Version, may cause crashes or contain bugs!
 
-No releases have been created, and we are very much in development mode.  If you are interested in testing (and know how to compile code) or are interested in being a maintainer, please connect with us on the [discord `development` channel](https://discord.gg/r7krmSd)
+We are very much in development mode. If you are interested in testing or are interested in being a maintainer, please connect with us on the [discord `development` channel](https://discord.gg/r7krmSd)
 
-# [Former docs] OpenVR-InputEmulator
+# OpenVR-MotionCompensation
 
-An OpenVR driver that allows to enable motion compensatio. 
-Includes a dashboard to configure some settings directly in VR.
+An OpenVR driver that allows to enable motion compensation.
+Includes a dashboard to configure the settings directly in VR.
 
-The OpenVR driver hooks into the lighthouse driver and allows to modify any pose updates or button/axis events coming from the Vive controllers before they reach the OpenVR runtime. 
+This driver hooks into the device driver and allows to modify any pose updates coming from the HMD before they reach the OpenVR runtime. 
 Due to the nature of this hack the driver may break when Valve decides to update the driver-side OpenVR API.
 
-The motivation of this driver is to allow the base of motion simulators (driving or flying) to be the reference point for the world, cancelling out simulator movement and differencing
-head movement from the simulator movement to update the pose.
+The motivation of this driver is to allow the base of motion simulators (driving or flying) to be the reference point for the world, cancelling out simulator movement and differencing head movement from the simulator movement to update the pose.
 
 
 # Notes:
@@ -21,44 +20,45 @@ head movement from the simulator movement to update the pose.
 This is a work-in-progress and may contain bugs.
 
 
+## How to open
+
+There are two ways to open the settings page:
+1. On VR, open the Steam Dashboard (Menu button on the controller). In the bottom left is a new icon, a small cogwheel. Click on this icon to bring up the OVRMC overlay 
+2. Go to the install folder and click on "startdesktopmode.bat". This will open OVRMC on your regular desktop.
+
+
 ## Top Page:
 
 ![Root Page](docs/screenshots/DeviceManipulationPage.png)
 
-- **Identify**: Sends a haptic pulse to the selected device (Devices without haptic feedback like the Vive trackers can be identified by a flashing white light).
-- **Status**: Shows the current status of the selected device.
-- **Device Mode**: Allows to select a device mode.
-  - **Default**: Default mode.
-  - **Disable**: Let OpenVR think that the device has been disconnected.
-  - **Redirect to**: Impersonate another device.
-  - **Swap with**: Swap two devices.
-  - **Motion Compensation**: Enable motion compensation with the selected device as reference device.
-- **Device Offsets**: Allows to add translation or rotation offsets to the selected device.
-- **Motion Compensation Settings**: Allows to configure motion compensation mode.
-- **Render Model**: Shows a render model at the device position (experimental).
-- **Input Remapping**: Allows to re-map input coming from controller buttons, joysticks or touchpads.
-- **Profile**: Allows to apply/define/delete device offsets/motion compensation profiles.
+- **HMD**: Choose the HMD you use (usaly only one should appear)
+- **Status**: Shows the current status of the selected HMD.
+- **Reference Tracker**: Choose the tracker / controller you want to use as reference.
+- **Status**: Shows the current status of the selected tracker / controller.
+- **Identify**: Sends a haptic pulse to the selected device (not yet implemented)
+- **Enable Motion Compensation**: Enable motion compensation with the selected devices.
+- **LPF Beta value**: Filter setting. Need to be between 0 and 1. Use the +- Buttons to incread / decrease in 0.05 Steps.
+- **Apply**: Apply the choosen settings.
 
 
-## Motion Compensation Settings Page:
+## LPF Beta value:
 
-![Motion Compensation Settings Page](docs/screenshots/MotionCompensationPage.png)
+Values must be between 0 and 1. A value closer to 0 means a stronger filter. A value clsoer to 1 means a weaker filter.
+If the value is to low, you may expirience a slow drifting. Raise the value for a faster response.
+Default value is set to 0.2
 
-**Vel/Acc Compensation Mode**: How should reported velocities and acceleration values be adjusted. The problem with only adjusting the headset position is that pose prediction also takes velocity and acceleration into accound. As long as the reported values to not differ too much from the real values, pose prediction errors are hardly noticeable. But with fast movements of the motion platform the pose prediction error can be noticeable. Available modes are:
-- **Disabled**: Do not adjust velocity/acceration values.
-- **Set Zero**: Set all velocity/acceleration values to zero. Most simple form of velocity/acceleration compensation.
-- **Use Reference Tracker**: Substract the velocity/acceleration values of the motion compensation reference tracker/controller from the values reported from the headset. Most accurate form of velocity/acceleration compensation. However, it requires that the reference tracker/controller is as closely mounted to the head position as possible. The further away it is from the head position the larger the error.
-- **Linear Approximation w/ Moving Average (Experimental)**: Uses linear approximation to estimate the velocity/acceleration values. The used formula is: (current_position - last_position) / time_difference. To reduce jitter the average over the last few values is used.
-  - **Moving Average Window**: How many values are used for calculating the average.
-- **Kalman Filter (Experimental)**: The position values are fed into a kalman filter which then outputs a velocity value. The kalman filter implementation is based on the filter described [here](https://en.wikipedia.org/wiki/Kalman_filter#Example_application.2C_technical).
-  - **Process/Observation Noise**: Parameters used to fine-tune the kalman filter. 
-  
+
+## Mounting advice:
+
+Mount the reference tracker/controller as closely to the head position as possible. The further away it is from the head position the larger the error.
+Continuous and heavy vibration will affect the IMU performance, causing noticable IMU drift. This will be noticable in the HMD in form of your camera moving violently arround the car. To adress this, it is suggested to use a damping system.
+
 
 ## Initial Setup
 See the wiki
 
 ## Building
-1. Open *'VRInputEmulator.sln'* in Visual Studio 2019.
+1. Open *'VRMotionCompensation.sln'* in Visual Studio 2019.
 2. Build Solution
 
 # License

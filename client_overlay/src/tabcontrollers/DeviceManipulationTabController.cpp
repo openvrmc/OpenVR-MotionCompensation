@@ -19,7 +19,6 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::initStage1()
 	{
-		reloadDeviceManipulationProfiles();
 		reloadMotionCompensationSettings();
 	}
 
@@ -29,60 +28,6 @@ namespace motioncompensation
 		this->widget = widget;
 
 		SearchDevices(0);
-		/*try
-		{
-			//Get some infos about the found devices
-			for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
-			{
-				auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
-				if (deviceClass != vr::TrackedDeviceClass_Invalid)
-				{
-					if (deviceClass == vr::TrackedDeviceClass_HMD || deviceClass == vr::TrackedDeviceClass_Controller || deviceClass == vr::TrackedDeviceClass_GenericTracker)
-					{
-						auto info = std::make_shared<DeviceInfo>();
-						info->openvrId = id;
-						info->deviceClass = deviceClass;
-						char buffer[vr::k_unMaxPropertyStringSize];
-
-						//Get and save the serial number
-						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;						
-						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);						
-						if (pError == vr::TrackedProp_Success)
-						{
-							info->serial = std::string(buffer);
-						}
-						else
-						{
-							info->serial = std::string("<unknown serial>");
-							LOG(ERROR) << "Could not get serial of device " << id;
-						}
-
-						//Get and save the current device mode
-						try
-						{
-							vrmotioncompensation::DeviceInfo info2;
-							parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-							info->deviceMode = info2.deviceMode;
-						}
-						catch (std::exception& e)
-						{
-							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-						}
-
-						//Store the found info
-						deviceInfos.push_back(info);
-						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
-					}
-					maxValidDeviceId = id;
-				}
-			}
-
-			emit deviceCountChanged((unsigned)deviceInfos.size());
-		}
-		catch (const std::exception & e)
-		{
-			LOG(ERROR) << "Could not get device infos: " << e.what();
-		}*/
 	}
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
@@ -117,57 +62,6 @@ namespace motioncompensation
 				}
 
 				SearchDevices(maxValidDeviceId + 1);
-
-				//Check if there is a new device (id start point is maxValidDeviceId + 1!)
-				/*bool newDeviceAdded = false;
-				for (uint32_t id = maxValidDeviceId + 1; id < vr::k_unMaxTrackedDeviceCount; ++id)
-				{
-					auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
-					if (deviceClass != vr::TrackedDeviceClass_Invalid)
-					{
-						if (deviceClass == vr::TrackedDeviceClass_Controller || deviceClass == vr::TrackedDeviceClass_GenericTracker)
-						{
-							auto info = std::make_shared<DeviceInfo>();
-							info->openvrId = id;
-							info->deviceClass = deviceClass;
-							char buffer[vr::k_unMaxPropertyStringSize];
-
-							//Get and save the serial number
-							vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
-							vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
-							if (pError == vr::TrackedProp_Success)
-							{
-								info->serial = std::string(buffer);
-							}
-							else
-							{
-								info->serial = std::string("<unknown serial>");
-								LOG(ERROR) << "Could not get serial of device " << id;
-							}
-
-							//Get and save the current device mode
-							try
-							{
-								vrmotioncompensation::DeviceInfo info2;
-								parent->vrMotionCompensation().getDeviceInfo(info->openvrId, info2);
-								info->deviceMode = info2.deviceMode;
-							}
-							catch (std::exception& e)
-							{
-								LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-							}
-
-							deviceInfos.push_back(info);
-							LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
-							newDeviceAdded = true;
-						}
-						maxValidDeviceId = id;
-					}
-				}
-				if (newDeviceAdded)
-				{
-					emit deviceCountChanged((unsigned)deviceInfos.size());
-				}*/
 			}
 		}
 		else
@@ -246,10 +140,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::handleEvent(const vr::VREvent_t&)
 	{
-		/*switch (vrEvent.eventType) {
-			default:
-				break;
-		}*/
+
 	}
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()
@@ -325,13 +216,13 @@ namespace motioncompensation
 	void DeviceManipulationTabController::setTrackerArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
+		LOG(DEBUG) << "Set Tracker Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
 	}
 
 	void DeviceManipulationTabController::setHMDArrayID(unsigned deviceID, unsigned ArrayID)
 	{
 		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, deviceID));
-		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << " Array ID: " << ArrayID;
+		LOG(DEBUG) << "Set HMD Array ID, device ID: " << deviceID << ", Array ID: " << ArrayID;
 	}
 
 	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
@@ -378,127 +269,20 @@ namespace motioncompensation
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		motionCompensationMode = (vrmotioncompensation::MotionCompensationMode)settings->value("motionCompensationVelAccMode", 0).toUInt();
 		LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
 		settings->endGroup();
-	}
 
-	void DeviceManipulationTabController::reloadDeviceManipulationProfiles()
-	{
-		deviceManipulationProfiles.clear();
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		auto profileCount = settings->beginReadArray("deviceManipulationProfiles");
-		for (int i = 0; i < profileCount; i++)
-		{
-			settings->setArrayIndex(i);
-			deviceManipulationProfiles.emplace_back();
-			auto& entry = deviceManipulationProfiles[i];
-			entry.profileName = settings->value("profileName").toString().toStdString();
-		}
-		settings->endArray();
-		settings->endGroup();
+		LOG(INFO) << "Loading Data; LPF Beta: " << LPFBeta;
 	}
 
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
 	{
+		LOG(INFO) << "Saving Data; LPF Beta: " << LPFBeta;
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
-		settings->setValue("motionCompensationVelAccMode", (unsigned)motionCompensationMode);
 		settings->setValue("motionCompensationLPFBeta", LPFBeta);
 		settings->endGroup();
 		settings->sync();
-	}
-
-	void DeviceManipulationTabController::saveDeviceManipulationProfiles()
-	{
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		settings->beginWriteArray("deviceManipulationProfiles");
-		unsigned i = 0;
-
-		for (auto& p : deviceManipulationProfiles)
-		{
-			settings->setArrayIndex(i);
-			settings->setValue("profileName", QString::fromStdString(p.profileName));
-		}
-		settings->endArray();
-		settings->endGroup();
-		settings->sync();
-	}
-
-	unsigned DeviceManipulationTabController::getDeviceManipulationProfileCount()
-	{
-		return (unsigned)deviceManipulationProfiles.size();
-	}
-
-	QString DeviceManipulationTabController::getDeviceManipulationProfileName(unsigned index)
-	{
-		if (index >= deviceManipulationProfiles.size())
-		{
-			return QString();
-		}
-		else
-		{
-			return QString::fromStdString(deviceManipulationProfiles[index].profileName);
-		}
-	}
-
-	void DeviceManipulationTabController::addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping)
-	{
-		if (deviceIndex >= deviceInfos.size())
-		{
-			return;
-		}
-
-		auto device = deviceInfos[deviceIndex];
-		DeviceManipulationProfile* profile = nullptr;
-		for (auto& p : deviceManipulationProfiles)
-		{
-			if (p.profileName.compare(name.toStdString()) == 0)
-			{
-				profile = &p;
-				break;
-			}
-		}
-
-		if (!profile)
-		{
-			auto i = deviceManipulationProfiles.size();
-			deviceManipulationProfiles.emplace_back();
-			profile = &deviceManipulationProfiles[i];
-		}
-
-		profile->profileName = name.toStdString();
-		saveDeviceManipulationProfiles();
-		OverlayController::appSettings()->sync();
-		emit deviceManipulationProfilesChanged();
-	}
-
-	void DeviceManipulationTabController::applyDeviceManipulationProfile(unsigned index, unsigned deviceIndex)
-	{
-		if (index < deviceManipulationProfiles.size())
-		{
-			if (deviceIndex >= deviceInfos.size())
-			{
-				return;
-			}
-			auto device = deviceInfos[deviceIndex];
-			auto& profile = deviceManipulationProfiles[index];
-			emit deviceInfoChanged(deviceIndex);
-		}
-	}
-
-	void DeviceManipulationTabController::deleteDeviceManipulationProfile(unsigned index)
-	{
-		if (index < deviceManipulationProfiles.size())
-		{
-			auto pos = deviceManipulationProfiles.begin() + index;
-			deviceManipulationProfiles.erase(pos);
-			saveDeviceManipulationProfiles();
-			OverlayController::appSettings()->sync();
-			emit deviceManipulationProfilesChanged();
-		}
 	}
 
 	// Enables or disables the motion compensation for the selected device
@@ -516,8 +300,6 @@ namespace motioncompensation
 			m_deviceModeErrorString = "Please select a reference tracker";
 			return false;
 		}
-
-		LOG(DEBUG) << "setMotionCompensationMode Array IDs, MCindex: " << MCindex << " RTindex: " << RTindex;
 
 		//Search for the device ID
 		auto search = TrackerArrayIdToDeviceId.find(RTindex);
@@ -542,7 +324,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "setMotionCompensationMode device IDs, MCindex: " << MCindex << " RTindex: " << RTindex << " MaxValid ID: " << maxValidDeviceId;
+		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << ", RTindex: " << RTindex << " out of a maximum of: " << maxValidDeviceId;
 
 		if (MCindex == RTindex)
 		{
@@ -575,7 +357,6 @@ namespace motioncompensation
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode";
 				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
-				//parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
 			}
 			else
 			{
@@ -617,6 +398,8 @@ namespace motioncompensation
 
 			return false;
 		}
+
+		saveMotionCompensationSettings();
 
 		/*if (notify)
 		{
@@ -680,6 +463,96 @@ namespace motioncompensation
 		LPFBeta = value;		
 
 		return true;
+	}
+
+	bool DeviceManipulationTabController::setDebugMode(bool TestForStandby)
+	{
+		bool enable = false;
+		QString newButtonText = "";
+		int newLoggerStatus = 0;
+
+		// Queue new debug logger state
+		if (TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 1)
+		{
+			enable = true;
+			newLoggerStatus = 2;
+			newButtonText = "Stop logging";
+		}
+		else if (TestForStandby)
+		{
+			// return from function if standby mode was not active
+			return true;
+		}
+		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
+		{
+			newLoggerStatus = 1;
+			newButtonText = "Standby...";
+		}
+		else if ((!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
+				 (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
+		{
+			enable = false;
+			newLoggerStatus = 0;
+			newButtonText = "Start logging";
+		}
+		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
+		{
+			enable = true;
+			newLoggerStatus = 2;
+			newButtonText = "Stop logging";
+		}
+
+		// Only send new state when logger is not in standby mode
+		if (newLoggerStatus != 1)
+		{
+			try
+			{
+				LOG(INFO) << "Sending debug mode (Status: " << newLoggerStatus << ")";
+				parent->vrMotionCompensation().startDebugLogger(enable);
+			}
+			catch (vrmotioncompensation::vrmotioncompensation_exception& e)
+			{
+				switch (e.errorcode)
+				{
+					case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+					{
+						m_deviceModeErrorString = "Not an error";
+					} break;
+					case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
+					{
+						m_deviceModeErrorString = "MC must be running to\nstart the debug logger";
+					} break;
+					default:
+					{
+						m_deviceModeErrorString = "Unknown error";
+					} break;
+
+					LOG(ERROR) << "Exception caught while sending debug mode: " << e.what();
+
+					return false;
+				}
+			}
+			catch (std::exception& e)
+			{
+				m_deviceModeErrorString = "Unknown exception";
+				LOG(ERROR) << "Exception caught while sending debug mode: " << e.what();
+
+				return false;
+			}
+		}
+
+		// If send was successful or not needed, apply state
+		DebugLoggerStatus = newLoggerStatus;
+		debugModeButtonString = newButtonText;
+
+		emit debugModeChanged();
+
+		return true;
+	}
+
+	QString DeviceManipulationTabController::getDebugModeButtonText()
+	{
+		return debugModeButtonString;
 	}
 
 	QString DeviceManipulationTabController::getDeviceModeErrorString()

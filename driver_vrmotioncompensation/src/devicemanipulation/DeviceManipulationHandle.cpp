@@ -35,18 +35,20 @@ namespace vrmotioncompensation
 					{						
 						m_motionCompensationManager._setMotionCompensationZeroPose(newPose);
 					}
-
-					//Update reference tracker position
-					m_motionCompensationManager._updateMotionCompensationRefPose(newPose);
+					else
+					{
+						//Update reference tracker position
+						m_motionCompensationManager._updateMotionCompensationRefPose(newPose);
+					}
 				}
-
-				return true;
 			}
 			else if (m_deviceMode == MotionCompensationDeviceMode::MotionCompensated)
 			{
-				m_motionCompensationManager._applyMotionCompensation(newPose, this);
-
-				return true;
+				//Check if the pose is valid to prevent unwanted jitter and movement
+				if (newPose.poseIsValid && newPose.result == vr::TrackingResult_Running_OK)
+				{
+					m_motionCompensationManager._applyMotionCompensation(newPose);
+				}
 			}
 
 			return true;

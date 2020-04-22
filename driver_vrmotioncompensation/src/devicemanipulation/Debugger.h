@@ -60,12 +60,15 @@ namespace vrmotioncompensation
 				}
 			};
 
-		public:
-			
-		
+		public:		
 			Debugger();
+			~Debugger();
 
 			void Start();
+
+			void Stop();
+
+			bool IsRunning();
 
 			void CountUp();
 
@@ -104,6 +107,9 @@ namespace vrmotioncompensation
 
 			bool DebuggerRunning = false;
 			bool InSync = false;
+			bool WroteToFile = false;
+
+			std::recursive_mutex _mut;
 		};
 	}
 }

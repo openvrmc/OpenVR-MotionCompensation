@@ -235,6 +235,7 @@ MyStackViewPage
             {
                 id: deviceModeApplyButton
                 Layout.preferredWidth: 200
+                Layout.bottomMargin: 35
                 enabled: false
                 text: "Apply"
                 onClicked:
@@ -246,6 +247,42 @@ MyStackViewPage
                     if (!DeviceManipulationTabController.sendLPFBeta())
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send LPF Beta:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                    }
+                    if (!DeviceManipulationTabController.setDebugMode(true))
+                    {
+                        deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                    }
+                }
+            }
+        }
+
+        //Debug Mode
+        RowLayout
+        {
+            spacing: 18
+
+            MyText
+            {
+                text: "Debug Logger"
+            }
+        }
+
+        //Enable debug logger:
+        RowLayout
+        {
+        spacing: 16
+
+        MyPushButton
+            {
+                id: debugLoggerButton
+                Layout.preferredWidth: 250
+                text: "Start logging"
+                enabled: false          // Set to "true" (without the " " ) to enable debug logger
+                onClicked:
+                {
+                    if (!DeviceManipulationTabController.setDebugMode(false))
+                    {
+                        deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
                 }
             }
@@ -294,13 +331,13 @@ MyStackViewPage
                     fetchHMDInfo()
                 }
             }
-            onDeviceManipulationProfilesChanged:
-            {
-                reloadDeviceManipulationProfiles()
-            }
             onSettingChanged:
             {
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            }
+            onDebugModeChanged:
+            {
+                debugLoggerButton.text = DeviceManipulationTabController.getDebugModeButtonText()
             }
         }
 

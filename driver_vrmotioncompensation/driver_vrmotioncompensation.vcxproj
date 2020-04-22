@@ -196,6 +196,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRIVER_VRINPUTEMULATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_72_0;..\lib_vrmotioncompensation\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

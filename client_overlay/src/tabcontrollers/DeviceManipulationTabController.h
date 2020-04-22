@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
 #include <memory>
 #include <openvr.h>
 #include <vrmotioncompensation.h>
@@ -13,13 +14,6 @@ namespace motioncompensation
 	// forward declaration
 	class OverlayController;
 
-	struct DeviceManipulationProfile
-	{
-		std::string profileName;
-		int deviceMode = 0;
-		int motionCompensationMode = 0;
-	};
-
 	struct DeviceInfo
 	{
 		std::string serial;
@@ -27,10 +21,6 @@ namespace motioncompensation
 		uint32_t openvrId = 0;
 		int deviceStatus = 0;					// 0: Normal, 1: Disconnected/Suspended
 		vrmotioncompensation::MotionCompensationDeviceMode deviceMode = vrmotioncompensation::MotionCompensationDeviceMode::Default;
-		//uint32_t refDeviceId = 0;
-		//uint32_t renderModelIndex = 0;
-		//vr::VROverlayHandle_t renderModelOverlay = vr::k_ulOverlayHandleInvalid;
-		//std::string renderModelOverlayName;
 	};
 
 	class DeviceManipulationTabController : public QObject
@@ -46,10 +36,11 @@ namespace motioncompensation
 		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
 		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
 
-		std::vector<DeviceManipulationProfile> deviceManipulationProfiles;
-
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
+
+		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
+		QString debugModeButtonString;
 
 		QString m_deviceModeErrorString;
 
@@ -84,30 +75,24 @@ namespace motioncompensation
 		Q_INVOKABLE void increaseLPFBeta(double value);
 
 		void reloadMotionCompensationSettings();
-		void reloadDeviceManipulationProfiles();
 		void saveMotionCompensationSettings();
-		void saveDeviceManipulationProfiles();
-
-		Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
-		Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);
 
 		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
 
 		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
-		Q_INVOKABLE bool setLPFBeta(double value);
+		Q_INVOKABLE bool setLPFBeta(double value);		
+		Q_INVOKABLE bool setDebugMode(bool TestForStandby);
+		Q_INVOKABLE QString getDebugModeButtonText();
 		Q_INVOKABLE bool sendLPFBeta();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 	public slots:
-		void addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping);
-		void applyDeviceManipulationProfile(unsigned index, unsigned deviceIndex);
-		void deleteDeviceManipulationProfile(unsigned index);
 
 	signals:
 		//void loadComplete();
 		void deviceCountChanged(unsigned deviceCount);
 		void deviceInfoChanged(unsigned index);
 		void settingChanged();
-		void deviceManipulationProfilesChanged();
+		void debugModeChanged();
 	};
 } // namespace motioncompensation
