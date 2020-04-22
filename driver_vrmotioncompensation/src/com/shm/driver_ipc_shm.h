@@ -28,8 +28,6 @@ namespace vrmotioncompensation
 			void init(ServerDriver* driver);
 			void shutdown();
 
-			//void sendReplySetMotionCompensationMode(bool success);
-
 		private:
 			static void _ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver* driver);
 

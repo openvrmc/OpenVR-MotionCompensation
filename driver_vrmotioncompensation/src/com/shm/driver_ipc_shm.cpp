@@ -28,27 +28,6 @@ namespace vrmotioncompensation
 			}
 		}
 
-		/*void IpcShmCommunicator::sendReplySetMotionCompensationMode(bool success)
-		{
-			if (_setMotionCompensationMessageId != 0)
-			{
-				ipc::Reply resp(ipc::ReplyType::GenericReply);
-				resp.messageId = _setMotionCompensationMessageId;
-
-				if (success)
-				{
-					resp.status = ipc::ReplyStatus::Ok;
-				}
-				else
-				{
-					resp.status = ipc::ReplyStatus::NotTracking;
-				}
-
-				sendReply(_setMotionCompensationClientId, resp);
-			}
-			_setMotionCompensationMessageId = 0;
-		}*/
-
 		void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver* driver)
 		{
 			_this->_ipcThreadRunning = true;

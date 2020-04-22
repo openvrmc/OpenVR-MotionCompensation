@@ -196,27 +196,50 @@ namespace vrmotioncompensation
 			// ----------------------------------------------------------------------------------------------- //
 			// Velocity and acceleration
 			vr::HmdVector3d_t Filter_VecVelocity = { 0, 0, 0 };
-			/*Filter_VecVelocity.v[0] = vecVelocityDif(0, pose.vecPosition, pose.vecVelocity);
-			Filter_VecVelocity.v[1] = vecVelocityDif(1, pose.vecPosition, pose.vecVelocity);
-			Filter_VecVelocity.v[2] = vecVelocityDif(2, pose.vecPosition, pose.vecVelocity);*/
-
 			vr::HmdVector3d_t Filter_VecAcceleration = { 0, 0, 0 };
+			
+			// Get current time in microseconds and convert it to seconds
+			long long now = std::chrono::duration_cast <std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+			double tdiff = (double)(now - _RefTrackerLastTime) / 1.0E6 + (pose.poseTimeOffset - RefTrackerlastPose.poseTimeOffset);
+			
+			Filter_VecVelocity.v[0] = vecVelocity(tdiff, _Filter_vecPosition_1.v[0], RefTrackerlastPose.vecPosition[0]);
+			Filter_VecVelocity.v[1] = vecVelocity(tdiff, _Filter_vecPosition_1.v[1], RefTrackerlastPose.vecPosition[1]);
+			Filter_VecVelocity.v[2] = vecVelocity(tdiff, _Filter_vecPosition_1.v[2], RefTrackerlastPose.vecPosition[2]);
 
-			
+			Filter_VecAcceleration.v[0] = vecAcceleration(tdiff, Filter_VecVelocity.v[0], RefTrackerlastPose.vecVelocity[0]);
+			Filter_VecAcceleration.v[1] = vecAcceleration(tdiff, Filter_VecVelocity.v[1], RefTrackerlastPose.vecVelocity[1]);
+			Filter_VecAcceleration.v[2] = vecAcceleration(tdiff, Filter_VecVelocity.v[2], RefTrackerlastPose.vecVelocity[2]);
+
+
 			vr::HmdVector3d_t Filter_vecAngularVelocity = { 0, 0, 0 };
-			
+			vr::HmdVector3d_t Filter_vecAngularAcceleration = { 0, 0, 0 };
+			vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_2);
+
+			Filter_vecAngularVelocity.v[0] = rotVelocity(tdiff, RotEulerFilter.v[0], RotEulerFilterOld.v[0]);
+			Filter_vecAngularVelocity.v[1] = rotVelocity(tdiff, RotEulerFilter.v[1], RotEulerFilterOld.v[1]);
+			Filter_vecAngularVelocity.v[2] = rotVelocity(tdiff, RotEulerFilter.v[2], RotEulerFilterOld.v[2]);
+
+			Filter_vecAngularAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[0], RefTrackerlastPose.vecAngularVelocity[0]);
+			Filter_vecAngularAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[1], RefTrackerlastPose.vecAngularVelocity[1]);
+			Filter_vecAngularAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[2], RefTrackerlastPose.vecAngularVelocity[2]);
 
 			// Convert velocity and acceleration values into app space and undo device rotation
 			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
 			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
-			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecVelocity[0], pose.vecVelocity[1], pose.vecVelocity[2] });
-			//_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
-			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
+			//_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecVelocity[0], pose.vecVelocity[1], pose.vecVelocity[2] });
+			//_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
+			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
+			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
 
-			_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
-			_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
+			//_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
+			//_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
+			_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecAcceleration);
+			_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularAcceleration);
+			
 
+			// ----------------------------------------------------------------------------------------------- //
+			// ----------------------------------------------------------------------------------------------- //
 			// Wait 10 frames before setting reference pose to valid
 			if (_RefPoseValidCounter > 100)
 			{
@@ -227,9 +250,9 @@ namespace vrmotioncompensation
 				_RefPoseValidCounter++;
 			}			
 
-			_LastPoseRAW.v[0] = pose.vecPosition[0];
-			_LastPoseRAW.v[1] = pose.vecPosition[1];
-			_LastPoseRAW.v[2] = pose.vecPosition[2];
+			// Save last rotation and pose
+			RotEulerFilterOld = RotEulerFilter;
+			RefTrackerlastPose = pose;
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
@@ -348,20 +371,38 @@ namespace vrmotioncompensation
 
 		}
 
-		double MotionCompensationManager::vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3])
+		double MotionCompensationManager::vecVelocity(double time, const double vecPosition, const double Old_vecPosition)
 		{
-			// NewVelocity = RawVelocity * ((FilterPose - LastPoseRaw) / (RawPose - LastPoseRaw))
+			double NewVelocity = 0.0;
+			
+			if (time != (double)0.0)
+			{
+				NewVelocity = (vecPosition - Old_vecPosition) / time;
+			}
 
+			return NewVelocity;
+		}
+
+		double MotionCompensationManager::vecAcceleration(double time, const double vecVelocity, const double Old_vecVelocity)
+		{
+			double NewAcceleration = 0.0;
+
+			if (time != (double)0.0)
+			{
+				NewAcceleration = (vecVelocity - vecVelocity) / time;
+			}
+
+			return NewAcceleration;
+		}
+
+		double MotionCompensationManager::rotVelocity(double time, const double vecAngle, const double Old_vecAngle)
+		{
 			double NewVelocity = 0.0;
 
-			/*if (vecPosition[i] - _LastPoseRAW.v[i] != 0)
+			if (time != (double)0.0)
 			{
-				NewVelocity = vecVelocity[i] * ((std::abs(_Filter_vecPosition_3.v[i] - _LastPoseRAW.v[i])) / std::abs((vecPosition[i] - _LastPoseRAW.v[i])));
+				NewVelocity = (1 - AngleDifference(vecAngle, Old_vecAngle)) / time;
 			}
-			else
-			{
-				NewVelocity = vecVelocity[i];
-			}*/
 
 			return NewVelocity;
 		}

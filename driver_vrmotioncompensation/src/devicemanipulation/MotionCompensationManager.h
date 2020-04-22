@@ -78,7 +78,11 @@ namespace vrmotioncompensation
 
 			void runFrame();
 
-			double vecVelocityDif(int i, const double vecPosition[3], const double vecVelocity[3]);
+			double vecVelocity(double time, const double vecPosition, const double Old_vecPosition);
+
+			double vecAcceleration(double time, const double vecVelocity, const double Old_vecVelocity);
+
+			double rotVelocity(double time, const double vecAngle, const double Old_vecAngle);
 
 			double MotionCompensationManager::EMA(const double RawData, int Axis);
 
@@ -99,6 +103,9 @@ namespace vrmotioncompensation
 
 			int MCdeviceID = -1;
 			int RTdeviceID = -1;
+			long long _RefTrackerLastTime = -1;
+			vr::DriverPose_t RefTrackerlastPose;
+			vr::HmdVector3d_t RotEulerFilterOld = {0, 0, 0};
 
 			Debugger DebugLogger;
 
@@ -119,10 +126,6 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t _Filter_vecPosition_1 = { 0, 0, 0 };
 			vr::HmdVector3d_t _FilterOld_vecPosition_1 = { 0, 0, 0 };
 			vr::HmdVector3d_t _FilterOld_vecPosition_2 = { 0, 0, 0 };
-
-			//vr::HmdVector3d_t _Filter_vecPosition_2 = { 0, 0, 0 };
-			//vr::HmdVector3d_t _Filter_vecPosition_3 = { 0, 0, 0 };
-			vr::HmdVector3d_t _LastPoseRAW = { 0, 0, 0 };
 
 			vr::HmdVector3d_t _motionCompensationRefPosVel = { 0, 0, 0 };
 			vr::HmdVector3d_t _motionCompensationRefPosAcc = { 0, 0, 0 };
