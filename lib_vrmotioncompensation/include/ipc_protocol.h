@@ -96,6 +96,7 @@ namespace vrmotioncompensation
 			uint32_t clientId;
 			uint32_t messageId;			// Used to associate with Reply
 			double LPFBeta;
+			uint32_t samples;
 		};
 
 		struct Request_DebugLogger_Settings

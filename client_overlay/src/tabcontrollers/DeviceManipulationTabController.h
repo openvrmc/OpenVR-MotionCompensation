@@ -38,6 +38,7 @@ namespace motioncompensation
 
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
+		uint32_t samples = 100;
 
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
 		QString debugModeButtonString;
@@ -68,11 +69,13 @@ namespace motioncompensation
 		Q_INVOKABLE int getDeviceState(unsigned index);
 		Q_INVOKABLE int getDeviceMode(unsigned index);
 		Q_INVOKABLE double getLPFBeta();
+		Q_INVOKABLE unsigned getSamples();
 		Q_INVOKABLE void setTrackerArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE void setHMDArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE int getTrackerDeviceID(unsigned ArrayID);
 		Q_INVOKABLE int getHMDDeviceID(unsigned ArrayID);
 		Q_INVOKABLE void increaseLPFBeta(double value);
+		Q_INVOKABLE void increaseSamples(int value);
 
 		void reloadMotionCompensationSettings();
 		void saveMotionCompensationSettings();
@@ -80,10 +83,11 @@ namespace motioncompensation
 		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
 
 		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
-		Q_INVOKABLE bool setLPFBeta(double value);		
+		Q_INVOKABLE bool setLPFBeta(double value);	
+		Q_INVOKABLE bool setSamples(unsigned value);
 		Q_INVOKABLE bool setDebugMode(bool TestForStandby);
 		Q_INVOKABLE QString getDebugModeButtonText();
-		Q_INVOKABLE bool sendLPFBeta();
+		Q_INVOKABLE bool sendMCSettings();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 	public slots:

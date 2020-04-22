@@ -10,7 +10,7 @@ MyStackViewPage
 {
     id: devicePage
     width: 1200
-    height: 800
+    height: 840
     headerText: "OpenVR Motion Compensation"
     headerShowBackButton: false
 
@@ -180,7 +180,7 @@ MyStackViewPage
                     {
                         if (!DeviceManipulationTabController.setLPFBeta(val.toFixed(4)))
                         {
-                            deviceManipulationMessageDialog.showMessage("LPF Beta value", "Could not set new value: " + DeviceManipulationTabController.getDeviceModeErrorString())
+                            deviceManipulationMessageDialog.showMessage("LPF Beta value", "Could not set new value:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                         }
                     }
                     text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
@@ -228,6 +228,82 @@ MyStackViewPage
             }
         }
 
+        RowLayout
+        {
+            MyText
+            {
+                text: "EMA Samples:"
+            }
+
+            Item
+            {
+                Layout.preferredWidth: 192
+            }
+
+            MyTextField
+            {
+                id: samplesInputField
+                text: "100"
+                keyBoardUID: 20
+                Layout.preferredWidth: 140
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                horizontalAlignment: Text.AlignHCenter
+                function onInputEvent(input)
+                {
+                    var val = parseInt(input)
+                    if (!isNaN(val))
+                    {
+                        if (!DeviceManipulationTabController.setSamples(val))
+                        {
+                            deviceManipulationMessageDialog.showMessage("Samples", "Could not set new value:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                        }
+                    }
+                    text = DeviceManipulationTabController.getSamples()
+                }
+            }
+
+            Item
+            {
+                Layout.preferredWidth: 10
+            }
+
+            MyPushButton
+            {
+                id: samplesIncreaseButton
+                Layout.preferredWidth: 45
+                enabled: false
+                text: "+"
+                onClicked:
+                {
+                    DeviceManipulationTabController.increaseSamples(5);
+                }
+            }
+
+            Item
+            {
+                Layout.preferredWidth: 10
+            }
+
+            MyPushButton
+            {
+                id: samplesDecreaseButton
+                Layout.preferredWidth: 45
+                enabled: false
+                text: "-"
+                onClicked:
+                {
+                    DeviceManipulationTabController.increaseSamples(-5);
+                }
+            }
+
+            MyText
+            {
+                Layout.leftMargin: 40
+                text: "2 < samples"
+            }
+        }
+
         //Apply button
         RowLayout
         {
@@ -244,9 +320,9 @@ MyStackViewPage
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
-                    if (!DeviceManipulationTabController.sendLPFBeta())
+                    if (!DeviceManipulationTabController.sendMCSettings())
                     {
-                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send LPF Beta:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
+                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send Settings:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
                     if (!DeviceManipulationTabController.setDebugMode(true))
                     {
@@ -314,6 +390,7 @@ MyStackViewPage
         {
             appVersionText.text = OverlayController.getVersionString()
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            samplesInputField.text = DeviceManipulationTabController.getSamples()
         }
 
         Connections
@@ -334,6 +411,7 @@ MyStackViewPage
             onSettingChanged:
             {
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+                samplesInputField.text = DeviceManipulationTabController.getSamples()
             }
             onDebugModeChanged:
             {
@@ -418,6 +496,8 @@ MyStackViewPage
             referenceTrackerIdentifyButton.enabled = false
             lpfBetaIncreaseButton.enabled = false
             lpfBetaDecreaseButton.enabled = false
+            samplesIncreaseButton.enabled = false
+            samplesDecreaseButton.enabled = false
         }
         else
         {
@@ -426,6 +506,8 @@ MyStackViewPage
             referenceTrackerIdentifyButton.enabled = true
             lpfBetaIncreaseButton.enabled = true
             lpfBetaDecreaseButton.enabled = true
+            samplesIncreaseButton.enabled = true
+            samplesDecreaseButton.enabled = true
 
             //Select a valid index
             if (oldHMDIndex >= 0 && oldHMDIndex < hmdCount)

@@ -46,7 +46,7 @@ namespace vrmotioncompensation
 				return _motionCompensationMode;
 			}
 
-			void setAlpha(double samples);
+			void setAlpha(uint32_t samples);
 
 			void setLPFBeta(double NewBeta)
 			{

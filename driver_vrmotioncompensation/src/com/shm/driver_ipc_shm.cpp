@@ -292,8 +292,12 @@ namespace vrmotioncompensation
 									auto serverDriver = ServerDriver::getInstance();
 									if (serverDriver)
 									{
-										LOG(INFO) << "Setting driver motion compensation properties: LPF_Beta = " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
+										LOG(INFO) << "Setting driver motion compensation properties:";
+										LOG(INFO) << "LPF_Beta: " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
+										LOG(INFO) << "samples: " << message.msg.dm_SetMotionCompensationProperties.samples;
+										LOG(INFO) << "End of property listing";
 										serverDriver->motionCompensation().setLPFBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
+										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}

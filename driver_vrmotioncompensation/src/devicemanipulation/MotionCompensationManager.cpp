@@ -110,10 +110,10 @@ namespace vrmotioncompensation
 			_motionCompensationZeroPoseValid = false;
 		}
 
-		void MotionCompensationManager::setAlpha(double samples)
+		void MotionCompensationManager::setAlpha(uint32_t samples)
 		{
 			_samples = samples;
-			_alpha = 2.0 / (1.0 + samples);
+			_alpha = 2.0 / (1.0 + (double)samples);
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()
@@ -153,7 +153,7 @@ namespace vrmotioncompensation
 
 			// Position
 			// Add a exponential median average filter
-			if (_samples >= 100)
+			if (_samples >= 10)
 			{
 				_Filter_vecPosition_1.v[0] = EMA(pose.vecPosition[0], 0);
 				_Filter_vecPosition_1.v[1] = EMA(pose.vecPosition[1], 1);
@@ -354,14 +354,14 @@ namespace vrmotioncompensation
 
 			double NewVelocity = 0.0;
 
-			if (vecPosition[i] - _LastPoseRAW.v[i] != 0)
+			/*if (vecPosition[i] - _LastPoseRAW.v[i] != 0)
 			{
 				NewVelocity = vecVelocity[i] * ((std::abs(_Filter_vecPosition_3.v[i] - _LastPoseRAW.v[i])) / std::abs((vecPosition[i] - _LastPoseRAW.v[i])));
 			}
 			else
 			{
 				NewVelocity = vecVelocity[i];
-			}
+			}*/
 
 			return NewVelocity;
 		}

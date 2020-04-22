@@ -223,6 +223,11 @@ namespace motioncompensation
 		return LPFBeta;
 	}
 
+	unsigned DeviceManipulationTabController::getSamples()
+	{
+		return samples;
+	}
+
 	void DeviceManipulationTabController::setTrackerArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
@@ -275,14 +280,27 @@ namespace motioncompensation
 		emit settingChanged();
 	}
 
+	void DeviceManipulationTabController::increaseSamples(int value)
+	{
+		samples += value;
+
+		if (samples <= 2)
+		{
+			samples = 2;
+		}
+
+		emit settingChanged();
+	}
+
 	void DeviceManipulationTabController::reloadMotionCompensationSettings()
 	{
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
 		LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
+		samples = settings->value("motionCompensationSamples", 100).toUInt();
 		settings->endGroup();
 
-		LOG(INFO) << "Loading Data; LPF Beta: " << LPFBeta;
+		LOG(INFO) << "Loading Data; LPF Beta: " << LPFBeta << "; samples: " << samples;
 	}
 
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
@@ -291,6 +309,7 @@ namespace motioncompensation
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
 		settings->setValue("motionCompensationLPFBeta", LPFBeta);
+		settings->setValue("motionCompensationSamples", samples);
 		settings->endGroup();
 		settings->sync();
 	}
@@ -420,12 +439,12 @@ namespace motioncompensation
 		return true;
 	}
 
-	bool DeviceManipulationTabController::sendLPFBeta()
+	bool DeviceManipulationTabController::sendMCSettings()
 	{
 		try
 		{
-			LOG(INFO) << "Sending LPF Beta value: " << LPFBeta;
-			parent->vrMotionCompensation().setLPFBeta(LPFBeta);
+			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << LPFBeta << "; samples: " << samples;
+			parent->vrMotionCompensation().setMoticonCompensationSettings(LPFBeta, samples);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -471,6 +490,20 @@ namespace motioncompensation
 		}
 
 		LPFBeta = value;		
+
+		return true;
+	}
+
+	bool DeviceManipulationTabController::setSamples(unsigned value)
+	{
+		// A few checks if the user input is valid
+		if (value <= 1)
+		{
+			m_deviceModeErrorString = "Samples cannot be lower than 2";
+			return false;
+		}
+
+		samples = value;
 
 		return true;
 	}
