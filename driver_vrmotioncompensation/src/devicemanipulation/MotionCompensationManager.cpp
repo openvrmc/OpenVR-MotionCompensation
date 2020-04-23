@@ -175,7 +175,6 @@ namespace vrmotioncompensation
 			// Rotation
 			if (LPF_Beta < 1.0)
 			{
-				// Add a simple low pass filter
 				// 1st stage
 				_Filter_rotPosition_1 = lowPassFilterQuaternion(pose.qRotation, _Filter_rotPosition_1);
 
@@ -227,13 +226,10 @@ namespace vrmotioncompensation
 			vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
 			vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
-			//_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecVelocity[0], pose.vecVelocity[1], pose.vecVelocity[2] });
-			//_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularVelocity[0], pose.vecAngularVelocity[1], pose.vecAngularVelocity[2] });
+
 			_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
 			_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
 
-			//_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAcceleration[0], pose.vecAcceleration[1], pose.vecAcceleration[2] });
-			//_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, { pose.vecAngularAcceleration[0], pose.vecAngularAcceleration[1], pose.vecAngularAcceleration[2] });
 			_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecAcceleration);
 			_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularAcceleration);
 			
