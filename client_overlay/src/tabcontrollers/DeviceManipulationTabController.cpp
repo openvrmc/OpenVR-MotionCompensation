@@ -415,7 +415,7 @@ namespace motioncompensation
 				} break;
 				default:
 				{
-					m_deviceModeErrorString = "Unknown error";
+					m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
 				} break;
 			}
 			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
@@ -458,7 +458,7 @@ namespace motioncompensation
 				} break;
 				default:
 				{
-					m_deviceModeErrorString = "Unknown error";					
+					m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
 				} break;
 
 				LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
