@@ -315,8 +315,10 @@ namespace motioncompensation
 	}
 
 	// Enables or disables the motion compensation for the selected device
-	bool DeviceManipulationTabController::setMotionCompensationMode(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify*/)
+	bool DeviceManipulationTabController::setMotionCompensationMode(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation, bool setZero)
 	{
+		setZeroMode = setZero;
+
 		// A few checks if the user input is valid
 		if (MCindex < 0)
 		{
@@ -443,8 +445,8 @@ namespace motioncompensation
 	{
 		try
 		{
-			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << LPFBeta << "; samples: " << samples;
-			parent->vrMotionCompensation().setMoticonCompensationSettings(LPFBeta, samples);
+			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << LPFBeta << "; samples: " << samples << "; ZeroMode: " << setZeroMode;
+			parent->vrMotionCompensation().setMoticonCompensationSettings(LPFBeta, samples, setZeroMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -497,9 +499,9 @@ namespace motioncompensation
 	bool DeviceManipulationTabController::setSamples(unsigned value)
 	{
 		// A few checks if the user input is valid
-		if (value <= 1)
+		if (value < 1)
 		{
-			m_deviceModeErrorString = "Samples cannot be lower than 2";
+			m_deviceModeErrorString = "Samples cannot be lower than 1";
 			return false;
 		}
 
@@ -603,20 +605,20 @@ namespace motioncompensation
 		return m_deviceModeErrorString;
 	}
 
-	bool DeviceManipulationTabController::updateDeviceInfo(unsigned index)
+	bool DeviceManipulationTabController::updateDeviceInfo(unsigned OpenVRId)
 	{
 		bool retval = false;
 
-		/*if (index < deviceInfos.size())
+		if (OpenVRId < deviceInfos.size())
 		{
 			try
 			{
 				vrmotioncompensation::DeviceInfo info;
 
-				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[index]->openvrId, info);
-				if (deviceInfos[index]->deviceMode != info.deviceMode)
+				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[OpenVRId]->openvrId, info);
+				if (deviceInfos[OpenVRId]->deviceMode != info.deviceMode)
 				{
-					deviceInfos[index]->deviceMode = info.deviceMode;
+					deviceInfos[OpenVRId]->deviceMode = info.deviceMode;
 					retval = true;
 				}
 			}
@@ -624,7 +626,7 @@ namespace motioncompensation
 			{
 				LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 			}
-		}*/
+		}
 
 		return retval;
 	}

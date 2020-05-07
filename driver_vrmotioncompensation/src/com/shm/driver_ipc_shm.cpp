@@ -277,6 +277,7 @@ namespace vrmotioncompensation
 										LOG(INFO) << "End of property listing";
 										serverDriver->motionCompensation().setLPFBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
 										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
+										serverDriver->motionCompensation().setZeroMode(message.msg.dm_SetMotionCompensationProperties.setZero);
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}

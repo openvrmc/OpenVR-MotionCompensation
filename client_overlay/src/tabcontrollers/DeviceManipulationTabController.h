@@ -39,6 +39,7 @@ namespace motioncompensation
 		vrmotioncompensation::MotionCompensationMode motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 		double LPFBeta = 0.2;
 		uint32_t samples = 100;
+		bool setZeroMode = false;
 
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
 		QString debugModeButtonString;
@@ -80,9 +81,9 @@ namespace motioncompensation
 		void reloadMotionCompensationSettings();
 		void saveMotionCompensationSettings();
 
-		Q_INVOKABLE bool updateDeviceInfo(unsigned index);
+		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
 
-		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation/*, bool notify = true*/);
+		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation, bool setZero);
 		Q_INVOKABLE bool setLPFBeta(double value);	
 		Q_INVOKABLE bool setSamples(unsigned value);
 		Q_INVOKABLE bool setDebugMode(bool TestForStandby);

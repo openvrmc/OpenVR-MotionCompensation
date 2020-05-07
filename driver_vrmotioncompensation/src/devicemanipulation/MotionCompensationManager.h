@@ -68,6 +68,11 @@ namespace vrmotioncompensation
 				return RTdeviceID;
 			}
 
+			void setZeroMode(bool setZero)
+			{
+				ZeroMode = setZero;
+			}
+
 			bool _isMotionCompensationZeroPoseValid();
 			
 			void _setMotionCompensationZeroPose(const vr::DriverPose_t& pose);
@@ -112,6 +117,7 @@ namespace vrmotioncompensation
 			double LPF_Beta = 0.2;
 			double _alpha = -1.0;
 			uint32_t _samples = 100;
+			bool ZeroMode = false;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			

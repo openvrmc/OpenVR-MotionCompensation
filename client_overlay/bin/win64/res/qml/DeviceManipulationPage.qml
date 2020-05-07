@@ -10,7 +10,7 @@ MyStackViewPage
 {
     id: devicePage
     width: 1200
-    height: 840
+    height: 800
     headerText: "OpenVR Motion Compensation"
     headerShowBackButton: false
 
@@ -27,12 +27,12 @@ MyStackViewPage
     }
     content: ColumnLayout
     {
-        spacing: 18
+        spacing: 12
 
         //HMD
         RowLayout
         {
-            spacing: 38
+            spacing: 40
 
             MyText
             {
@@ -51,7 +51,8 @@ MyStackViewPage
                 {
 					if (currentIndex >= 0)
                     {
-						//DeviceManipulationTabController.updateDeviceInfo(currentIndex);
+						var openVRId = DeviceManipulationTabController.getTrackerDeviceID(currentIndex)
+                        DeviceManipulationTabController.updateDeviceInfo(openVRId)
 						fetchHMDInfo()
                     }
                 }
@@ -97,7 +98,9 @@ MyStackViewPage
                 {
                     if (currentIndex >= 0)
                     {
-                        //DeviceManipulationTabController.updateDeviceInfo(currentIndex);
+                    
+                        var openVRId = DeviceManipulationTabController.getTrackerDeviceID(currentIndex)
+                        DeviceManipulationTabController.updateDeviceInfo(openVRId)
                         fetchTrackerInfo()
                     }
                 }
@@ -148,6 +151,26 @@ MyStackViewPage
             CheckBox
             {
                 id: enableMotionCompensationCheckBox
+            }
+        }
+
+        //Set Vel/Acc to zero
+        RowLayout
+        {
+        spacing: 18
+            MyText
+            {
+                text: "Set Vel + Acc to zero:"
+            }
+
+            Item
+            {
+                Layout.preferredWidth: 78
+            }
+
+            CheckBox
+            {
+                id: setZeroCheckBox
             }
         }
 
@@ -311,12 +334,13 @@ MyStackViewPage
             {
                 id: deviceModeApplyButton
                 Layout.preferredWidth: 200
+                Layout.topMargin: 20
                 Layout.bottomMargin: 35
                 enabled: false
                 text: "Apply"
                 onClicked:
                 {
-                    if (!DeviceManipulationTabController.setMotionCompensationMode(hmdSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked))
+                    if (!DeviceManipulationTabController.setMotionCompensationMode(hmdSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked, setZeroCheckBox.checked))
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
@@ -333,7 +357,7 @@ MyStackViewPage
         }
 
         //Debug Mode
-        RowLayout
+        /*RowLayout
         {
             spacing: 18
 
@@ -362,8 +386,7 @@ MyStackViewPage
                     }
                 }
             }
-        }
-
+        }*/
         Item
         {
             Layout.fillWidth: true

@@ -387,7 +387,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool modal)
+	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, bool modal)
 	{
 		if (_ipcServerQueue)
 		{
@@ -398,6 +398,7 @@ namespace vrmotioncompensation
 			message.msg.dm_SetMotionCompensationProperties.messageId = 0;
 			message.msg.dm_SetMotionCompensationProperties.LPFBeta = LPF_Beta;
 			message.msg.dm_SetMotionCompensationProperties.samples = samples;
+			message.msg.dm_SetMotionCompensationProperties.setZero = setZero;
 
 			if (modal)
 			{
