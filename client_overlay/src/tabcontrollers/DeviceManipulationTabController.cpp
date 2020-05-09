@@ -305,7 +305,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
 	{
-		LOG(INFO) << "Saving Data; LPF Beta: " << LPFBeta;
+		LOG(INFO) << "Saving Data; LPF Beta: " << LPFBeta << ", samples: " << samples;
 		auto settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
 		settings->setValue("motionCompensationLPFBeta", LPFBeta);
