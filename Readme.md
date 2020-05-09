@@ -22,7 +22,6 @@ This is a work-in-progress and may contain bugs.
 
 ## Current development focus:
 - Add a "Reset Zero Pose" Button
-- Fix "Status" not working
 - Fix "Identify" not working
 
 ## Planned for the future:
@@ -48,7 +47,9 @@ There are two ways to open the settings page:
 - **Status**: Shows the current status of the selected tracker / controller.
 - **Identify**: Sends a haptic pulse to the selected device (not working in v0.2.0)
 - **Enable Motion Compensation**: Enable motion compensation with the selected devices.
-- **LPF Beta value**: Filter setting. Need to be between 0 and 1. Use the +- Buttons to incread / decrease in 0.05 Steps.
+- **Set Zero**: Set all Velocity and Acceleration values to zero that are send to the HMD.
+- **LPF Beta value**: Filter setting for rotation. Needs to be between 0 and 1. Set to 1 to disable. Use the +- Buttons to incread / decrease in 0.05 steps.
+- **Samples**: Filter setting for xyz. . Use the +- Buttons to incread / decrease in 50 steps.
 - **Apply**: Apply the choosen settings.
 
 
@@ -58,11 +59,14 @@ Values must be between 0 and 1. The number is the rate at which the filter follo
 A low filter-value will filter vibrations better, but you will notice a swimming or lagging picture, as it takes time for the filter to adapt to the real value.<br>
 You have to find the sweet spot for your setup. A good starting point is 0.2 for Lighthouse-Tracked devices.<br>
 
+## Samples:
+
+A higher value will filter vibrations better, but you will notice a swimming or lagging picture if it is too high. Go with +-50 steps and tune from there.<br>
 
 ## Mounting advice:
 
-Mount the reference tracker/controller as closely to the head position as possible. The further away it is from the head position the larger the error.
-Continuous and heavy vibration will affect the IMU performance, causing noticable IMU drift. This will be noticable in the HMD in form of your camera moving violently arround the vehicle. To adress this, it is suggested to use a damping system.
+Mount the reference tracker/controller as closely to the head position as possible. The further away it is from the head position the larger the error.<br>
+Continuous and heavy vibration will affect the IMU performance, causing noticable IMU drift. This will be noticable in the HMD in form of your camera moving violently arround the vehicle. To adress this, it is suggested to use a damping system.<br>
 
 
 # Initial Setup
