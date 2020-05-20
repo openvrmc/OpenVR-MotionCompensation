@@ -23,6 +23,7 @@ This is a work-in-progress and may contain bugs.
 ## Current development focus:
 - Add a "Reset Zero Pose" Button
 - Fix "Identify" not working
+- Add FlyPT Mover as reference source
 
 ## Planned for the future:
 - Add posibility to set an offset to make it possible to mount the tracker anywhere on the rig.
@@ -30,10 +31,21 @@ This is a work-in-progress and may contain bugs.
 
 # How to use
 
+## Tracker Mounting:
+
+Mount the reference tracker/controller as closely to the head position as possible. The further away it is from the head position the larger the error.<br>
+Continuous and heavy vibration will affect the IMU performance, causing noticable IMU drift. This will be noticable in the HMD in form of your camera moving violently arround. To adress this, it is suggested to use a damping system.<br>
+
+
+## Download and Install
+Download the latest version and install it. No additional steps needed!<br>
+Windows Defender might pop up with "unknown publisher" message. If you don't want to take this risk, you can of course compile it from source by yourself.
+
+
 ## Open settings
 
 There are two ways to open the settings page:
-1. In VR, open the Steam Dashboard (Menu button on the controller). In the bottom left is a new icon, a small cogwheel. Click on this icon to bring up the OVRMC overlay 
+1. In VR, open the Steam Dashboard (Menu button on the controller). In the bottom left is a new icon, a small cogwheel. Click on this icon to bring up the OVRMC overlay
 2. Go to the install folder and click on "startdesktopmode.bat". This will open OVRMC on your regular desktop.
 
 
@@ -42,15 +54,15 @@ There are two ways to open the settings page:
 ![Root Page](docs/screenshots/DeviceManipulationPage.png)
 
 - **HMD**: Choose the HMD you use (usaly only one should appear)
-- **Status**: Shows the current status of the selected HMD. (not working in v0.2.0)
+- **Status**: Shows the current status of the selected HMD.
 - **Reference Tracker**: Choose the tracker / controller you want to use as reference.
 - **Status**: Shows the current status of the selected tracker / controller.
-- **Identify**: Sends a haptic pulse to the selected device (not working in v0.2.0)
+- **Identify**: Sends a haptic pulse to the selected device. (Does not work in current version)
 - **Enable Motion Compensation**: Enable motion compensation with the selected devices.
-- **Set Zero**: Set all Velocity and Acceleration values to zero that are send to the HMD.
+- **Set Zero**: Set all Velocity and Acceleration values to zero that are send to the HMD. This might help with rendering issues, specialy with Oculus HMDs.
 - **LPF Beta value**: Filter setting for rotation. Needs to be between 0 and 1. Set to 1 to disable. Use the +- Buttons to incread / decrease in 0.05 steps.
-- **Samples**: Filter setting for xyz. . Use the +- Buttons to incread / decrease in 50 steps.
-- **Apply**: Apply the choosen settings.
+- **Samples**: Filter setting for xyz. Use the +- Buttons to incread / decrease by 50.
+- **Apply**: Apply the choosen settings. Also sets the reference pose.
 
 
 ## LPF Beta value:
@@ -63,10 +75,6 @@ You have to find the sweet spot for your setup. A good starting point is 0.2 for
 
 A higher value will filter vibrations better, but you will notice a swimming or lagging picture if it is too high. Go with +-50 steps and tune from there.<br>
 
-## Mounting advice:
-
-Mount the reference tracker/controller as closely to the head position as possible. The further away it is from the head position the larger the error.<br>
-Continuous and heavy vibration will affect the IMU performance, causing noticable IMU drift. This will be noticable in the HMD in form of your camera moving violently arround the vehicle. To adress this, it is suggested to use a damping system.<br>
 
 
 # Initial Setup

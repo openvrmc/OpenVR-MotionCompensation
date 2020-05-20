@@ -9,6 +9,8 @@
 #include <boost/timer/timer.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/system_clocks.hpp>
+#include <boost/interprocess/windows_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 // driver namespace
 namespace vrmotioncompensation
@@ -103,8 +105,14 @@ namespace vrmotioncompensation
 
 			const double AngleDifference(double angle1, double angle2);
 
+			vr::HmdVector3d_t Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point);
+
+			vr::HmdVector3d_t Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t centerOfRotation, vr::HmdVector3d_t point);
+
 		private:
 			ServerDriver* m_parent;
+
+			boost::interprocess::windows_shared_memory _shdmem;
 
 			int MCdeviceID = -1;
 			int RTdeviceID = -1;
@@ -122,6 +130,9 @@ namespace vrmotioncompensation
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
 			
+			// Offset data
+			vr::HmdVector3d_t _HMDoffset = { 0, 0, 0 };
+
 			// Zero position
 			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };;
 			vr::HmdQuaternion_t _motionCompensationZeroRot = { 1, 0, 0, 0 };;
@@ -146,6 +157,9 @@ namespace vrmotioncompensation
 
 			bool _RefPoseValid = false;
 			int _RefPoseValidCounter = 0;
+
+			//vr::HmdVector3d_t _centerOfRotation = { 0, 0, 0 };
+			//vr::HmdVector3d_t _translation = { 0, 0, 0 };
 		};
 	}
 }

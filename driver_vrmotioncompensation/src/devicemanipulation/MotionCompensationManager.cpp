@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 
 // driver namespace
 namespace vrmotioncompensation
@@ -89,6 +90,19 @@ namespace vrmotioncompensation
 				_motionCompensationEnabled = true;
 				
 				setAlpha(_samples);
+			}
+			else if (Mode == MotionCompensationMode::Mover)
+			{
+				try
+				{
+					_shdmem = { boost::interprocess::open_only, "MoverPoseTest", boost::interprocess::read_only };
+					int Zahl[4] = { 1, 43, 41, 19 };
+				}
+				catch (boost::interprocess::interprocess_exception)
+				{
+					LOG(ERROR) << "Could not open shared memory";
+				}
+
 			}
 			else
 			{
@@ -316,6 +330,16 @@ namespace vrmotioncompensation
 					DebugLogger.AddDebugData(pose.qRotation, 2);
 				}
 
+				/*if (_motionCompensationMode == MotionCompensationMode::Mover)
+				{
+					vr::HmdVector3d_t MoverPos = { 0, 0, 0 };
+					vr::HmdVector3d_t MoverRot = { 0, 0, 0 };
+
+					_Filter_vecPosition_1.v[0] = (double)cos(MoverRot.v[0]) * (_HMDoffset.v[0] - MoverPos.v[0]) - (double)sin(MoverRot.v[0]) * (_HMDoffset.v[1] - MoverPos.v[1]) + MoverPos.v[0];
+					_Filter_vecPosition_1.v[1] = (double)sin(MoverRot.v[0]) * (_HMDoffset.v[0] - MoverPos.v[0]) + (double)cos(MoverRot.v[0]) * (_HMDoffset.v[1] - MoverPos.v[1]) + MoverPos.v[1];
+					_Filter_vecPosition_1.v[2] = 0;
+				}*/
+
 				// All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
 				// convert pose from driver space to app space
 				vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
@@ -440,7 +464,7 @@ namespace vrmotioncompensation
 			return NewVelocity;
 		}
 
-		//Low Pass Filter for 3d Vectors
+		// Low Pass Filter for 3d Vectors
 		double MotionCompensationManager::EMA(const double RawData, int Axis)
 		{			
 			_FilterOld_vecPosition_1.v[Axis] += _alpha * (RawData - _FilterOld_vecPosition_1.v[Axis]);
@@ -448,7 +472,7 @@ namespace vrmotioncompensation
 			return 2 * _FilterOld_vecPosition_1.v[Axis] - _FilterOld_vecPosition_2.v[Axis];
 		}
 
-		//Low Pass Filter for 3d Vectors
+		// Low Pass Filter for 3d Vectors
 		vr::HmdVector3d_t MotionCompensationManager::LPF(const double RawData[3], vr::HmdVector3d_t SmoothData)
 		{
 			vr::HmdVector3d_t RetVal;
@@ -460,7 +484,7 @@ namespace vrmotioncompensation
 			return RetVal;
 		}
 
-		//Low Pass Filter for 3d Vectors
+		// Low Pass Filter for 3d Vectors
 		vr::HmdVector3d_t MotionCompensationManager::LPF(vr::HmdVector3d_t RawData, vr::HmdVector3d_t SmoothData)
 		{
 			vr::HmdVector3d_t RetVal;
@@ -472,13 +496,13 @@ namespace vrmotioncompensation
 			return RetVal;
 		}
 
-		//Low Pass Filter for quaternion
+		// Low Pass Filter for quaternion
 		vr::HmdQuaternion_t MotionCompensationManager::lowPassFilterQuaternion(vr::HmdQuaternion_t RawData, vr::HmdQuaternion_t SmoothData)
 		{
 			return Slerp(SmoothData, RawData, LPF_Beta);
 		}
 
-		//Spherical Linear Interpolation for Quaternions
+		// Spherical Linear Interpolation for Quaternions
 		vr::HmdQuaternion_t MotionCompensationManager::Slerp(vr::HmdQuaternion_t q1, vr::HmdQuaternion_t q2, double lambda)
 		{
 			vr::HmdQuaternion_t qr;
@@ -520,7 +544,7 @@ namespace vrmotioncompensation
 			return qr;
 		}
 
-		//Convert Quaternion to Euler Angles in Radians
+		// Convert Quaternion to Euler Angles in Radians
 		vr::HmdVector3d_t MotionCompensationManager::ToEulerAngles(vr::HmdQuaternion_t q)
 		{
 			vr::HmdVector3d_t angles;
@@ -550,11 +574,81 @@ namespace vrmotioncompensation
 			return angles;
 		}
 
-		//Returns the shortest difference between to angles
+		// Returns the shortest difference between to angles
 		const double MotionCompensationManager::AngleDifference(double Raw, double New)
 		{
 			double diff = fmod((New - Raw + (double)180), (double)360) - (double)180;
 			return diff < -(double)180 ? diff + (double)360 : diff;
+		}
+
+		// Calculates the new coordinates of 'point', moved and rotated by VecRotation and VecPosition
+		vr::HmdVector3d_t MotionCompensationManager::Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
+		{
+			// point is the user-input offset to the controller
+			// VecRotation and VecPosition is the current rig-pose
+
+			vr::HmdQuaternion_t quat = vrmath::quaternionFromYawPitchRoll(VecRotation.v[0], VecRotation.v[1], VecRotation.v[2]);
+
+			double n1 = quat.x * 2.f;
+			double n2 = quat.y * 2.f;
+			double n3 = quat.z * 2.f;
+
+			double _n4 = quat.x * n1;
+			double _n5 = quat.y * n2;
+			double _n6 = quat.z * n3;
+			double _n7 = quat.x * n2;
+			double _n8 = quat.x * n3;
+			double _n9 = quat.y * n3;
+			double _n10 = quat.w * n1;
+			double _n11 = quat.w * n2;
+			double _n12 = quat.w * n3;
+			
+			vr::HmdVector3d_t translation = {
+				(1 - (_n5 + _n6)) * VecPosition.v[0] + (_n7 - _n12) * VecPosition.v[1] + (_n8 + _n11) * VecPosition.v[2],
+				(_n7 + _n12) * VecPosition.v[0] + (1 - (_n4 + _n6)) * VecPosition.v[1] + (_n9 - _n10) * VecPosition.v[2],
+				(_n8 - _n11) * VecPosition.v[0] + (_n9 + _n10) * VecPosition.v[1] + (1 - (_n4 + _n5)) * VecPosition.v[2]
+			};
+
+			return {
+				(1.0 - (_n5 + _n6)) * point.v[0] + (_n7 - _n12) * point.v[1] + (_n8 + _n11) * point.v[2] + translation.v[0],
+				(_n7 + _n12) * point.v[0] + (1.0 - (_n4 + _n6)) * point.v[1] + (_n9 - _n10) * point.v[2] + translation.v[1],
+				(_n8 - _n11) * point.v[0] + (_n9 + _n10) * point.v[1] + (1.0 - (_n4 + _n5)) * point.v[2] + translation.v[2]
+			};
+		}
+
+		// 
+		vr::HmdVector3d_t MotionCompensationManager::Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t centerOfRotation, vr::HmdVector3d_t point)
+		{
+			// point is the user-input offset to the controller
+			// VecRotation and VecPosition is the current rig-pose
+
+			vr::HmdQuaternion_t quat = vrmath::quaternionFromYawPitchRoll(VecRotation.v[0], VecRotation.v[1], VecRotation.v[2]);
+
+			double n1 = quat.x * 2.f;
+			double n2 = quat.y * 2.f;
+			double n3 = quat.z * 2.f;
+
+			double _n4 = quat.x * n1;
+			double _n5 = quat.y * n2;
+			double _n6 = quat.z * n3;
+			double _n7 = quat.x * n2;
+			double _n8 = quat.x * n3;
+			double _n9 = quat.y * n3;
+			double _n10 = quat.w * n1;
+			double _n11 = quat.w * n2;
+			double _n12 = quat.w * n3;
+
+			vr::HmdVector3d_t translation = {
+				(1 - (_n5 + _n6)) * (VecPosition.v[0]) + (_n7 - _n12) * (VecPosition.v[1]) + (_n8 + _n11) * (VecPosition.v[2]),
+				(_n7 + _n12) * (VecPosition.v[0]) + (1 - (_n4 + _n6)) * (VecPosition.v[1]) + (_n9 - _n10) * (VecPosition.v[2]),
+				(_n8 - _n11) * (VecPosition.v[0]) + (_n9 + _n10) * (VecPosition.v[1]) + (1 - (_n4 + _n5)) * (VecPosition.v[2])
+			};
+
+			return {
+				(1.0 - (_n5 + _n6)) * (point.v[0] - centerOfRotation.v[0]) + (_n7 - _n12) * (point.v[1] - centerOfRotation.v[1]) + (_n8 + _n11) * (point.v[2] - centerOfRotation.v[2]) + centerOfRotation.v[0] + translation.v[0],
+				(_n7 + _n12) * (point.v[0] - centerOfRotation.v[0]) + (1.0 - (_n4 + _n6)) * (point.v[1] - centerOfRotation.v[1]) + (_n9 - _n10) * (point.v[2] - centerOfRotation.v[2]) + centerOfRotation.v[1] + translation.v[1],
+				(_n8 - _n11) * (point.v[0] - centerOfRotation.v[0]) + (_n9 + _n10) * (point.v[1] - centerOfRotation.v[1]) + (1.0 - (_n4 + _n5)) * (point.v[2] - centerOfRotation.v[2]) + centerOfRotation.v[2] + translation.v[2]
+			};
 		}
 	}
 }
