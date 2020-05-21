@@ -147,10 +147,32 @@ namespace motioncompensation
 
 		return newDeviceAdded;
 	}
-
+	
 	void DeviceManipulationTabController::handleEvent(const vr::VREvent_t&)
 	{
 
+	}
+
+	void DeviceManipulationTabController::reloadMotionCompensationSettings()
+	{
+		auto settings = OverlayController::appSettings();
+		settings->beginGroup("deviceManipulationSettings");
+		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
+		_samples = settings->value("motionCompensationSamples", 100).toUInt();
+		settings->endGroup();
+
+		LOG(INFO) << "Loading Data; LPF Beta: " << _LPFBeta << "; samples: " << _samples;
+	}
+
+	void DeviceManipulationTabController::saveMotionCompensationSettings()
+	{
+		LOG(INFO) << "Saving Data; LPF Beta: " << _LPFBeta << ", samples: " << _samples;
+		auto settings = OverlayController::appSettings();
+		settings->beginGroup("deviceManipulationSettings");
+		settings->setValue("motionCompensationLPFBeta", _LPFBeta);
+		settings->setValue("motionCompensationSamples", _samples);
+		settings->endGroup();
+		settings->sync();
 	}
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()
@@ -218,28 +240,12 @@ namespace motioncompensation
 		}
 	}
 
-	double DeviceManipulationTabController::getLPFBeta()
-	{
-		return LPFBeta;
-	}
-
-	unsigned DeviceManipulationTabController::getSamples()
-	{
-		return samples;
-	}
-
 	void DeviceManipulationTabController::setTrackerArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
 		LOG(DEBUG) << "Set Tracker Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
-
-	void DeviceManipulationTabController::setHMDArrayID(unsigned OpenVRId, unsigned ArrayID)
-	{
-		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
-		LOG(DEBUG) << "Set HMD Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
-	}
-
+	
 	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
 	{
 		//Search for the device ID
@@ -248,8 +254,14 @@ namespace motioncompensation
 		{
 			return search->second;
 		}
-		
+
 		return -1;
+	}
+
+	void DeviceManipulationTabController::setHMDArrayID(unsigned OpenVRId, unsigned ArrayID)
+	{
+		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
+		LOG(DEBUG) << "Set HMD Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
 
 	int DeviceManipulationTabController::getHMDDeviceID(unsigned ArrayID)
@@ -263,61 +275,37 @@ namespace motioncompensation
 
 		return -1;
 	}
-
-	void DeviceManipulationTabController::increaseLPFBeta(double value)
+	
+	bool DeviceManipulationTabController::updateDeviceInfo(unsigned OpenVRId)
 	{
-		LPFBeta += value;
+		bool retval = false;
 
-		if (LPFBeta > 1.0)
+		if (OpenVRId < deviceInfos.size())
 		{
-			LPFBeta = 1.0;
-		}
-		else if (LPFBeta < 0.0)
-		{
-			LPFBeta = 0.0;
-		}
+			try
+			{
+				vrmotioncompensation::DeviceInfo info;
 
-		emit settingChanged();
-	}
-
-	void DeviceManipulationTabController::increaseSamples(int value)
-	{
-		samples += value;
-
-		if (samples <= 2)
-		{
-			samples = 2;
+				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[OpenVRId]->openvrId, info);
+				if (deviceInfos[OpenVRId]->deviceMode != info.deviceMode)
+				{
+					deviceInfos[OpenVRId]->deviceMode = info.deviceMode;
+					retval = true;
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOG(ERROR) << "Exception caught while getting device info: " << e.what();
+			}
 		}
 
-		emit settingChanged();
-	}
-
-	void DeviceManipulationTabController::reloadMotionCompensationSettings()
-	{
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
-		samples = settings->value("motionCompensationSamples", 100).toUInt();
-		settings->endGroup();
-
-		LOG(INFO) << "Loading Data; LPF Beta: " << LPFBeta << "; samples: " << samples;
-	}
-
-	void DeviceManipulationTabController::saveMotionCompensationSettings()
-	{
-		LOG(INFO) << "Saving Data; LPF Beta: " << LPFBeta << ", samples: " << samples;
-		auto settings = OverlayController::appSettings();
-		settings->beginGroup("deviceManipulationSettings");
-		settings->setValue("motionCompensationLPFBeta", LPFBeta);
-		settings->setValue("motionCompensationSamples", samples);
-		settings->endGroup();
-		settings->sync();
+		return retval;
 	}
 
 	// Enables or disables the motion compensation for the selected device
 	bool DeviceManipulationTabController::setMotionCompensationMode(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation, bool setZero)
 	{
-		setZeroMode = setZero;
+		_setZeroMode = setZero;
 
 		// A few checks if the user input is valid
 		if (MCindex < 0)
@@ -387,15 +375,15 @@ namespace motioncompensation
 			if (EnableMotionCompensation)
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode";
-				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 			}
 			else
 			{
 				LOG(INFO) << "Sending Normal Mode";
-				motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;				
+				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;				
 			}
 
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, motionCompensationMode);
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, _motionCompensationMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
@@ -445,8 +433,8 @@ namespace motioncompensation
 	{
 		try
 		{
-			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << LPFBeta << "; samples: " << samples << "; ZeroMode: " << setZeroMode;
-			parent->vrMotionCompensation().setMoticonCompensationSettings(LPFBeta, samples, setZeroMode);
+			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << _LPFBeta << "; samples: " << _samples << "; ZeroMode: " << _setZeroMode;
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -476,7 +464,12 @@ namespace motioncompensation
 
 		return true;
 	}
-
+	
+	QString DeviceManipulationTabController::getDeviceModeErrorString()
+	{
+		return m_deviceModeErrorString;
+	}
+	
 	bool DeviceManipulationTabController::setLPFBeta(double value)
 	{
 		// A few checks if the user input is valid
@@ -491,9 +484,14 @@ namespace motioncompensation
 			return false;
 		}
 
-		LPFBeta = value;		
+		_LPFBeta = value;
 
 		return true;
+	}
+
+	double DeviceManipulationTabController::getLPFBeta()
+	{
+		return _LPFBeta;
 	}
 
 	bool DeviceManipulationTabController::setSamples(unsigned value)
@@ -505,9 +503,52 @@ namespace motioncompensation
 			return false;
 		}
 
-		samples = value;
+		_samples = value;
 
 		return true;
+	}
+
+	unsigned DeviceManipulationTabController::getSamples()
+	{
+		return _samples;
+	}
+
+	void DeviceManipulationTabController::setZeroMode(bool setZero)
+	{
+		_setZeroMode = setZero;
+	}
+
+	bool DeviceManipulationTabController::getZeroMode()
+	{
+		return _setZeroMode;
+	}
+
+	void DeviceManipulationTabController::increaseLPFBeta(double value)
+	{
+		_LPFBeta += value;
+
+		if (_LPFBeta > 1.0)
+		{
+			_LPFBeta = 1.0;
+		}
+		else if (_LPFBeta < 0.0)
+		{
+			_LPFBeta = 0.0;
+		}
+
+		emit settingChanged();
+	}
+
+	void DeviceManipulationTabController::increaseSamples(int value)
+	{
+		_samples += value;
+
+		if (_samples <= 2)
+		{
+			_samples = 2;
+		}
+
+		emit settingChanged();
 	}
 
 	bool DeviceManipulationTabController::setDebugMode(bool TestForStandby)
@@ -517,7 +558,7 @@ namespace motioncompensation
 		int newLoggerStatus = 0;
 
 		// Queue new debug logger state
-		if (TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 1)
+		if (TestForStandby && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 1)
 		{
 			enable = true;
 			newLoggerStatus = 2;
@@ -528,19 +569,19 @@ namespace motioncompensation
 			// return from function if standby mode was not active
 			return true;
 		}
-		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
+		else if (!TestForStandby && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 0)
 		{
 			newLoggerStatus = 1;
 			newButtonText = "Standby...";
 		}
-		else if ((!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
-				 (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
+		else if ((!TestForStandby && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::Disabled && DebugLoggerStatus == 1) ||
+				 (!TestForStandby && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 2))
 		{
 			enable = false;
 			newLoggerStatus = 0;
 			newButtonText = "Start logging";
 		}
-		else if (!TestForStandby && motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
+		else if (!TestForStandby && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker && DebugLoggerStatus == 0)
 		{
 			enable = true;
 			newLoggerStatus = 2;
@@ -598,36 +639,5 @@ namespace motioncompensation
 	QString DeviceManipulationTabController::getDebugModeButtonText()
 	{
 		return debugModeButtonString;
-	}
-
-	QString DeviceManipulationTabController::getDeviceModeErrorString()
-	{
-		return m_deviceModeErrorString;
-	}
-
-	bool DeviceManipulationTabController::updateDeviceInfo(unsigned OpenVRId)
-	{
-		bool retval = false;
-
-		if (OpenVRId < deviceInfos.size())
-		{
-			try
-			{
-				vrmotioncompensation::DeviceInfo info;
-
-				parent->vrMotionCompensation().getDeviceInfo(deviceInfos[OpenVRId]->openvrId, info);
-				if (deviceInfos[OpenVRId]->deviceMode != info.deviceMode)
-				{
-					deviceInfos[OpenVRId]->deviceMode = info.deviceMode;
-					retval = true;
-				}
-			}
-			catch (std::exception& e)
-			{
-				LOG(ERROR) << "Exception caught while getting device info: " << e.what();
-			}
-		}
-
-		return retval;
 	}
 } // namespace motioncompensation

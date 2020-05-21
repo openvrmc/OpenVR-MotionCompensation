@@ -36,6 +36,7 @@ DISTFILES += \
     bin/win64/res/qml/MyDialogOkCancelPopup.qml \
     bin/win64/res/qml/MyDialogOkPopup.qml \
     bin/win64/res/qml/MyOffsetGroupBox.qml \
+    bin/win64/res/qml/MyOffsetGroupBox.qml \
     bin/win64/res/qml/MyPushButton.qml \
     bin/win64/res/qml/MyPushButton2.qml \
     bin/win64/res/qml/MyRangeSlider.qml \
@@ -46,6 +47,7 @@ DISTFILES += \
     bin/win64/res/qml/MyText.qml \
     bin/win64/res/qml/MyTextField.qml \
     bin/win64/res/qml/MyToggleButton.qml \
+    bin/win64/res/qml/SettingsPage.qml \
     bin/win64/res/qml/backarrow.svg \
     bin/win64/res/qml/mainwidget.qml \
     bin/win64/res/qml/qmldir

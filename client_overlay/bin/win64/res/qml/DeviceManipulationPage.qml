@@ -14,7 +14,7 @@ MyStackViewPage
     headerText: "OpenVR Motion Compensation"
     headerShowBackButton: false
 
-    //Generic popup
+    // Generic popup
     MyDialogOkPopup
     {
         id: deviceManipulationMessageDialog
@@ -29,22 +29,26 @@ MyStackViewPage
     {
         spacing: 12
 
-        //HMD
-        RowLayout
+        // HMD
+        GridLayout
         {
-            spacing: 40
+            columns: 3
 
             MyText
             {
+                Layout.preferredWidth: 250
+                Layout.leftMargin: 0
+                Layout.rightMargin: 0
+                horizontalAlignment: Text.AlignLeft
                 text: "HMD:"
             }
 
             MyComboBox
             {
                 id: hmdSelectionComboBox
-                Layout.maximumWidth: 799
-                Layout.minimumWidth: 799
-                Layout.preferredWidth: 799
+                Layout.maximumWidth: 650
+                Layout.minimumWidth: 650
+                Layout.preferredWidth: 650
                 Layout.fillWidth: true
                 model: []
                 onCurrentIndexChanged:
@@ -59,7 +63,7 @@ MyStackViewPage
             }
         }
 
-        //Status device
+        // Status device
         RowLayout
         {
             spacing: 18
@@ -76,22 +80,37 @@ MyStackViewPage
             }
         }
 
-        //Reference tracker
         RowLayout
         {
-            spacing: 18
+            Rectangle
+            {
+                color: "#ffffff"
+                height: 1
+                Layout.fillWidth: true
+            }
+        }
+
+        // Reference tracker
+        GridLayout
+        {
+            columns: 3
 
             MyText
             {
+                Layout.preferredWidth: 250
+                Layout.leftMargin: 0
+                Layout.rightMargin: 0
+                horizontalAlignment: Text.AlignLeft
+
                 text: "Reference Tracker:"
             }
 
             MyComboBox
             {
                 id: referenceTrackerSelectionComboBox
-                Layout.maximumWidth: 660
-                Layout.minimumWidth: 660
-                Layout.preferredWidth: 660
+                Layout.maximumWidth: 650
+                Layout.minimumWidth: 650
+                Layout.preferredWidth: 650
                 Layout.fillWidth: true
                 model: []
                 onCurrentIndexChanged:
@@ -108,6 +127,7 @@ MyStackViewPage
 
             MyPushButton
             {
+                Layout.leftMargin: 10
                 id: referenceTrackerIdentifyButton
                 enabled: hmdSelectionComboBox.currentIndex >= 0
                 Layout.preferredWidth: 194
@@ -121,11 +141,10 @@ MyStackViewPage
             }
         }
 
-        //Status reference tracker
+        // Status reference tracker
         RowLayout
         {
             spacing: 18
-            Layout.bottomMargin: 16
 
             MyText
             {
@@ -139,7 +158,17 @@ MyStackViewPage
             }
         }
 
-        //Enable Motion Compensation checkbox
+        RowLayout
+        {
+            Rectangle
+            {
+                color: "#ffffff"
+                height: 1
+                Layout.fillWidth: true
+            }
+        }
+
+        // Enable Motion Compensation checkbox
         RowLayout
         {
         spacing: 18
@@ -154,182 +183,38 @@ MyStackViewPage
             }
         }
 
-        //Set Vel/Acc to zero
         RowLayout
         {
-        spacing: 18
-            MyText
-            {
-                text: "Set Vel + Acc to zero:"
-            }
-
             Item
             {
-                Layout.preferredWidth: 78
-            }
+                Layout.preferredHeight: 40
 
-            CheckBox
-            {
-                id: setZeroCheckBox
             }
         }
 
-        //LPF Beta Value
-        RowLayout
-        {
-            MyText
-            {
-                text: "LPF Beta value:"
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 178
-            }
-
-            MyTextField
-            {
-                id: lpfBetaInputField
-                text: "0.0000"
-                keyBoardUID: 10
-                Layout.preferredWidth: 140
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
-                horizontalAlignment: Text.AlignHCenter
-                function onInputEvent(input)
-                {
-                    var val = parseFloat(input)
-                    if (!isNaN(val))
-                    {
-                        if (!DeviceManipulationTabController.setLPFBeta(val.toFixed(4)))
-                        {
-                            deviceManipulationMessageDialog.showMessage("LPF Beta value", "Could not set new value:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
-                        }
-                    }
-                    text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
-                }
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 10
-            }
-
-            MyPushButton
-            {
-                id: lpfBetaIncreaseButton
-                Layout.preferredWidth: 45
-                enabled: false
-                text: "+"
-                onClicked:
-                {
-                    DeviceManipulationTabController.increaseLPFBeta(0.01);
-                }
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 10
-            }
-
-            MyPushButton
-            {
-                id: lpfBetaDecreaseButton
-                Layout.preferredWidth: 45
-                enabled: false
-                text: "-"
-                onClicked:
-                {
-                    DeviceManipulationTabController.increaseLPFBeta(-0.01);
-                }
-            }
-
-            MyText
-            {
-                Layout.leftMargin: 40
-                text: "0 < value < 1"
-            }
-        }
 
         RowLayout
         {
-            MyText
-            {
-                text: "EMA Samples:"
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 192
-            }
-
-            MyTextField
-            {
-                id: samplesInputField
-                text: "100"
-                keyBoardUID: 20
-                Layout.preferredWidth: 140
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
-                horizontalAlignment: Text.AlignHCenter
-                function onInputEvent(input)
-                {
-                    var val = parseInt(input)
-                    if (!isNaN(val))
-                    {
-                        if (!DeviceManipulationTabController.setSamples(val))
-                        {
-                            deviceManipulationMessageDialog.showMessage("Samples", "Could not set new value:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
-                        }
-                    }
-                    text = DeviceManipulationTabController.getSamples()
-                }
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 10
-            }
-
+            // Settings button
             MyPushButton
             {
-                id: samplesIncreaseButton
-                Layout.preferredWidth: 45
+                Layout.preferredWidth: 200
+                Layout.topMargin: 20
+                Layout.bottomMargin: 35
                 enabled: false
-                text: "+"
+                text: "Settings"
                 onClicked:
                 {
-                    DeviceManipulationTabController.increaseSamples(5);
+                    var res = mainView.push(settingsPage)
                 }
             }
 
             Item
             {
-                Layout.preferredWidth: 10
+               Layout.preferredWidth: 710
             }
 
-            MyPushButton
-            {
-                id: samplesDecreaseButton
-                Layout.preferredWidth: 45
-                enabled: false
-                text: "-"
-                onClicked:
-                {
-                    DeviceManipulationTabController.increaseSamples(-5);
-                }
-            }
-
-            MyText
-            {
-                Layout.leftMargin: 40
-                text: "2 < samples"
-            }
-        }
-
-        //Apply button
-        RowLayout
-        {
+            // Apply button
             MyPushButton
             {
                 id: deviceModeApplyButton
@@ -356,7 +241,7 @@ MyStackViewPage
             }
         }
 
-        //Debug Mode
+        // Debug Mode
         /*RowLayout
         {
             spacing: 18
@@ -393,7 +278,7 @@ MyStackViewPage
             Layout.fillHeight: true
         }
 
-        //Version number
+        // Version number
         RowLayout
         {
             spacing: 18
@@ -454,7 +339,7 @@ MyStackViewPage
         var hmdCount = 0;
         var trackerCount = 0;
 
-        //Collect all found devices
+        // Collect all found devices
         for (var i = 0; i < deviceCount; i++)
         {
             var openVRId = DeviceManipulationTabController.getOpenVRId(i)
@@ -492,12 +377,12 @@ MyStackViewPage
 
         if (hmdCount < 1 || trackerCount < 1)
         {   
-            //Empty comboboxes
+            // Empty comboboxes
             if (hmdCount < 1)
             {
                 hmdSelectionComboBox.currentIndex = -1
 
-                //Uncheck check box
+                // Uncheck check box
                 enableMotionCompensationCheckBox.checkState = Qt.Unchecked
             }
             else
@@ -524,7 +409,7 @@ MyStackViewPage
         }
         else
         {
-            //Enable buttons
+            // Enable buttons
             deviceModeApplyButton.enabled = true
             referenceTrackerIdentifyButton.enabled = true
             lpfBetaIncreaseButton.enabled = true
@@ -532,7 +417,7 @@ MyStackViewPage
             samplesIncreaseButton.enabled = true
             samplesDecreaseButton.enabled = true
 
-            //Select a valid index
+            // Select a valid index
             if (oldHMDIndex >= 0 && oldHMDIndex < hmdCount)
             {
                 hmdSelectionComboBox.currentIndex = oldHMDIndex
