@@ -35,12 +35,14 @@ MyStackViewPage
                 Layout.fillWidth: true
                 model: [
                     "Reference Tracker",
-                    "Reference Tracker with Offset",
                     "FlyPT Mover with Offset"
                 ]
                 onCurrentIndexChanged:
                 {
-
+                    if (currentIndex >= 0)
+                    {
+                        DeviceManipulationTabController.setMotionCompensationMode(currentIndex)
+                    }
                 }
             }
         }
@@ -64,7 +66,6 @@ MyStackViewPage
                 id: lpfBetaIncreaseButton
                 Layout.leftMargin: 0
                 Layout.preferredWidth: 45
-                enabled: false
                 text: "-"
                 onClicked:
                 {
@@ -99,7 +100,6 @@ MyStackViewPage
             {
                 id: lpfBetaDecreaseButton
                 Layout.preferredWidth: 45
-                enabled: false
                 text: "+"
                 onClicked:
                 {
@@ -133,7 +133,6 @@ MyStackViewPage
                 id: samplesIncreaseButton
                 Layout.leftMargin: 0
                 Layout.preferredWidth: 45
-                enabled: false
                 text: "-"
                 onClicked:
                 {
@@ -168,7 +167,6 @@ MyStackViewPage
             {
                 id: samplesDecreaseButton
                 Layout.preferredWidth: 45
-                enabled: false
                 text: "+"
                 onClicked:
                 {
@@ -337,19 +335,20 @@ MyStackViewPage
             }
         }
 
-        Connections
+		Component.onCompleted:
         {
-            target: DeviceManipulationTabController
-            onDeviceInfoChanged:
-            {
-                if (index == deviceIndex)
-                {
-                    updateDeviceInfo()
-                }
-            }
+            lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+            samplesInputField.text = DeviceManipulationTabController.getSamples()
         }
 
+        Connections
+        {
+            target: DeviceManipulationTabController			
+            onSettingChanged:
+            {
+                lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
+                samplesInputField.text = DeviceManipulationTabController.getSamples()
+            }
+        }
     }
-
 }
-

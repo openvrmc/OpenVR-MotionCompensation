@@ -10,7 +10,7 @@ GroupBox
     property double offsetY: 0.0
     property double offsetZ: 0.0
 
-    property double offsetTranslationStep: 1.0
+    property double offsetTranslationStep: 0.001
 
     property var setTranslationOffset: function(x, y, z) {}
     property var updateValues: function() {}
@@ -18,9 +18,9 @@ GroupBox
 
     function updateGUI()
     {
-        xInputField.text = offsetX.toFixed(1)
-        yInputField.text = offsetY.toFixed(1)
-        zInputField.text = offsetZ.toFixed(1)
+        xInputField.text = offsetX.toFixed(3)
+        yInputField.text = offsetY.toFixed(3)
+        zInputField.text = offsetZ.toFixed(3)
     }
 
     Layout.fillWidth: true
@@ -75,7 +75,7 @@ GroupBox
             MyTextField
             {
                 id: xInputField
-                text: "0.00"
+                text: "0.000"
                 keyBoardUID: 30
                 Layout.preferredWidth: 140
                 Layout.leftMargin: 10
@@ -86,8 +86,9 @@ GroupBox
                     var val = parseFloat(input)
                     if (!isNaN(val))
                     {
-                        setTranslationOffset(val.toFixed(1), offsetY, offsetZ)
-                    } else
+                        setTranslationOffset(val.toFixed(3), offsetY, offsetZ)
+                    }
+                    else
                     {
                         getOffsets()
                     }
@@ -130,7 +131,7 @@ GroupBox
             MyTextField
             {
                 id: yInputField
-                text: "0.00"
+                text: "0.000"
                 keyBoardUID: 31
                 Layout.preferredWidth: 140
                 Layout.leftMargin: 10
@@ -141,8 +142,9 @@ GroupBox
                     var val = parseFloat(input)
                     if (!isNaN(val))
                     {
-                        setTranslationOffset(offsetX, val.toFixed(1), offsetZ)
-                    } else
+                        setTranslationOffset(offsetX, val.toFixed(3), offsetZ)
+                    }
+                    else
                     {
                         getOffsets()
                     }
@@ -185,7 +187,7 @@ GroupBox
             MyTextField
             {
                 id: zInputField
-                text: "0.00"
+                text: "0.000"
                 keyBoardUID: 32
                 Layout.preferredWidth: 140
                 Layout.leftMargin: 10
@@ -196,8 +198,9 @@ GroupBox
                     var val = parseFloat(input)
                     if (!isNaN(val))
                     {
-                        setTranslationOffset(offsetX, offsetY, val.toFixed(1))
-                    } else
+                        setTranslationOffset(offsetX, offsetY, val.toFixed(3))
+                    }
+                    else
                     {
                         getOffsets()
                     }

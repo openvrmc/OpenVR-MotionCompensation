@@ -7,6 +7,7 @@
 #include <vrmotioncompensation.h>
 #include <vrmotioncompensation_types.h>
 #include <vector>
+#include "src/QGlobalShortcut/qglobalshortcut.h"
 
 class QQuickWindow;
 // application namespace
@@ -32,28 +33,38 @@ namespace motioncompensation
 		OverlayController* parent;
 		QQuickWindow* widget;
 
+		// Device and ID storage
 		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;
 		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
 		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
 
-		vrmotioncompensation::MotionCompensationMode _motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
+		// Settings
+		vrmotioncompensation::MotionCompensationMode _motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+		vrmotioncompensation::MotionCompensationMode _motionCompensationModeOldMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 		double _LPFBeta = 0.2;
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
+		vr::HmdVector3d_t _offset = { 0, 0, 0 };
 
+		QGlobalShortcut* shortcutFirst;
+
+		// Debug
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
 		QString debugModeButtonString;
 
+		// Error return string
 		QString m_deviceModeErrorString;
 
-		unsigned settingsUpdateCounter = 0;
-
+		// Threads
 		std::thread identifyThread;
+		unsigned settingsUpdateCounter = 0;
 
 	public:
 		~DeviceManipulationTabController();
 
 		void initStage1();
+
+		void Beenden();
 
 		void initStage2(OverlayController* parent, QQuickWindow* widget);
 
@@ -84,7 +95,7 @@ namespace motioncompensation
 
 		// General functions
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
-		Q_INVOKABLE bool setMotionCompensationMode(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation, bool setZero);		
+		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);		
 		Q_INVOKABLE bool sendMCSettings();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
@@ -100,7 +111,13 @@ namespace motioncompensation
 
 		Q_INVOKABLE void increaseLPFBeta(double value);
 		Q_INVOKABLE void increaseSamples(int value);
-		
+
+		Q_INVOKABLE void setHMDtoRefOffset(double x, double y, double z);
+		Q_INVOKABLE double getHMDtoRefOffset(unsigned axis);
+
+		Q_INVOKABLE void setMotionCompensationMode(unsigned NewMode);
+		Q_INVOKABLE int getMotionCompensationMode();
+
 		// Debug mode
 		Q_INVOKABLE bool setDebugMode(bool TestForStandby);
 		Q_INVOKABLE QString getDebugModeButtonText();

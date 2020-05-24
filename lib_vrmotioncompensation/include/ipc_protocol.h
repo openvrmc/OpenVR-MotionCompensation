@@ -42,7 +42,7 @@ namespace vrmotioncompensation
 			AlreadyInUse,
 			InvalidType,
 			NotFound,
-			TooManyDevices,
+			SharedMemoryError,
 			InvalidVersion,
 			MissingProperty,
 			InvalidOperation,
@@ -98,6 +98,7 @@ namespace vrmotioncompensation
 			double LPFBeta;
 			uint32_t samples;
 			bool setZero;
+			vr::HmdVector3d_t offsets;
 		};
 
 		struct Request_DebugLogger_Settings

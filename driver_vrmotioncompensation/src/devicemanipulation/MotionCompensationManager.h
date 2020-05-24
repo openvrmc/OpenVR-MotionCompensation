@@ -37,7 +37,7 @@ namespace vrmotioncompensation
 
 			void StopDebugData();
 
-			void setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
+			bool setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
 
 			void setNewMotionCompensatedDevice(int MCdevice);
 
@@ -70,9 +70,11 @@ namespace vrmotioncompensation
 				return RTdeviceID;
 			}
 
-			void setZeroMode(bool setZero)
+			void setZeroMode(bool setZero);
+
+			void setOffsets(vr::HmdVector3d_t offsets)
 			{
-				ZeroMode = setZero;
+				_offset = offsets;
 			}
 
 			bool _isMotionCompensationZeroPoseValid();
@@ -91,7 +93,7 @@ namespace vrmotioncompensation
 
 			double rotVelocity(double time, const double vecAngle, const double Old_vecAngle);
 
-			double MotionCompensationManager::EMA(const double RawData, int Axis);
+			double MotionCompensationManager::DEMA(const double RawData, int Axis);
 
 			vr::HmdVector3d_t LPF(const double RawData[3], vr::HmdVector3d_t SmoothData);
 
@@ -106,6 +108,8 @@ namespace vrmotioncompensation
 			const double AngleDifference(double angle1, double angle2);
 
 			vr::HmdVector3d_t Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point);
+
+			vr::HmdVector3d_t Transform(vr::HmdQuaternion_t quat, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point);
 
 			vr::HmdVector3d_t Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t centerOfRotation, vr::HmdVector3d_t point);
 
@@ -125,13 +129,13 @@ namespace vrmotioncompensation
 			double LPF_Beta = 0.2;
 			double _alpha = -1.0;
 			uint32_t _samples = 100;
-			bool ZeroMode = false;
+			bool _SetZeroMode = false;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
 			
 			// Offset data
-			vr::HmdVector3d_t _HMDoffset = { 0, 0, 0 };
+			vr::HmdVector3d_t _offset = { 0, 0, 0 };
 
 			// Zero position
 			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };;

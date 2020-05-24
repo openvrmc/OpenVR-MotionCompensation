@@ -370,6 +370,11 @@ namespace vrmotioncompensation
 					ss << "Device not found";
 					throw vrmotioncompensation_notfound(ss.str(), (int)resp.status);
 				}
+				else if (resp.status == ipc::ReplyStatus::SharedMemoryError)
+				{
+					ss << "MMF could not be opened";
+					throw vrmotioncompensation_sharedmemoryerror(ss.str(), (int)resp.status);
+				}
 				else if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;
@@ -387,7 +392,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, bool modal)
+	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, vr::HmdVector3d_t offsets)
 	{
 		if (_ipcServerQueue)
 		{
@@ -399,45 +404,39 @@ namespace vrmotioncompensation
 			message.msg.dm_SetMotionCompensationProperties.LPFBeta = LPF_Beta;
 			message.msg.dm_SetMotionCompensationProperties.samples = samples;
 			message.msg.dm_SetMotionCompensationProperties.setZero = setZero;
+			message.msg.dm_SetMotionCompensationProperties.offsets = offsets;
 
-			if (modal)
+
+			//Create random message ID
+			uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
+			message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
+
+			//Allocate memory for the reply
+			std::promise<ipc::Reply> respPromise;
+			auto respFuture = respPromise.get_future();
 			{
-				//Create random message ID
-				uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
-				message.msg.dm_SetMotionCompensationProperties.messageId = messageId;
-
-				//Allocate memory for the reply
-				std::promise<ipc::Reply> respPromise;
-				auto respFuture = respPromise.get_future();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
-				}
-
-				//Send message
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
-
-				auto resp = respFuture.get();
-				{
-					std::lock_guard<std::recursive_mutex> lock(_mutex);
-					_ipcPromiseMap.erase(messageId);
-				}
-
-				//If there was an error, notify the user
-				std::stringstream ss;
-				ss << "Error while setting motion compensation mode: ";
-
-				if (resp.status != ipc::ReplyStatus::Ok)
-				{
-					ss << "Error code " << (int)resp.status;
-					throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
-				}
+				std::lock_guard<std::recursive_mutex> lock(_mutex);
+				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
 			}
-			else
+
+			//Send message
+			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
+
+			auto resp = respFuture.get();
 			{
-				_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
-				WRITELOG(INFO, "MC message created sending to driver" << std::endl);
+				std::lock_guard<std::recursive_mutex> lock(_mutex);
+				_ipcPromiseMap.erase(messageId);
+			}
+
+			//If there was an error, notify the user
+			std::stringstream ss;
+			ss << "Error while setting motion compensation mode: ";
+
+			if (resp.status != ipc::ReplyStatus::Ok)
+			{
+				ss << "Error code " << (int)resp.status;
+				throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
 			}
 		}
 		else

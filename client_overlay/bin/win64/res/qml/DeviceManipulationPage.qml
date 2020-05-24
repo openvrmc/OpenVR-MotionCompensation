@@ -117,7 +117,6 @@ MyStackViewPage
                 {
                     if (currentIndex >= 0)
                     {
-                    
                         var openVRId = DeviceManipulationTabController.getTrackerDeviceID(currentIndex)
                         DeviceManipulationTabController.updateDeviceInfo(openVRId)
                         fetchTrackerInfo()
@@ -201,7 +200,6 @@ MyStackViewPage
                 Layout.preferredWidth: 200
                 Layout.topMargin: 20
                 Layout.bottomMargin: 35
-                enabled: false
                 text: "Settings"
                 onClicked:
                 {
@@ -225,7 +223,7 @@ MyStackViewPage
                 text: "Apply"
                 onClicked:
                 {
-                    if (!DeviceManipulationTabController.setMotionCompensationMode(hmdSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked, setZeroCheckBox.checked))
+                    if (!DeviceManipulationTabController.applySettings(hmdSelectionComboBox.currentIndex, referenceTrackerSelectionComboBox.currentIndex, enableMotionCompensationCheckBox.checked))
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
@@ -233,10 +231,10 @@ MyStackViewPage
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send Settings:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
-                    if (!DeviceManipulationTabController.setDebugMode(true))
+                    /*if (!DeviceManipulationTabController.setDebugMode(true))
                     {
                         deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
-                    }
+                    }*/
                 }
             }
         }
@@ -297,8 +295,6 @@ MyStackViewPage
         Component.onCompleted:
         {
             appVersionText.text = OverlayController.getVersionString()
-            lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
-            samplesInputField.text = DeviceManipulationTabController.getSamples()
         }
 
         Connections
@@ -315,11 +311,6 @@ MyStackViewPage
                 {
                     fetchHMDInfo()
                 }
-            }
-            onSettingChanged:
-            {
-                lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
-                samplesInputField.text = DeviceManipulationTabController.getSamples()
             }
             onDebugModeChanged:
             {
@@ -402,20 +393,12 @@ MyStackViewPage
             //Disable buttons
             deviceModeApplyButton.enabled = false
             referenceTrackerIdentifyButton.enabled = false
-            lpfBetaIncreaseButton.enabled = false
-            lpfBetaDecreaseButton.enabled = false
-            samplesIncreaseButton.enabled = false
-            samplesDecreaseButton.enabled = false
         }
         else
         {
             // Enable buttons
             deviceModeApplyButton.enabled = true
             referenceTrackerIdentifyButton.enabled = true
-            lpfBetaIncreaseButton.enabled = true
-            lpfBetaDecreaseButton.enabled = true
-            samplesIncreaseButton.enabled = true
-            samplesDecreaseButton.enabled = true
 
             // Select a valid index
             if (oldHMDIndex >= 0 && oldHMDIndex < hmdCount)

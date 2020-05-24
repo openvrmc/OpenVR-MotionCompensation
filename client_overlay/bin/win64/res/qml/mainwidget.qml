@@ -16,7 +16,7 @@ Rectangle
         stackView: mainView
     }
 
-	property SettingsPage deviceOffsetsPage:  SettingsPage
+	property SettingsPage settingsPage: SettingsPage
 	{
         stackView: mainView
     }

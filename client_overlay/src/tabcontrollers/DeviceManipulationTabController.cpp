@@ -20,6 +20,15 @@ namespace motioncompensation
 	void DeviceManipulationTabController::initStage1()
 	{
 		reloadMotionCompensationSettings();
+
+		shortcutFirst = new QGlobalShortcut(this);
+		connect(shortcutFirst, &QGlobalShortcut::activated, this, &DeviceManipulationTabController::Beenden);
+		shortcutFirst->setShortcut(QKeySequence("Ctrl+E"));
+	}
+
+	void DeviceManipulationTabController::Beenden()
+	{
+		qApp->quit();
 	}
 
 	void DeviceManipulationTabController::initStage2(OverlayController* parent, QQuickWindow* widget)
@@ -303,10 +312,8 @@ namespace motioncompensation
 	}
 
 	// Enables or disables the motion compensation for the selected device
-	bool DeviceManipulationTabController::setMotionCompensationMode(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation, bool setZero)
+	bool DeviceManipulationTabController::applySettings(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation)
 	{
-		_setZeroMode = setZero;
-
 		// A few checks if the user input is valid
 		if (MCindex < 0)
 		{
@@ -314,25 +321,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		if (RTindex < 0)
-		{
-			m_deviceModeErrorString = "Please select a reference tracker";
-			return false;
-		}
-
-		//Search for the device ID
-		auto search = TrackerArrayIdToDeviceId.find(RTindex);
-		if (search != TrackerArrayIdToDeviceId.end())
-		{
-			RTindex = search->second;
-		}
-		else
-		{
-			m_deviceModeErrorString = "Invalid internal reference for RT";
-			return false;
-		}
-
-		search = HMDArrayIdToDeviceId.find(MCindex);
+		auto search = HMDArrayIdToDeviceId.find(MCindex);
 		if (search != HMDArrayIdToDeviceId.end())
 		{
 			MCindex = search->second;
@@ -343,12 +332,48 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got these internal array IDs: HMD: " << MCindex << ", RTindex: " << RTindex;
+		LOG(DEBUG) << "Got these internal array IDs for HMD: " << MCindex;
 
-		if (MCindex == RTindex)
+		// Input validation for tracker - not needed with Mover integration
+		if (_motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
 		{
-			m_deviceModeErrorString = "\"Device\" and \"Reference Tracker\" cannot be the same!";
-			return false;
+			if (RTindex < 0)
+			{
+				m_deviceModeErrorString = "Please select a reference tracker";
+				return false;
+			}
+
+			// Search for the device ID
+			search = TrackerArrayIdToDeviceId.find(RTindex);
+			if (search != TrackerArrayIdToDeviceId.end())
+			{
+				RTindex = search->second;
+			}
+			else
+			{
+				m_deviceModeErrorString = "Invalid internal reference for RT";
+				return false;
+			}
+
+			LOG(DEBUG) << "Got these internal array IDs for Tracker: " << RTindex;
+
+			if (MCindex == RTindex)
+			{
+				m_deviceModeErrorString = "\"Device\" and \"Reference Tracker\" cannot be the same!";
+				return false;
+			}
+
+			if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+			{
+				m_deviceModeErrorString = "\"Reference Tracker\" cannot be a HMD!";
+				return false;
+			}
+
+			if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
+			{
+				m_deviceModeErrorString = "\"Reference Tracker\" is invalid!";
+				return false;
+			}
 		}
 
 		if (deviceInfos[MCindex]->deviceClass != vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
@@ -357,33 +382,34 @@ namespace motioncompensation
 			return false;
 		}
 
-		if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
-		{
-			m_deviceModeErrorString = "\"Reference Tracker\" cannot be a HMD!";
-			return false;
-		}
-
-		if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
-		{
-			m_deviceModeErrorString = "\"Reference Tracker\" is invalid!";
-			return false;
-		}
-
 		try
 		{
-			//Send new settings to the driver.dll
-			if (EnableMotionCompensation)
+			int RT_OVRID = -1;
+
+			vrmotioncompensation::MotionCompensationMode NewMode = _motionCompensationMode;
+
+			// Send new settings to the driver.dll
+			if (EnableMotionCompensation && NewMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
 			{
-				LOG(INFO) << "Sending Motion Compensation Mode";
-				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+				LOG(INFO) << "Sending Motion Compensation Mode: ReferenceTracker";
+			}
+			else if (EnableMotionCompensation && NewMode == vrmotioncompensation::MotionCompensationMode::Mover)
+			{
+				LOG(INFO) << "Sending Motion Compensation Mode: Mover";
 			}
 			else
 			{
-				LOG(INFO) << "Sending Normal Mode";
-				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;				
+				LOG(INFO) << "Sending Motion Compensation Mode: Disabled";
+
+				NewMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 			}
 
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, _motionCompensationMode);
+			if (NewMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker || _motionCompensationModeOldMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
+			{
+				RT_OVRID = deviceInfos[RTindex]->openvrId;
+			}
+
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, RT_OVRID, NewMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
@@ -400,6 +426,10 @@ namespace motioncompensation
 				case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
 				{
 					m_deviceModeErrorString = "Device not found";
+				} break;
+				case (int)vrmotioncompensation::ipc::ReplyStatus::SharedMemoryError:
+				{
+					m_deviceModeErrorString = "MMF could not be opened";
 				} break;
 				default:
 				{
@@ -418,13 +448,9 @@ namespace motioncompensation
 			return false;
 		}
 
-		saveMotionCompensationSettings();
+		_motionCompensationModeOldMode = _motionCompensationMode;
 
-		/*if (notify)
-		{
-			updateDeviceInfo(index);
-			emit deviceInfoChanged(index);
-		}*/
+		saveMotionCompensationSettings();
 
 		return true;
 	}
@@ -433,8 +459,8 @@ namespace motioncompensation
 	{
 		try
 		{
-			LOG(INFO) << "Sending Motion Compensation settings. LPF Beta: " << _LPFBeta << "; samples: " << _samples << "; ZeroMode: " << _setZeroMode;
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);
+			LOG(INFO) << "Sending Motion Compensation settings";
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -549,6 +575,50 @@ namespace motioncompensation
 		}
 
 		emit settingChanged();
+	}
+
+	void DeviceManipulationTabController::setHMDtoRefOffset(double x, double y, double z)
+	{
+		_offset = { x, y, z };
+	}
+
+	double DeviceManipulationTabController::getHMDtoRefOffset(unsigned axis)
+	{
+		return _offset.v[axis];
+	}
+
+	void DeviceManipulationTabController::setMotionCompensationMode(unsigned NewMode)
+	{
+		switch (NewMode)
+		{
+		case 0:
+			_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+			break;
+		case 1:
+			_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Mover;
+			break;
+		default:
+			break;
+		}
+	}
+
+	int DeviceManipulationTabController::getMotionCompensationMode()
+	{
+		switch (_motionCompensationMode)
+		{
+		case vrmotioncompensation::MotionCompensationMode::Disabled:
+			return 0;
+			break;
+		case vrmotioncompensation::MotionCompensationMode::ReferenceTracker:
+			return 0;
+			break;
+		case vrmotioncompensation::MotionCompensationMode::Mover:
+			return 1;
+			break;
+		default:
+			return 0;
+			break;
+		}
 	}
 
 	bool DeviceManipulationTabController::setDebugMode(bool TestForStandby)

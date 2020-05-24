@@ -66,3 +66,4 @@ else:unix: LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
 
 INCLUDEPATH += $$PWD/../openvr/headers
 DEPENDPATH += $$PWD/../openvr/headers
+
