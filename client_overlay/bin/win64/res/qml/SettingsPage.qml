@@ -7,10 +7,32 @@ import ovrmc.motioncompensation 1.0
 MyStackViewPage
 {
     id: settingsPage
+	width: 1200
+	height: 800
     headerText: "Settings"
 
     content: ColumnLayout
     {
+		MyNewKeyBinding
+		{
+			id: keybinding
+			width: 400
+			height: 200
+
+			focus: true
+
+			function showPopup(id)
+			{
+				loadValues(id)
+				open()
+			}
+
+			updateShortcut: function()
+			{
+				refreshButtonText()
+			}
+		}
+
         spacing: 18
 
         GridLayout
@@ -194,8 +216,8 @@ MyStackViewPage
             {
                 var hasChanged = false
 
-                value = DeviceManipulationTabController.getHMDtoRefOffset(0)
-                if (offsetX != value)
+				value = DeviceManipulationTabController.getHMDtoRefOffset(0)
+				if (offsetX != value)
                 {
                     offsetX = value
                     hasChanged = true
@@ -268,7 +290,7 @@ MyStackViewPage
 
         GridLayout
         {
-            columns: 2
+			columns: 3
 
             MyText
             {
@@ -279,23 +301,39 @@ MyStackViewPage
                 text: "Enable / Disable MC:"
             }
 
-            MyTextField
-            {
-                id: hotkeyEnableMCField
-                text: "Palceholder 1"
-                keyBoardUID: 60
-                Layout.preferredWidth: 200
-                horizontalAlignment: Text.AlignHCenter
-                function onInputEvent(input)
-                {
+			MyPushButton
+			{
+				id: btn_enableMC
+				Layout.preferredWidth: 200
+				Layout.topMargin: 0
+				Layout.bottomMargin: 0
+				text: ""
+				onClicked:
+				{
+					keybinding.showPopup(0);
+				}
+			}
 
-                }
-            }
+			MyPushButtonIcon
+			{
+				id: btn_enableMC_Remove
+				Layout.preferredWidth: 45
+				Layout.preferredHeight: 45
+				Layout.leftMargin: 20
+				Layout.topMargin: 0
+				Layout.bottomMargin: 0
+				imagesource : "octicons-trashcan.png"
+				onClicked:
+				{
+					settings.removeKey(0);
+					refreshButtonText();
+				}
+			}
         }
 
         GridLayout
         {
-            columns: 2
+			columns: 3
 
             MyText
             {
@@ -306,18 +344,34 @@ MyStackViewPage
                 text: "Reset Reference Pose:"
             }
 
-            MyTextField
-            {
-                id: hotkeyResetRefPoseField
-                text: "Palceholder 2"
-                keyBoardUID: 61
-                Layout.preferredWidth: 200
-                horizontalAlignment: Text.AlignHCenter
-                function onInputEvent(input)
-                {
+			MyPushButton
+			{
+				id: btn_setZeroPose
+				Layout.preferredWidth: 200
+				Layout.topMargin: 0
+				Layout.bottomMargin: 0
+				text: ""
+				onClicked:
+				{
+					keybinding.showPopup(1);
+				}
+			}
 
-                }
-            }
+			MyPushButtonIcon
+			{
+				id: btn_setZeroPose_Remove
+				Layout.preferredWidth: 45
+				Layout.preferredHeight: 45
+				Layout.leftMargin: 20
+				Layout.topMargin: 0
+				Layout.bottomMargin: 0
+				imagesource : "octicons-trashcan.png"
+				onClicked:
+				{
+					settings.removeKey(1);
+					refreshButtonText();
+				}
+			}
         }
 
         Item
@@ -335,10 +389,17 @@ MyStackViewPage
             }
         }
 
+		function refreshButtonText()
+		{
+			btn_enableMC.text = settings.getModifiers_AsString(0) + settings.getKey_AsString(0);
+			btn_setZeroPose.text = settings.getModifiers_AsString(1) + settings.getKey_AsString(1);
+		}
+
 		Component.onCompleted:
         {
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
             samplesInputField.text = DeviceManipulationTabController.getSamples()
+			refreshButtonText()
         }
 
         Connections

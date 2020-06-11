@@ -29,9 +29,34 @@ namespace motioncompensation
 	{
 		Q_OBJECT
 
+	public:
+		struct ShortcutStruct
+		{
+			Qt::Key key;
+			Qt::KeyboardModifiers modifiers;
+			QGlobalShortcut* shortcut;
+			QString description;
+			void (DeviceManipulationTabController::* method)();
+			QMetaObject::Connection connectionHandler;
+			bool isConnected;
+
+			ShortcutStruct()
+			{
+				key = Qt::Key::Key_unknown;
+				modifiers = 0;
+				shortcut = nullptr;
+				description = "No description provided";
+				method = nullptr;
+				isConnected = false;
+			}
+		};
+
 	private:
 		OverlayController* parent;
 		QQuickWindow* widget;
+
+		// Shortcut realted
+		ShortcutStruct shortcut[2];
 
 		// Device and ID storage
 		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;
@@ -60,6 +85,7 @@ namespace motioncompensation
 		unsigned settingsUpdateCounter = 0;
 
 	public:
+
 		~DeviceManipulationTabController();
 
 		void initStage1();
@@ -77,6 +103,24 @@ namespace motioncompensation
 		void reloadMotionCompensationSettings();
 
 		void saveMotionCompensationSettings();
+
+		// Shortcut related functions
+		void InitShortcuts();
+		void NewShortcut(int id, void (DeviceManipulationTabController::* method)(), QString description);
+		void ConnectShortcut(int id);
+		void DisconnectShortcut(int id);
+
+		Q_INVOKABLE void slotFirst();
+		Q_INVOKABLE void slotSecond();
+		Q_INVOKABLE void newKey(int id, Qt::Key key, Qt::KeyboardModifiers modifier);
+		Q_INVOKABLE void removeKey(int id);
+		Q_INVOKABLE QString getStringFromKey(Qt::Key key);
+		Q_INVOKABLE QString getStringFromModifiers(Qt::KeyboardModifiers key);
+		Q_INVOKABLE Qt::Key getKey_AsKey(int id);
+		Q_INVOKABLE QString getKey_AsString(int id);
+		Q_INVOKABLE Qt::KeyboardModifiers getModifiers_AsModifiers(int id);
+		Q_INVOKABLE QString getModifiers_AsString(int id);
+		Q_INVOKABLE QString getKeyDescription(int id);
 
 		// General getter and setter
 		Q_INVOKABLE unsigned getDeviceCount();

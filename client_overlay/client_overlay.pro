@@ -35,10 +35,12 @@ DISTFILES += \
     bin/win64/res/qml/MyComboBox.qml \
     bin/win64/res/qml/MyDialogOkCancelPopup.qml \
     bin/win64/res/qml/MyDialogOkPopup.qml \
+    bin/win64/res/qml/MyNewKeyBinding.qml \
     bin/win64/res/qml/MyOffsetGroupBox.qml \
     bin/win64/res/qml/MyOffsetGroupBox.qml \
     bin/win64/res/qml/MyPushButton.qml \
     bin/win64/res/qml/MyPushButton2.qml \
+    bin/win64/res/qml/MyPushButtonIcon.qml \
     bin/win64/res/qml/MyRangeSlider.qml \
     bin/win64/res/qml/MyResources.qlm \
     bin/win64/res/qml/MyResources.qml \
@@ -50,6 +52,7 @@ DISTFILES += \
     bin/win64/res/qml/SettingsPage.qml \
     bin/win64/res/qml/backarrow.svg \
     bin/win64/res/qml/mainwidget.qml \
+    bin/win64/res/qml/octicons-trashcan.png \
     bin/win64/res/qml/qmldir
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
@@ -66,4 +69,3 @@ else:unix: LIBS += -L$$PWD/../openvr/lib/win64/ -lopenvr_api
 
 INCLUDEPATH += $$PWD/../openvr/headers
 DEPENDPATH += $$PWD/../openvr/headers
-

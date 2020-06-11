@@ -20,10 +20,6 @@ namespace motioncompensation
 	void DeviceManipulationTabController::initStage1()
 	{
 		reloadMotionCompensationSettings();
-
-		shortcutFirst = new QGlobalShortcut(this);
-		connect(shortcutFirst, &QGlobalShortcut::activated, this, &DeviceManipulationTabController::Beenden);
-		shortcutFirst->setShortcut(QKeySequence("Ctrl+E"));
 	}
 
 	void DeviceManipulationTabController::Beenden()
@@ -182,6 +178,103 @@ namespace motioncompensation
 		settings->setValue("motionCompensationSamples", _samples);
 		settings->endGroup();
 		settings->sync();
+	}
+
+	void DeviceManipulationTabController::InitShortcuts()
+	{
+		NewShortcut(0, &DeviceManipulationTabController::slotFirst, "Enable / Disable Motion Compensation");
+		NewShortcut(1, &DeviceManipulationTabController::slotSecond, "Reset reference zero pose");
+	}
+
+	void DeviceManipulationTabController::NewShortcut(int id, void (DeviceManipulationTabController::* method)(), QString description)
+	{
+		shortcut[id].shortcut = new QGlobalShortcut(this);
+		shortcut[id].description = description;
+		shortcut[id].method = method;
+
+		if (shortcut[id].isConnected)
+		{
+			disconnect(shortcut[id].connectionHandler);
+		}
+
+		ConnectShortcut(id);
+	}
+
+	void DeviceManipulationTabController::ConnectShortcut(int id)
+	{
+		shortcut[id].connectionHandler = connect(shortcut[id].shortcut, &QGlobalShortcut::activated, this, shortcut[id].method);
+		shortcut[id].isConnected = true;
+	}
+
+	void DeviceManipulationTabController::DisconnectShortcut(int id)
+	{
+		disconnect(shortcut[id].connectionHandler);
+		shortcut[id].isConnected = false;
+	}
+
+	void DeviceManipulationTabController::slotFirst()
+	{
+		//qDebug() << "First";
+	}
+
+	void DeviceManipulationTabController::slotSecond()
+	{
+		//qDebug() << "Second";
+	}
+
+	void DeviceManipulationTabController::newKey(int id, Qt::Key key, Qt::KeyboardModifiers modifier)
+	{
+		shortcut[id].key = key;
+		shortcut[id].modifiers = modifier;
+
+		shortcut[id].shortcut->setShortcut(QKeySequence(key + modifier));
+	}
+
+	void DeviceManipulationTabController::removeKey(int id)
+	{
+		shortcut[id].shortcut->unsetShortcut();
+		shortcut[id].key = Qt::Key::Key_unknown;
+		shortcut[id].modifiers = 0;
+	}
+
+	QString DeviceManipulationTabController::getStringFromKey(Qt::Key key)
+	{
+		return QKeySequence(key).toString();
+	}
+
+	QString DeviceManipulationTabController::getStringFromModifiers(Qt::KeyboardModifiers key)
+	{
+		return QKeySequence(key).toString();
+	}
+
+	Qt::Key DeviceManipulationTabController::getKey_AsKey(int id)
+	{
+		return shortcut[id].key;
+	}
+
+	QString DeviceManipulationTabController::getKey_AsString(int id)
+	{
+		if (shortcut[id].shortcut->isEmpty())
+		{
+			return "Empty";
+		}
+
+		return QKeySequence(shortcut[id].key).toString();
+	}
+
+	Qt::KeyboardModifiers DeviceManipulationTabController::getModifiers_AsModifiers(int id)
+	{
+		return shortcut[id].modifiers;
+	}
+
+	QString DeviceManipulationTabController::getModifiers_AsString(int id)
+	{
+		return QKeySequence(shortcut[id].modifiers).toString();
+	}
+
+	QString DeviceManipulationTabController::getKeyDescription(int id)
+	{
+		return shortcut[id].description;
 	}
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()

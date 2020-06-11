@@ -101,6 +101,9 @@
     <None Include="bin\win64\res\qml\SettingsPage.qml">
       <Filter>qml</Filter>
     </None>
+    <None Include="bin\win64\res\qml\MyNewKeyBinding.qml">
+      <Filter>qml</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\logging.h">

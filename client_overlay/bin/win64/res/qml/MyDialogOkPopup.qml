@@ -2,7 +2,8 @@ import QtQuick 2.9
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 
-Popup {
+Popup
+{
     id: myDialogPopup
 
     implicitHeight: parent.height
@@ -13,7 +14,8 @@ Popup {
     property int dialogWidth: 600
     property int dialogHeight: 300
 
-    property Item dialogContentItem: MyText {
+    property Item dialogContentItem: MyText
+	{
         text: dialogText
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -24,13 +26,16 @@ Popup {
 
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
-    background: Rectangle {
+    background: Rectangle
+	{
         color: "black"
         opacity: 0.8
      }
 
-    contentItem: Item {
-        Rectangle {
+    contentItem: Item
+	{
+        Rectangle
+		{
             implicitWidth: dialogWidth
             implicitHeight: dialogHeight
             anchors.centerIn: parent
@@ -38,47 +43,59 @@ Popup {
             color: "#1b2939"
             border.color: "#cccccc"
             border.width: 2
-            ColumnLayout {
+
+            ColumnLayout
+			{
                 anchors.fill: parent
                 anchors.margins: 12
-                MyText {
+                MyText
+				{
                     Layout.leftMargin: 16
                     Layout.rightMargin: 16
                     text: dialogTitle
                 }
-                Rectangle {
+                Rectangle
+				{
                     color: "#cccccc"
                     height: 1
                     Layout.fillWidth: true
                 }
-                Item {
+                Item
+				{
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                 }
-                ColumnLayout {
+                ColumnLayout
+				{
                     id: dialogContent
                 }
-                Item {
+                Item
+				{
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                 }
-                RowLayout {
+                RowLayout
+				{
                     Layout.fillWidth: true
                     Layout.leftMargin: 24
                     Layout.rightMargin: 24
                     Layout.bottomMargin: 12
-                    Item {
+                    Item
+					{
                         Layout.fillWidth: true
                     }
-                    MyPushButton {
+                    MyPushButton
+					{
                         implicitWidth: 200
                         text: "Ok"
-                        onClicked: {
+                        onClicked:
+						{
                             okClicked = true
                             myDialogPopup.close()
                         }
                     }
-                    Item {
+                    Item
+					{
                         Layout.fillWidth: true
                     }
                 }
@@ -86,7 +103,8 @@ Popup {
         }
     }
 
-    Component.onCompleted: {
+    Component.onCompleted:
+	{
         dialogContentItem.parent = dialogContent
     }
 }

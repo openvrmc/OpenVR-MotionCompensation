@@ -138,8 +138,8 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t _offset = { 0, 0, 0 };
 
 			// Zero position
-			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };;
-			vr::HmdQuaternion_t _motionCompensationZeroRot = { 1, 0, 0, 0 };;
+			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };
+			vr::HmdQuaternion_t _motionCompensationZeroRot = { 1, 0, 0, 0 };
 			bool _motionCompensationZeroPoseValid = false;
 			
 			// Reference position

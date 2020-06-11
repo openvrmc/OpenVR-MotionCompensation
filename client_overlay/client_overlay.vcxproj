@@ -210,6 +210,7 @@
     <None Include="bin\win64\res\qml\MyComboBox.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkCancelPopup.qml" />
     <None Include="bin\win64\res\qml\MyDialogOkPopup.qml" />
+    <None Include="bin\win64\res\qml\MyNewKeyBinding.qml" />
     <None Include="bin\win64\res\qml\MyOffsetGroupBox.qml" />
     <None Include="bin\win64\res\qml\MyPushButton.qml" />
     <None Include="bin\win64\res\qml\MyPushButton2.qml" />
