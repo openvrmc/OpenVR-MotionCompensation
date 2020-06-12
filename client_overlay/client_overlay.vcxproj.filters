@@ -7,9 +7,6 @@
     <ClCompile Include="Release\moc_overlaycontroller.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Release\moc_DeviceManipulationTabController.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\tabcontrollers\DeviceManipulationTabController.cpp">
       <Filter>src\tabcontrollers</Filter>
     </ClCompile>
@@ -26,6 +23,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_qglobalshortcut.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_DeviceManipulationTabController.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_DeviceManipulationTabController.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>

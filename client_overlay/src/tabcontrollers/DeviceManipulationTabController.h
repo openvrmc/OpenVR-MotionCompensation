@@ -140,7 +140,7 @@ namespace motioncompensation
 		// General functions
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
 		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);		
-		Q_INVOKABLE bool sendMCSettings();
+		//Q_INVOKABLE bool sendMCSettings();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 		// Settings

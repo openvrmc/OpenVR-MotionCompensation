@@ -9,7 +9,6 @@ namespace vrmotioncompensation
 	{
 		Disabled = 0,
 		ReferenceTracker = 1,
-		Mover = 2,
 	};
 
 	enum class MotionCompensationDeviceMode : uint32_t

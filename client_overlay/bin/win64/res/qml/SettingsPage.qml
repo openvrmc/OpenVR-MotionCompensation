@@ -56,8 +56,7 @@ MyStackViewPage
                 Layout.preferredWidth: 518
                 Layout.fillWidth: true
                 model: [
-                    "Reference Tracker",
-                    "FlyPT Mover with Offset"
+                    "Reference Tracker"
                 ]
                 onCurrentIndexChanged:
                 {

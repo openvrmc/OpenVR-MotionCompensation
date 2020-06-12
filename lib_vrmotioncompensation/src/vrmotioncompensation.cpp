@@ -370,11 +370,6 @@ namespace vrmotioncompensation
 					ss << "Device not found";
 					throw vrmotioncompensation_notfound(ss.str(), (int)resp.status);
 				}
-				else if (resp.status == ipc::ReplyStatus::SharedMemoryError)
-				{
-					ss << "MMF could not be opened";
-					throw vrmotioncompensation_sharedmemoryerror(ss.str(), (int)resp.status);
-				}
 				else if (resp.status != ipc::ReplyStatus::Ok)
 				{
 					ss << "Error code " << (int)resp.status;

@@ -477,32 +477,23 @@ namespace motioncompensation
 
 		try
 		{
-			int RT_OVRID = -1;
-
-			vrmotioncompensation::MotionCompensationMode NewMode = _motionCompensationMode;
-
 			// Send new settings to the driver.dll
-			if (EnableMotionCompensation && NewMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
+			if (EnableMotionCompensation && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode: ReferenceTracker";
-			}
-			else if (EnableMotionCompensation && NewMode == vrmotioncompensation::MotionCompensationMode::Mover)
-			{
-				LOG(INFO) << "Sending Motion Compensation Mode: Mover";
 			}
 			else
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode: Disabled";
 
-				NewMode = vrmotioncompensation::MotionCompensationMode::Disabled;
+				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 			}
 
-			if (NewMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker || _motionCompensationModeOldMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
-			{
-				RT_OVRID = deviceInfos[RTindex]->openvrId;
-			}
+			// Send new mode
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, _motionCompensationMode);
 
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, RT_OVRID, NewMode);
+			// Send settings
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
 		{
@@ -519,10 +510,6 @@ namespace motioncompensation
 				case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
 				{
 					m_deviceModeErrorString = "Device not found";
-				} break;
-				case (int)vrmotioncompensation::ipc::ReplyStatus::SharedMemoryError:
-				{
-					m_deviceModeErrorString = "MMF could not be opened";
 				} break;
 				default:
 				{
@@ -548,7 +535,7 @@ namespace motioncompensation
 		return true;
 	}
 
-	bool DeviceManipulationTabController::sendMCSettings()
+	/*bool DeviceManipulationTabController::sendMCSettings()
 	{
 		try
 		{
@@ -582,7 +569,7 @@ namespace motioncompensation
 		}
 
 		return true;
-	}
+	}*/
 	
 	QString DeviceManipulationTabController::getDeviceModeErrorString()
 	{
@@ -687,9 +674,6 @@ namespace motioncompensation
 		case 0:
 			_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 			break;
-		case 1:
-			_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Mover;
-			break;
 		default:
 			break;
 		}
@@ -704,9 +688,6 @@ namespace motioncompensation
 			break;
 		case vrmotioncompensation::MotionCompensationMode::ReferenceTracker:
 			return 0;
-			break;
-		case vrmotioncompensation::MotionCompensationMode::Mover:
-			return 1;
 			break;
 		default:
 			return 0;

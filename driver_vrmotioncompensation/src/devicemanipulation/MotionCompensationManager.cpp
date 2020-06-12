@@ -88,24 +88,6 @@ namespace vrmotioncompensation
 				
 				setAlpha(_samples);
 			}
-			else if (Mode == MotionCompensationMode::Mover)
-			{
-				try
-				{
-					_shdmem = { boost::interprocess::open_only, "OVRMC_MMF", boost::interprocess::read_only };
-
-					_RefPoseValid = false;
-					_RefPoseValidCounter = 0;
-					_motionCompensationZeroPoseValid = false;
-					_motionCompensationEnabled = true;
-				}
-				catch (boost::interprocess::interprocess_exception)
-				{
-					LOG(ERROR) << "Could not open shared memory";
-					
-					return false;
-				}
-			}
 			else
 			{
 				_motionCompensationEnabled = false;

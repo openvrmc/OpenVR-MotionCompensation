@@ -176,15 +176,13 @@ namespace vrmotioncompensation
 									}
 									else
 									{
-										MotionCompensationMode NewMode = message.msg.dm_MotionCompensationMode.CompensationMode;
+										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.MCdeviceId);
+										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(message.msg.dm_MotionCompensationMode.RTdeviceId);
 
 										int MCdeviceID = message.msg.dm_MotionCompensationMode.MCdeviceId;
 										int RTdeviceID = message.msg.dm_MotionCompensationMode.RTdeviceId;
 
-										DeviceManipulationHandle* MCdevice = driver->getDeviceManipulationHandleById(MCdeviceID);
-										DeviceManipulationHandle* RTdevice = driver->getDeviceManipulationHandleById(RTdeviceID);										
-
-										if (!MCdevice || (!RTdevice && NewMode == MotionCompensationMode::ReferenceTracker))
+										if (!MCdevice || !RTdevice)
 										{
 											resp.status = ipc::ReplyStatus::NotFound;
 										}
@@ -194,85 +192,56 @@ namespace vrmotioncompensation
 
 											if (serverDriver)
 											{
-												MotionCompensationMode OldMode = serverDriver->motionCompensation().getMotionCompensationMode();
-
-												// Mode changes
-												if (NewMode == MotionCompensationMode::ReferenceTracker && OldMode == MotionCompensationMode::ReferenceTracker)
+												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
-													// New RTdevice is different from old
-													if (serverDriver->motionCompensation().getRTdeviceID() != RTdeviceID)
+													LOG(INFO) << "Setting driver into motion compensation mode";
+
+													//Check if an old device needs a mode change
+													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
 													{
-														LOG(INFO) << "Changing Mode: ReferenceTracker -> ReferenceTracker";
+														//New MCdevice is different from old
+														if (serverDriver->motionCompensation().getMCdeviceID() != MCdeviceID)
+														{
+															//Set old MCdevice to default
+															DeviceManipulationHandle* OldMCdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getMCdeviceID());
+															OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-														// Set old RTdevice to default
-														DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
-														OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+															//Set new MCdevice to motion compensated
+															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+															serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
+														}
 
-														// Set new RTdevice to reference tracker
+														//New RTdevice is different from old
+														if (serverDriver->motionCompensation().getRTdeviceID() != RTdeviceID)
+														{
+															//Set old RTdevice to default
+															DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
+															OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+
+															//Set new RTdevice to reference tracker
+															RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+															serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
+														}
+													}
+													else
+													{
+														//Activate motion compensation mode for specified device
+														MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 														RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
-														serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
+
+														//Set motion compensation mode
+														serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, MCdeviceID, RTdeviceID);
 													}
 												}
-												else if (NewMode == MotionCompensationMode::ReferenceTracker && OldMode == MotionCompensationMode::Mover)
+												else if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::Disabled)
 												{
-													LOG(INFO) << "Changing Mode: ReferenceTracker -> Mover";
+													LOG(INFO) << "Setting driver into default mode";
 
-													// Set new RTdevice to reference tracker
-													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
-													serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
-												}
-												else if (NewMode == MotionCompensationMode::Mover && OldMode == MotionCompensationMode::ReferenceTracker)
-												{
-													LOG(INFO) << "Changing Mode: Mover -> ReferenceTracker";
+													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-													// Set old RTdevice to default
-													DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
-													OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-												}
-												else if (NewMode == MotionCompensationMode::ReferenceTracker)
-												{
-													LOG(INFO) << "Changing Mode: Disabled -> ReferenceTracker";
-
-													// Set new RTdevice to reference tracker
-													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
-													serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
-
-													// Set new MCdevice to motion compensated
-													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
-													serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
-												}
-												else if (NewMode == MotionCompensationMode::Mover)
-												{
-													LOG(INFO) << "Changing Mode: Disabled -> Mover";
-
-													// Set new MCdevice to motion compensated
-													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
-													serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
-												}
-												else if (NewMode == MotionCompensationMode::Disabled)
-												{
-													LOG(INFO) << "Changing Mode: Any mode -> Disabled";
-
-													// Set old MCdevice to default
-													DeviceManipulationHandle* OldMCdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getMCdeviceID());
-													OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-
-													if (OldMode == MotionCompensationMode::ReferenceTracker)
-													{
-														// Set old RTdevice to default
-														DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
-														OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-													}
-
-													// Reset device IDs
-													MCdeviceID = -1;
-													RTdeviceID = -1;
-												}
-
-												// Set new mode
-												if (!serverDriver->motionCompensation().setMotionCompensationMode(NewMode, MCdeviceID, RTdeviceID))
-												{
-													resp.status = ipc::ReplyStatus::SharedMemoryError;
+													//Reset and set some vars for every device
+													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled, -1, -1);
 												}
 
 												resp.status = ipc::ReplyStatus::Ok;
