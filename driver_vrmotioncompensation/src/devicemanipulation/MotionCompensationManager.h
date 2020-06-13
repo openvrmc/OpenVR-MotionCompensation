@@ -79,6 +79,8 @@ namespace vrmotioncompensation
 
 			bool _isMotionCompensationZeroPoseValid();
 			
+			void _resetMotionCompensationZeroPose();
+
 			void _setMotionCompensationZeroPose(const vr::DriverPose_t& pose);
 			
 			void _updateMotionCompensationRefPose(const vr::DriverPose_t& pose);

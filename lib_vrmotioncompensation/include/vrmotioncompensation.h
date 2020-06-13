@@ -158,6 +158,8 @@ namespace vrmotioncompensation
 
 		void setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, vr::HmdVector3d_t offsets);
 
+		void VRMotionCompensation::resetRefZeroPose();
+
 		void startDebugLogger(bool enable, bool modal = true);
 
 	private:

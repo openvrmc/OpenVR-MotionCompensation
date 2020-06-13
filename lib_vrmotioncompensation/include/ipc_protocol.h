@@ -21,6 +21,7 @@ namespace vrmotioncompensation
 			DeviceManipulation_GetDeviceInfo,
 			DeviceManipulation_MotionCompensationMode,
 			DeviceManipulation_SetMotionCompensationProperties,
+			DeviceManipulation_ResetRefZeroPose,
 			DebugLogger_Settings,
 		};
 
@@ -101,6 +102,12 @@ namespace vrmotioncompensation
 			vr::HmdVector3d_t offsets;
 		};
 
+		struct Request_DeviceManipulation_ResetRefZeroPose
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+		};
+
 		struct Request_DebugLogger_Settings
 		{
 			uint32_t clientId;
@@ -138,6 +145,7 @@ namespace vrmotioncompensation
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
+				Request_DeviceManipulation_ResetRefZeroPose dm_ResetRefZeroPose;
 				Request_DebugLogger_Settings dl_Settings;
 				MsgUnion()
 				{

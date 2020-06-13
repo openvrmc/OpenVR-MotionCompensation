@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
+import ovrmc.motioncompensation 1.0
 
 Popup
 {
@@ -54,8 +55,8 @@ Popup
 				// User has pressed escape, discard changes
 				else if (event.key === Qt.Key_Escape)
 				{
-					text_OldKey.text = settings.getStringFromKey(oldKey);
-					text_oldEventmodifier.text = settings.getStringFromModifiers(oldEventmodifier);
+					text_OldKey.text = DeviceManipulationTabController.getStringFromKey(oldKey);
+					text_oldEventmodifier.text = DeviceManipulationTabController.getStringFromModifiers(oldEventmodifier);
 				}
 				else
 				{
@@ -67,14 +68,14 @@ Popup
 					if ((event.key >= 0x01000030 && event.key <= 0x0100003b)	//F1 - F12
 						|| (event.key >= 0x21 && event.key <= 0xff))			//0-9, A-Z, Symbols like , . -
 					{
-						text_OldKey.text = settings.getStringFromKey(inputNewKey);
+						text_OldKey.text = DeviceManipulationTabController.getStringFromKey(inputNewKey);
 					}
 					else
 					{
 						text_OldKey.text = "";
 					}
 
-					text_oldEventmodifier.text = settings.getStringFromModifiers(inputNewEventmodifier);
+					text_oldEventmodifier.text = DeviceManipulationTabController.getStringFromModifiers(inputNewEventmodifier);
 				}
 			}
 		}
@@ -197,7 +198,7 @@ Popup
 
 	function saveKey()
 	{
-		settings.newKey(shortcutID, inputNewKey, inputNewEventmodifier);
+		DeviceManipulationTabController.newKey(shortcutID, inputNewKey, inputNewEventmodifier);
 		updateShortcut();
 	}
 
@@ -210,11 +211,11 @@ Popup
 	function loadValues(id)
 	{
 		shortcutID = id;
-		oldKey = settings.getKey_AsKey(id);
-		oldKeyText = settings.getKey_AsString(id);
-		oldEventmodifier = settings.getModifiers_AsModifiers(id);
-		oldEventmodifierText = settings.getModifiers_AsString(id);
-		keyDescription = settings.getKeyDescription(id);
+		oldKey = DeviceManipulationTabController.getKey_AsKey(id);
+		oldKeyText = DeviceManipulationTabController.getKey_AsString(id);
+		oldEventmodifier = DeviceManipulationTabController.getModifiers_AsModifiers(id);
+		oldEventmodifierText = DeviceManipulationTabController.getModifiers_AsString(id);
+		keyDescription = DeviceManipulationTabController.getKeyDescription(id);
 
 		refreshUI()
 	}

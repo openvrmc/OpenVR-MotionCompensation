@@ -134,6 +134,11 @@ namespace vrmotioncompensation
 			return _motionCompensationZeroPoseValid;
 		}
 
+		void MotionCompensationManager::_resetMotionCompensationZeroPose()
+		{
+			_motionCompensationZeroPoseValid = false;
+		}
+
 		void MotionCompensationManager::_setMotionCompensationZeroPose(const vr::DriverPose_t& pose)
 		{
 			// convert pose from driver space to app space

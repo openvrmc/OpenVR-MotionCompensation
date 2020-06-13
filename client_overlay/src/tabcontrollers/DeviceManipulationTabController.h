@@ -27,9 +27,8 @@ namespace motioncompensation
 
 	class DeviceManipulationTabController : public QObject
 	{
-		Q_OBJECT
+		Q_OBJECT		
 
-	public:
 		struct ShortcutStruct
 		{
 			Qt::Key key;
@@ -55,7 +54,7 @@ namespace motioncompensation
 		OverlayController* parent;
 		QQuickWindow* widget;
 
-		// Shortcut realted
+		// Shortcut related
 		ShortcutStruct shortcut[2];
 
 		// Device and ID storage
@@ -70,8 +69,7 @@ namespace motioncompensation
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
 		vr::HmdVector3d_t _offset = { 0, 0, 0 };
-
-		QGlobalShortcut* shortcutFirst;
+		bool _MotionCompensationIsOn = false;
 
 		// Debug
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
@@ -110,8 +108,6 @@ namespace motioncompensation
 		void ConnectShortcut(int id);
 		void DisconnectShortcut(int id);
 
-		Q_INVOKABLE void slotFirst();
-		Q_INVOKABLE void slotSecond();
 		Q_INVOKABLE void newKey(int id, Qt::Key key, Qt::KeyboardModifiers modifier);
 		Q_INVOKABLE void removeKey(int id);
 		Q_INVOKABLE QString getStringFromKey(Qt::Key key);
@@ -139,7 +135,9 @@ namespace motioncompensation
 
 		// General functions
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
-		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);		
+		void toggleMotionCompensationMode();
+		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);
+		void resetRefZeroPose();
 		//Q_INVOKABLE bool sendMCSettings();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 

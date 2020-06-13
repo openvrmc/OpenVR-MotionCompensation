@@ -5,6 +5,7 @@
 #include <openvr_math.h>
 #include <ipc_protocol.h>
 #include <chrono>
+#include <QQmlProperty>
 
 // application namespace
 namespace motioncompensation
@@ -20,6 +21,7 @@ namespace motioncompensation
 	void DeviceManipulationTabController::initStage1()
 	{
 		reloadMotionCompensationSettings();
+		InitShortcuts();
 	}
 
 	void DeviceManipulationTabController::Beenden()
@@ -160,10 +162,20 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::reloadMotionCompensationSettings()
 	{
-		auto settings = OverlayController::appSettings();
+		QSettings* settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
 		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
 		_samples = settings->value("motionCompensationSamples", 100).toUInt();
+
+		// Load shortcuts
+		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_0_key", Qt::Key::Key_unknown).toInt();
+		Qt::KeyboardModifiers shortcutMod = settings->value("shortcut_0_mod", Qt::KeyboardModifier::NoModifier).toInt();
+		newKey(0, shortcutKey, shortcutMod);
+
+		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_1_key", Qt::Key::Key_unknown).toInt();
+		Qt::KeyboardModifiers shortcutMod = settings->value("shortcut_1_mod", Qt::KeyboardModifier::NoModifier).toInt();
+		newKey(1, shortcutKey, shortcutMod);
+
 		settings->endGroup();
 
 		LOG(INFO) << "Loading Data; LPF Beta: " << _LPFBeta << "; samples: " << _samples;
@@ -172,18 +184,23 @@ namespace motioncompensation
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
 	{
 		LOG(INFO) << "Saving Data; LPF Beta: " << _LPFBeta << ", samples: " << _samples;
-		auto settings = OverlayController::appSettings();
+
+		QSettings* settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
 		settings->setValue("motionCompensationLPFBeta", _LPFBeta);
 		settings->setValue("motionCompensationSamples", _samples);
+		settings->setValue("shortcut_0_key", getKey_AsKey(0));
+		settings->setValue("shortcut_0_mod", (int)getModifiers_AsModifiers(0));
+		settings->setValue("shortcut_1_key", getKey_AsKey(1));
+		settings->setValue("shortcut_1_mod", (int)getModifiers_AsModifiers(1));
 		settings->endGroup();
 		settings->sync();
 	}
 
 	void DeviceManipulationTabController::InitShortcuts()
 	{
-		NewShortcut(0, &DeviceManipulationTabController::slotFirst, "Enable / Disable Motion Compensation");
-		NewShortcut(1, &DeviceManipulationTabController::slotSecond, "Reset reference zero pose");
+		NewShortcut(0, &DeviceManipulationTabController::toggleMotionCompensationMode, "Enable / Disable Motion Compensation");
+		NewShortcut(1, &DeviceManipulationTabController::resetRefZeroPose, "Reset reference zero pose");
 	}
 
 	void DeviceManipulationTabController::NewShortcut(int id, void (DeviceManipulationTabController::* method)(), QString description)
@@ -212,22 +229,15 @@ namespace motioncompensation
 		shortcut[id].isConnected = false;
 	}
 
-	void DeviceManipulationTabController::slotFirst()
-	{
-		//qDebug() << "First";
-	}
-
-	void DeviceManipulationTabController::slotSecond()
-	{
-		//qDebug() << "Second";
-	}
-
 	void DeviceManipulationTabController::newKey(int id, Qt::Key key, Qt::KeyboardModifiers modifier)
 	{
-		shortcut[id].key = key;
-		shortcut[id].modifiers = modifier;
+		if (key != Qt::Key::Key_unknown)
+		{
+			shortcut[id].key = key;
+			shortcut[id].modifiers = modifier;
 
-		shortcut[id].shortcut->setShortcut(QKeySequence(key + modifier));
+			shortcut[id].shortcut->setShortcut(QKeySequence(key + modifier));
+		}
 	}
 
 	void DeviceManipulationTabController::removeKey(int id)
@@ -404,6 +414,17 @@ namespace motioncompensation
 		return retval;
 	}
 
+	void DeviceManipulationTabController::toggleMotionCompensationMode()
+	{
+		int MCindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
+		int RTindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
+
+		LOG(DEBUG) << "Got these index for HMD selection: " << MCindex;
+		LOG(DEBUG) << "Got these index for controller selection: " << RTindex;
+
+		applySettings(MCindex, RTindex, !_MotionCompensationIsOn);
+	}
+
 	// Enables or disables the motion compensation for the selected device
 	bool DeviceManipulationTabController::applySettings(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation)
 	{
@@ -528,6 +549,7 @@ namespace motioncompensation
 			return false;
 		}
 
+		_MotionCompensationIsOn = EnableMotionCompensation;
 		_motionCompensationModeOldMode = _motionCompensationMode;
 
 		saveMotionCompensationSettings();
@@ -571,6 +593,36 @@ namespace motioncompensation
 		return true;
 	}*/
 	
+	void DeviceManipulationTabController::resetRefZeroPose()
+	{
+		try
+		{
+			LOG(INFO) << "Resetting reference zero pose";
+			parent->vrMotionCompensation().resetRefZeroPose();
+		}
+		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
+		{
+			switch (e.errorcode)
+			{
+			case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+			{
+				m_deviceModeErrorString = "Not an error";
+			} break;
+			default:
+			{
+				m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
+			} break;
+
+			LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
+			}
+		}
+		catch (std::exception& e)
+		{
+			m_deviceModeErrorString = "Unknown exception";
+			LOG(ERROR) << "Exception caught while resetting reference zero pose: " << e.what();
+		}
+	}
+
 	QString DeviceManipulationTabController::getDeviceModeErrorString()
 	{
 		return m_deviceModeErrorString;

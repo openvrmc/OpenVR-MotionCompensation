@@ -440,6 +440,55 @@ namespace vrmotioncompensation
 		}
 	}
 
+	void VRMotionCompensation::resetRefZeroPose()
+	{
+		if (_ipcServerQueue)
+		{
+			// Create message
+			ipc::Request message(ipc::RequestType::DeviceManipulation_ResetRefZeroPose);
+			memset(&message.msg, 0, sizeof(message.msg));
+			message.msg.dm_ResetRefZeroPose.clientId = m_clientId;
+			message.msg.dm_ResetRefZeroPose.messageId = 0;
+
+
+			// Create random message ID
+			uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);
+			message.msg.dm_ResetRefZeroPose.messageId = messageId;
+
+			// Allocate memory for the reply
+			std::promise<ipc::Reply> respPromise;
+			auto respFuture = respPromise.get_future();
+			{
+				std::lock_guard<std::recursive_mutex> lock(_mutex);
+				_ipcPromiseMap.insert({ messageId, std::move(respPromise) });
+			}
+
+			// Send message
+			_ipcServerQueue->send(&message, sizeof(ipc::Request), 0);
+			WRITELOG(INFO, "MC message created sending to driver" << std::endl);
+
+			auto resp = respFuture.get();
+			{
+				std::lock_guard<std::recursive_mutex> lock(_mutex);
+				_ipcPromiseMap.erase(messageId);
+			}
+
+			// If there was an error, notify the user
+			std::stringstream ss;
+			ss << "Error while setting motion compensation mode: ";
+
+			if (resp.status != ipc::ReplyStatus::Ok)
+			{
+				ss << "Error code " << (int)resp.status;
+				throw vrmotioncompensation_exception(ss.str(), (int)resp.status);
+			}
+		}
+		else
+		{
+			throw vrmotioncompensation_connectionerror("No active connection.");
+		}
+	}
+
 	void VRMotionCompensation::startDebugLogger(bool enable, bool modal)
 	{
 		if (_ipcServerQueue)

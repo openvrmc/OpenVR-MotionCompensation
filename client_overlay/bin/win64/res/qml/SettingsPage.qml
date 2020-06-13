@@ -324,7 +324,7 @@ MyStackViewPage
 				imagesource : "octicons-trashcan.png"
 				onClicked:
 				{
-					settings.removeKey(0);
+					DeviceManipulationTabController.removeKey(0);
 					refreshButtonText();
 				}
 			}
@@ -367,7 +367,7 @@ MyStackViewPage
 				imagesource : "octicons-trashcan.png"
 				onClicked:
 				{
-					settings.removeKey(1);
+					DeviceManipulationTabController.removeKey(1);
 					refreshButtonText();
 				}
 			}
@@ -386,13 +386,7 @@ MyStackViewPage
                 hmdtoReferenceOffsetBox.updateValues()
                 setZeroCheckBox.checked = DeviceManipulationTabController.getZeroMode()
             }
-        }
-
-		function refreshButtonText()
-		{
-			btn_enableMC.text = settings.getModifiers_AsString(0) + settings.getKey_AsString(0);
-			btn_setZeroPose.text = settings.getModifiers_AsString(1) + settings.getKey_AsString(1);
-		}
+        }		
 
 		Component.onCompleted:
         {
@@ -411,4 +405,10 @@ MyStackViewPage
             }
         }
     }
+
+	function refreshButtonText()
+	{
+		btn_enableMC.text = DeviceManipulationTabController.getModifiers_AsString(0) + DeviceManipulationTabController.getKey_AsString(0);
+		btn_setZeroPose.text = DeviceManipulationTabController.getModifiers_AsString(1) + DeviceManipulationTabController.getKey_AsString(1);
+	}
 }

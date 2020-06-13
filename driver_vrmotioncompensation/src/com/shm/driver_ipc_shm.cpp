@@ -305,6 +305,36 @@ namespace vrmotioncompensation
 								}
 								break;
 
+								case ipc::RequestType::DeviceManipulation_ResetRefZeroPose:
+								{
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dm_SetMotionCompensationProperties.messageId;
+									auto serverDriver = ServerDriver::getInstance();
+									if (serverDriver)
+									{
+										LOG(INFO) << "Resetting reference zero pose";
+
+										serverDriver->motionCompensation()._resetMotionCompensationZeroPose();
+
+										resp.status = ipc::ReplyStatus::Ok;
+									}
+									else
+									{
+										resp.status = ipc::ReplyStatus::UnknownError;
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while setting motion compensation properties: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dm_SetMotionCompensationProperties.clientId, resp);
+									}
+								}
+								break;
+
 								case ipc::RequestType::DebugLogger_Settings:
 								{
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
