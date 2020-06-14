@@ -42,7 +42,7 @@ namespace motioncompensation
 			ShortcutStruct()
 			{
 				key = Qt::Key::Key_unknown;
-				modifiers = 0;
+				modifiers = Qt::KeyboardModifier::NoModifier;
 				shortcut = nullptr;
 				description = "No description provided";
 				method = nullptr;
@@ -64,7 +64,6 @@ namespace motioncompensation
 
 		// Settings
 		vrmotioncompensation::MotionCompensationMode _motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
-		vrmotioncompensation::MotionCompensationMode _motionCompensationModeOldMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
 		double _LPFBeta = 0.2;
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;

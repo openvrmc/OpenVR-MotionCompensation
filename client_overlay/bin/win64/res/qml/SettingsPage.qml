@@ -207,6 +207,7 @@ MyStackViewPage
         {
             boxTitle: "HMD to Reference Offset"
             id: hmdtoReferenceOffsetBox
+			height: 90
             setTranslationOffset: function(x, y, z)
             {
                 DeviceManipulationTabController.setHMDtoRefOffset(x, y, z)

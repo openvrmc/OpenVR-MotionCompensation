@@ -20,8 +20,8 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::initStage1()
 	{
-		reloadMotionCompensationSettings();
 		InitShortcuts();
+		reloadMotionCompensationSettings();		
 	}
 
 	void DeviceManipulationTabController::Beenden()
@@ -172,9 +172,9 @@ namespace motioncompensation
 		Qt::KeyboardModifiers shortcutMod = settings->value("shortcut_0_mod", Qt::KeyboardModifier::NoModifier).toInt();
 		newKey(0, shortcutKey, shortcutMod);
 
-		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_1_key", Qt::Key::Key_unknown).toInt();
-		Qt::KeyboardModifiers shortcutMod = settings->value("shortcut_1_mod", Qt::KeyboardModifier::NoModifier).toInt();
-		newKey(1, shortcutKey, shortcutMod);
+		shortcutKey = (Qt::Key)settings->value("shortcut_1_key", Qt::Key::Key_unknown).toInt();
+		Qt::KeyboardModifiers shortcutMod_2 = settings->value("shortcut_1_mod", Qt::KeyboardModifier::NoModifier).toInt();
+		newKey(1, shortcutKey, shortcutMod_2);
 
 		settings->endGroup();
 
@@ -498,6 +498,8 @@ namespace motioncompensation
 
 		try
 		{
+			vrmotioncompensation::MotionCompensationMode NewMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+
 			// Send new settings to the driver.dll
 			if (EnableMotionCompensation && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
 			{
@@ -507,11 +509,11 @@ namespace motioncompensation
 			{
 				LOG(INFO) << "Sending Motion Compensation Mode: Disabled";
 
-				_motionCompensationMode = vrmotioncompensation::MotionCompensationMode::Disabled;
+				NewMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 			}
 
 			// Send new mode
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, _motionCompensationMode);
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, NewMode);
 
 			// Send settings
 			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
@@ -550,7 +552,6 @@ namespace motioncompensation
 		}
 
 		_MotionCompensationIsOn = EnableMotionCompensation;
-		_motionCompensationModeOldMode = _motionCompensationMode;
 
 		saveMotionCompensationSettings();
 

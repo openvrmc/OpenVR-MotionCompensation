@@ -14,7 +14,7 @@ GroupBox
 
     property var setTranslationOffset: function(x, y, z) {}
     property var updateValues: function() {}
-    height: 90
+	height: 90
 
     function updateGUI()
     {
