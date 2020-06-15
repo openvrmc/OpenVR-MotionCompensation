@@ -137,7 +137,6 @@ namespace motioncompensation
 		void toggleMotionCompensationMode();
 		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);
 		void resetRefZeroPose();
-		//Q_INVOKABLE bool sendMCSettings();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
 		// Settings

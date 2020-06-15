@@ -558,42 +558,6 @@ namespace motioncompensation
 		return true;
 	}
 
-	/*bool DeviceManipulationTabController::sendMCSettings()
-	{
-		try
-		{
-			LOG(INFO) << "Sending Motion Compensation settings";
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
-		}
-		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
-		{
-			switch (e.errorcode)
-			{
-				case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
-				{
-					m_deviceModeErrorString = "Not an error";					
-				} break;
-				default:
-				{
-					m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
-				} break;
-
-				LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
-
-				return false;
-			}
-		}
-		catch (std::exception& e)
-		{
-			m_deviceModeErrorString = "Unknown exception";
-			LOG(ERROR) << "Exception caught while setting LPF Beta: " << e.what();
-
-			return false;
-		}
-
-		return true;
-	}*/
-	
 	void DeviceManipulationTabController::resetRefZeroPose()
 	{
 		try

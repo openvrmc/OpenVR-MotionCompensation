@@ -12,6 +12,24 @@ namespace vrmotioncompensation
 {
 	namespace driver
 	{
+		MotionCompensationManager::MotionCompensationManager(ServerDriver* parent) : m_parent(parent)
+		{
+			try
+			{
+				// create shared memory
+				_shdmem = { boost::interprocess::open_or_create, "OVRMC_MMF", boost::interprocess::read_write, 32 };
+				_region = { _shdmem, boost::interprocess::read_write };
+
+				// get pointer address and fill it with data
+				_poffset = static_cast<vr::HmdVector3d_t*>(_region.get_address());
+				*_poffset = _offset;
+			}
+			catch (boost::interprocess::interprocess_exception & e)
+			{				
+				LOG(ERROR) << "Could not create or open shared memory. Error code " << e.get_error_code();
+			}
+		}
+
 		void MotionCompensationManager::WriteDebugData()
 		{
 			DebugLogger.WriteFile();
@@ -127,6 +145,12 @@ namespace vrmotioncompensation
 
 			_motionCompensationRefPosAcc = { 0, 0, 0 };
 			_motionCompensationRefRotAcc = { 0, 0, 0 };
+		}
+
+		void MotionCompensationManager::setOffsets(vr::HmdVector3d_t offsets)
+		{
+			_offset = offsets;
+			*_poffset = _offset;
 		}
 
 		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()

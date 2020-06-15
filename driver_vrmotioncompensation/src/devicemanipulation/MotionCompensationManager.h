@@ -25,9 +25,9 @@ namespace vrmotioncompensation
 		class MotionCompensationManager
 		{
 		public:
-			MotionCompensationManager(ServerDriver* parent) : m_parent(parent)
+			MotionCompensationManager(ServerDriver* parent);/* : m_parent(parent)
 			{
-			}
+			}*/
 			
 			void WriteDebugData();
 
@@ -72,10 +72,7 @@ namespace vrmotioncompensation
 
 			void setZeroMode(bool setZero);
 
-			void setOffsets(vr::HmdVector3d_t offsets)
-			{
-				_offset = offsets;
-			}
+			void setOffsets(vr::HmdVector3d_t offsets);
 
 			bool _isMotionCompensationZeroPoseValid();
 			
@@ -119,6 +116,7 @@ namespace vrmotioncompensation
 			ServerDriver* m_parent;
 
 			boost::interprocess::windows_shared_memory _shdmem;
+			boost::interprocess::mapped_region _region;
 
 			int MCdeviceID = -1;
 			int RTdeviceID = -1;
@@ -138,6 +136,7 @@ namespace vrmotioncompensation
 			
 			// Offset data
 			vr::HmdVector3d_t _offset = { 0, 0, 0 };
+			vr::HmdVector3d_t* _poffset = nullptr;
 
 			// Zero position
 			vr::HmdVector3d_t _motionCompensationZeroPos = { 0, 0, 0 };
@@ -163,9 +162,6 @@ namespace vrmotioncompensation
 
 			bool _RefPoseValid = false;
 			int _RefPoseValidCounter = 0;
-
-			//vr::HmdVector3d_t _centerOfRotation = { 0, 0, 0 };
-			//vr::HmdVector3d_t _translation = { 0, 0, 0 };
 		};
 	}
 }
