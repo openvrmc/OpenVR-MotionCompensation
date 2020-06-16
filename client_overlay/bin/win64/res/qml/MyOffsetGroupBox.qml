@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.3
 
 GroupBox
 {
-    property string boxTitle: "Offsets Laaaanger Text zum testen"
+	property string boxTitle: "No title provided"
 
     property double offsetX: 0.0
     property double offsetY: 0.0
@@ -28,7 +28,7 @@ GroupBox
     label: MyText
     {
         leftPadding: 10
-        text: parent.boxTitle
+		text: boxTitle
         bottomPadding: 0
     }
 

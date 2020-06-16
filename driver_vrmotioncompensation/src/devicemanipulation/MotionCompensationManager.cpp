@@ -23,6 +23,7 @@ namespace vrmotioncompensation
 				// get pointer address and fill it with data
 				_poffset = static_cast<vr::HmdVector3d_t*>(_region.get_address());
 				*_poffset = _offset;
+				LOG(INFO) << "Shared memory OVRMC_MMF created";
 			}
 			catch (boost::interprocess::interprocess_exception & e)
 			{				
