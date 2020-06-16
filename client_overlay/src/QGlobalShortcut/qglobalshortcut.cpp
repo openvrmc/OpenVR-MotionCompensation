@@ -158,6 +158,7 @@ bool QGlobalShortcut::unsetShortcut()
             UnregisterHotKey(0, data->id());
         }
         sPrivate->listKeys.clear();
+		sPrivate->keys = QKeySequence("");
     }
     return true;
 }

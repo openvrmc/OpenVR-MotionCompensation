@@ -244,7 +244,7 @@ namespace motioncompensation
 	{
 		shortcut[id].shortcut->unsetShortcut();
 		shortcut[id].key = Qt::Key::Key_unknown;
-		shortcut[id].modifiers = 0;
+		shortcut[id].modifiers = Qt::KeyboardModifier::NoModifier;
 	}
 
 	QString DeviceManipulationTabController::getStringFromKey(Qt::Key key)

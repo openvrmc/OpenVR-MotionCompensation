@@ -17,7 +17,7 @@ namespace vrmotioncompensation
 			try
 			{
 				// create shared memory
-				_shdmem = { boost::interprocess::open_or_create, "OVRMC_MMF", boost::interprocess::read_write, 32 };
+				_shdmem = { boost::interprocess::open_or_create, "OVRMC_MMF", boost::interprocess::read_write, 4096 };
 				_region = { _shdmem, boost::interprocess::read_write };
 
 				// get pointer address and fill it with data
