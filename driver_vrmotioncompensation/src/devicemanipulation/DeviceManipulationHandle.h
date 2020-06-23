@@ -23,7 +23,6 @@ namespace vrmotioncompensation
 			bool m_isValid = false;
 			ServerDriver* m_parent;
 			MotionCompensationManager& m_motionCompensationManager;
-			std::recursive_mutex _mutex;
 			vr::ETrackedDeviceClass m_eDeviceClass = vr::TrackedDeviceClass_Invalid;
 			uint32_t m_openvrId = vr::k_unTrackedDeviceIndexInvalid;
 			std::string m_serialNumber;
