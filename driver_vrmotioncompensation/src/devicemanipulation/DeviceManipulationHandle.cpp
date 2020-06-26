@@ -23,7 +23,6 @@ namespace vrmotioncompensation
 
 		bool DeviceManipulationHandle::handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize)
 		{
-			std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 			if (m_deviceMode == MotionCompensationDeviceMode::ReferenceTracker)
 			{ 
@@ -56,8 +55,6 @@ namespace vrmotioncompensation
 
 		void DeviceManipulationHandle::setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode)
 		{
-			std::lock_guard<std::recursive_mutex> lock(_mutex);
-
 			m_deviceMode = DeviceMode;
 		}
 	} // end namespace driver

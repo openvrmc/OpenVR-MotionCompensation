@@ -170,12 +170,14 @@ namespace vrmotioncompensation
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
 
 			// Save zero points
+			_ZeroLock.lock();
 			_motionCompensationZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
 			_motionCompensationZeroRot = tmpConj * pose.qRotation;			
 
 			DebugLogger.SetZeroPos(_motionCompensationZeroPos, pose.vecPosition, _motionCompensationZeroRot, pose.qRotation);
 
 			_motionCompensationZeroPoseValid = true;
+			_ZeroLock.unlock();
 		}
 
 		void MotionCompensationManager::_updateMotionCompensationRefPose(const vr::DriverPose_t& pose)
@@ -242,7 +244,9 @@ namespace vrmotioncompensation
 
 			// convert pose from driver space to app space
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
+			_RefLock.lock();
 			_motionCompensationRefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _Filter_vecPosition_1, true) - pose.vecWorldFromDriverTranslation;
+			_RefLock.unlock();
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
@@ -284,8 +288,12 @@ namespace vrmotioncompensation
 
 			// calculate orientation difference and its inverse
 			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition_2;
+			_RefLock.lock();
+			_ZeroLock.lock();
 			_motionCompensationRefRot = poseWorldRot * vrmath::quaternionConjugate(_motionCompensationZeroRot);
-			_motionCompensationRefRotInv = vrmath::quaternionConjugate(_motionCompensationRefRot);			
+			_motionCompensationRefRotInv = vrmath::quaternionConjugate(_motionCompensationRefRot);
+			_ZeroLock.unlock();
+			_RefLock.unlock();
 
 			if (!_SetZeroMode)
 			{
@@ -293,11 +301,13 @@ namespace vrmotioncompensation
 				vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
 				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
+				_RefVelLock.lock();
 				_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
 				_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
 
 				_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecAcceleration);
 				_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularAcceleration);
+				_RefVelLock.unlock();
 			}
 
 			// ----------------------------------------------------------------------------------------------- //
@@ -374,8 +384,12 @@ namespace vrmotioncompensation
 
 				// Do motion compensation
 				vr::HmdQuaternion_t poseWorldRot = tmpConj * pose.qRotation;
+				_RefLock.lock();
+				_ZeroLock.lock();
 				vr::HmdVector3d_t compensatedPoseWorldPos = _motionCompensationZeroPos + vrmath::quaternionRotateVector(_motionCompensationRefRot, _motionCompensationRefRotInv, poseWorldPos - _motionCompensationRefPos, true);
+				_ZeroLock.unlock();
 				vr::HmdQuaternion_t compensatedPoseWorldRot = _motionCompensationRefRotInv * poseWorldRot;
+				_RefLock.unlock();
 
 				// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
 				vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
@@ -401,6 +415,7 @@ namespace vrmotioncompensation
 				}
 				else
 				{
+					_RefVelLock.lock();
 					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosVel);
 					pose.vecVelocity[0] -= tmpPosVel.v[0];
 					pose.vecVelocity[1] -= tmpPosVel.v[1];
@@ -420,6 +435,7 @@ namespace vrmotioncompensation
 					pose.vecAngularAcceleration[0] -= tmpRotAcc.v[0];
 					pose.vecAngularAcceleration[1] -= tmpRotAcc.v[1];
 					pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];
+					_RefVelLock.unlock();
 				}
 				
 

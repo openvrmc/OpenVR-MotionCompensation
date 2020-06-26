@@ -21,6 +21,27 @@ namespace vrmotioncompensation
 		class ServerDriver;
 		class DeviceManipulationHandle;
 
+		class Spinlock
+		{
+			std::atomic_flag _Flag = ATOMIC_FLAG_INIT;
+
+		public:
+
+			void lock() noexcept
+			{
+				while (_Flag.test_and_set(std::memory_order_acquire))
+				{
+					// pause insn
+					YieldProcessor();
+				}
+			}
+
+			void unlock() noexcept
+			{
+				_Flag.clear(std::memory_order_release);
+			}
+			
+		};
 
 		class MotionCompensationManager
 		{
@@ -130,6 +151,8 @@ namespace vrmotioncompensation
 			double _alpha = -1.0;
 			uint32_t _samples = 100;
 			bool _SetZeroMode = false;
+
+			Spinlock _ZeroLock, _RefLock, _RefVelLock;
 
 			bool _motionCompensationEnabled = false;
 			MotionCompensationMode _motionCompensationMode = MotionCompensationMode::Disabled;			
