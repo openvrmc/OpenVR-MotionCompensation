@@ -286,16 +286,13 @@ namespace vrmotioncompensation
 
 			if (!_SetZeroMode)
 			{
-				// Convert velocity and acceleration values into app space and undo device rotation
-				vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition[1]);
-				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
-
+				// Convert velocity and acceleration values into app space
 				_RefVelLock.lock();
-				_RefVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecVelocity);
-				_RefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
+				_RefVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecVelocity, true);
+				_RefRotVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAngularVelocity, true);
 
-				_RefAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAcceleration);
-				_RefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularAcceleration);
+				_RefAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAcceleration, true);
+				_RefRotAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAngularAcceleration, true);
 				_RefVelLock.unlock();
 			}
 
@@ -370,10 +367,6 @@ namespace vrmotioncompensation
 				vr::HmdQuaternion_t compensatedPoseWorldRot = _RefRotInv * poseWorldRot;
 				_RefLock.unlock();
 
-				// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
-				vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
-				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
-
 				if (_SetZeroMode)
 				{
 					_zeroVec(pose.vecVelocity);
@@ -383,23 +376,24 @@ namespace vrmotioncompensation
 				}
 				else
 				{
+					// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
 					_RefVelLock.lock();
-					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _RefVel);
+					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefVel);
 					pose.vecVelocity[0] -= tmpPosVel.v[0];
 					pose.vecVelocity[1] -= tmpPosVel.v[1];
 					pose.vecVelocity[2] -= tmpPosVel.v[2];
 
-					vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _RefRotVel);
+					vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefRotVel);
 					pose.vecAngularVelocity[0] -= tmpRotVel.v[0];
 					pose.vecAngularVelocity[1] -= tmpRotVel.v[1];
 					pose.vecAngularVelocity[2] -= tmpRotVel.v[2];
 
-					vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _RefAcc);
+					vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefAcc);
 					pose.vecAcceleration[0] -= tmpPosAcc.v[0];
 					pose.vecAcceleration[1] -= tmpPosAcc.v[1];
 					pose.vecAcceleration[2] -= tmpPosAcc.v[2];
 
-					vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _RefRotAcc);
+					vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefRotAcc);
 					pose.vecAngularAcceleration[0] -= tmpRotAcc.v[0];
 					pose.vecAngularAcceleration[1] -= tmpRotAcc.v[1];
 					pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];
