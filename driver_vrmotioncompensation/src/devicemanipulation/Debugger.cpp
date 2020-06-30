@@ -49,65 +49,16 @@ namespace vrmotioncompensation
 
 			if (DebuggerRunning)
 			{
-				if (DebugCounter > 1)
-				{
-					for (int i = 0; i < 20; i++)
-					{
-						if (DebugDataV3[i].InUse)
-						{
-							if (DebugDataV3[i].Data[DebugCounter].v[0] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[0] != 0.0)
-							{
-								DebugDataV3[i].Data[DebugCounter].v[0] = DebugDataV3[i].Data[DebugCounter - 1].v[0];
-							}
-
-							if (DebugDataV3[i].Data[DebugCounter].v[1] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[1] != 0.0)
-							{
-								DebugDataV3[i].Data[DebugCounter].v[1] = DebugDataV3[i].Data[DebugCounter - 1].v[1];
-							}
-
-							if (DebugDataV3[i].Data[DebugCounter].v[2] == 0.0 && DebugDataV3[i].Data[DebugCounter - 1].v[2] != 0.0)
-							{
-								DebugDataV3[i].Data[DebugCounter].v[2] = DebugDataV3[i].Data[DebugCounter - 1].v[2];
-							}
-						}
-					}
-
-					for (int i = 0; i < 5; i++)
-					{
-						if (DebugDataQ4[i].InUse)
-						{
-							if (DebugDataQ4[i].Data[DebugCounter].w == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].w != 0.0)
-							{
-								DebugDataQ4[i].Data[DebugCounter].w = DebugDataQ4[i].Data[DebugCounter - 1].w;
-							}
-
-							if (DebugDataQ4[i].Data[DebugCounter].x == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].x != 0.0)
-							{
-								DebugDataQ4[i].Data[DebugCounter].x = DebugDataQ4[i].Data[DebugCounter - 1].x;
-							}
-
-							if (DebugDataQ4[i].Data[DebugCounter].y == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].y != 0.0)
-							{
-								DebugDataQ4[i].Data[DebugCounter].y = DebugDataQ4[i].Data[DebugCounter - 1].y;
-							}
-
-							if (DebugDataQ4[i].Data[DebugCounter].z == 0.0 && DebugDataQ4[i].Data[DebugCounter - 1].z != 0.0)
-							{
-								DebugDataQ4[i].Data[DebugCounter].z = DebugDataQ4[i].Data[DebugCounter - 1].z;
-							}
-						}
-					}				
-				}
-
 				DebugTiming[DebugCounter] = DebugTimer.seconds();
 
-				if (DebugCounter >= 10000)
+				if (DebugCounter >= MAX_DEBUG_ENTRIES - 1)
 				{
 					DebuggerRunning = false;
 				}
 				else
 				{
 					DebugCounter++;
+					Ref = Hmd = false;
 				}
 			}
 		}
@@ -118,9 +69,7 @@ namespace vrmotioncompensation
 
 			if (DebuggerRunning)
 			{
-				DebugDataV3[ID].Data[DebugCounter].v[0] = Data.v[0];
-				DebugDataV3[ID].Data[DebugCounter].v[1] = Data.v[1];
-				DebugDataV3[ID].Data[DebugCounter].v[2] = Data.v[2];
+				DebugDataV3[ID].Data[DebugCounter] = Data;
 			}			
 		}
 
@@ -130,10 +79,7 @@ namespace vrmotioncompensation
 
 			if (DebuggerRunning)
 			{
-				DebugDataQ4[ID].Data[DebugCounter].w = Data.w;
-				DebugDataQ4[ID].Data[DebugCounter].x = Data.x;
-				DebugDataQ4[ID].Data[DebugCounter].y = Data.y;
-				DebugDataQ4[ID].Data[DebugCounter].z = Data.z;
+				DebugDataQ4[ID].Data[DebugCounter] = Data;
 			}			
 		}
 
@@ -149,17 +95,26 @@ namespace vrmotioncompensation
 			}
 		}
 
-		bool Debugger::IsInSync()
+		void Debugger::gotRef()
 		{
-			return InSync;
+			Ref = true;
 		}
 
-		void Debugger::SetInSync(bool Sync)
+		void Debugger::gotHmd()
 		{
-			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
-
-			InSync = Sync;
+			Hmd = true;
 		}
+
+		bool Debugger::hasRef()
+		{
+			return Ref;
+		}
+
+		bool Debugger::hasHmd()
+		{
+			return Hmd;
+		}
+
 
 		void Debugger::SetDebugNameQ4(std::string Name, int ID)
 		{
@@ -177,30 +132,11 @@ namespace vrmotioncompensation
 			DebugDataV3[ID].InUse = true;
 		}
 
-		void Debugger::SetZeroPos(vr::HmdVector3d_t vPos, const double vPosRaw[3], vr::HmdQuaternion_t qPos, vr::HmdQuaternion_t qPosRaw)
-		{
-			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
-
-			vZeroPos = vPos;
-			vZeroPosRaw.v[0] = vPosRaw[0];
-			vZeroPosRaw.v[1] = vPosRaw[1];
-			vZeroPosRaw.v[2] = vPosRaw[2];
-			qZeroPos = qPos;
-			qZeroPosRaw = qPosRaw;
-		}
-
-		void Debugger::SetLPFValue(double value)
-		{
-			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
-
-			LPFValue = value;
-		}
-
 		void Debugger::WriteFile()
 		{
 			std::lock_guard<std::recursive_mutex> lockGuard(_mut);
 
-			if (!WroteToFile)
+			if (!WroteToFile && DebugCounter > 0)
 			{
 				LOG(DEBUG) << "Trying to write debug file...";
 
@@ -209,34 +145,30 @@ namespace vrmotioncompensation
 
 				if (!DebugFile.bad())
 				{
-					LOG(DEBUG) << "Writing " << DebugCounter << " debug points of data";
+					unsigned int index = 1;
 
-					//Write ZeroPos and filter setting
-					DebugFile << "ZeroPos X;" << vZeroPos.v[0] << ";Y;" << vZeroPos.v[1] << ";Z;" << vZeroPos.v[2] << ";";
-					DebugFile << "ZeroPosRaw X;" << vZeroPosRaw.v[0] << ";Y;" << vZeroPosRaw.v[1] << ";Z;" << vZeroPosRaw.v[2] << ";";
-					DebugFile << "ZeroPos w;" << qZeroPos.w << ";x;" << qZeroPos.x << ";y;" << qZeroPos.y << ";t;" << qZeroPos.z << ";";
-					DebugFile << "ZeroPosRaw w;" << qZeroPosRaw.w << ";x;" << qZeroPosRaw.x << ";y;" << qZeroPosRaw.y << ";z;" << qZeroPosRaw.z << ";";
-					DebugFile << "LPF Beta;" << LPFValue << ";";
-					DebugFile << std::endl;
+					LOG(DEBUG) << "Writing " << DebugCounter << " debug points of data";
 
 					//Write title
 					DebugFile << "Time;";
 
 					//Quaternions
-					for (int i = 0; i < 5; i++)
+					for (int i = 0; i < MAX_DEBUG_QUATERNIONS; i++)
 					{
 						if (DebugDataQ4[i].InUse)
 						{
-							DebugFile << DebugDataQ4[i].Name << " w;" << "x;" << "y;" << "z;";
+							DebugFile << DebugDataQ4[i].Name << "[" << index << ":4];";
+							index += 4;
 						}
 					}
 
 					//Vectors
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < MAX_DEBUG_VECTORS; i++)
 					{
 						if (DebugDataV3[i].InUse)
 						{
-							DebugFile << DebugDataV3[i].Name << " X;" << "Y;" << "Z;";
+							DebugFile << DebugDataV3[i].Name << "[" << index << ":3];";
+							index += 3;
 						}
 					}
 					DebugFile << std::endl;
@@ -246,7 +178,7 @@ namespace vrmotioncompensation
 					{
 						DebugFile << DebugTiming[i] << ";";
 				
-						for (int j = 0; j < 5; j++)
+						for (int j = 0; j < MAX_DEBUG_QUATERNIONS; j++)
 						{
 							if (DebugDataQ4[j].InUse)
 							{
@@ -257,7 +189,7 @@ namespace vrmotioncompensation
 							}
 						}
 				
-						for (int j = 0; j < 20; j++)
+						for (int j = 0; j < MAX_DEBUG_VECTORS; j++)
 						{
 							if (DebugDataV3[j].InUse)
 							{
