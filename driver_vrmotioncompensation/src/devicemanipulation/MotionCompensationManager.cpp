@@ -21,8 +21,8 @@ namespace vrmotioncompensation
 				_region = { _shdmem, boost::interprocess::read_write };
 
 				// get pointer address and fill it with data
-				_poffset = static_cast<vr::HmdVector3d_t*>(_region.get_address());
-				*_poffset = _offset;
+				_Poffset = static_cast<vr::HmdVector3d_t*>(_region.get_address());
+				*_Poffset = _Offset;
 				LOG(INFO) << "Shared memory OVRMC_MMF created";
 			}
 			catch (boost::interprocess::interprocess_exception & e)
@@ -33,57 +33,56 @@ namespace vrmotioncompensation
 
 		void MotionCompensationManager::WriteDebugData()
 		{
-			DebugLogger.WriteFile();
+			_DebugLogger.WriteFile();
 		}
 
 		void MotionCompensationManager::InitDebugData()
 		{
-			DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
-			DebugLogger.SetDebugNameV3("Ref Filter Pos", 1);
+			_DebugLogger.SetDebugNameV3("Ref Raw Pos", 0);
+			_DebugLogger.SetDebugNameV3("Ref Filter Pos", 1);
 
-			DebugLogger.SetDebugNameV3("Ref Raw PosVel", 2);
-			DebugLogger.SetDebugNameV3("Ref Filter PosVel", 3);
+			_DebugLogger.SetDebugNameV3("Ref Raw PosVel", 2);
+			_DebugLogger.SetDebugNameV3("Ref Filter PosVel", 3);
 
-			DebugLogger.SetDebugNameV3("Ref Raw PosAcc", 4);
-			DebugLogger.SetDebugNameV3("Ref Filter PosAcc", 5);
+			_DebugLogger.SetDebugNameV3("Ref Raw PosAcc", 4);
+			_DebugLogger.SetDebugNameV3("Ref Filter PosAcc", 5);
 
-			DebugLogger.SetDebugNameV3("Ref Raw RotVel", 6);
-			DebugLogger.SetDebugNameV3("Ref Filter RotVel", 7);
+			_DebugLogger.SetDebugNameV3("Ref Raw RotVel", 6);
+			_DebugLogger.SetDebugNameV3("Ref Filter RotVel", 7);
 
-			DebugLogger.SetDebugNameV3("Ref Raw RotAcc", 8);
-			DebugLogger.SetDebugNameV3("Ref Filter RotAcc", 9);
+			_DebugLogger.SetDebugNameV3("Ref Raw RotAcc", 8);
+			_DebugLogger.SetDebugNameV3("Ref Filter RotAcc", 9);
 
-			DebugLogger.SetDebugNameV3("HMD Raw Pos", 10);
-			DebugLogger.SetDebugNameV3("HMD MC Pos", 11);
+			_DebugLogger.SetDebugNameV3("HMD Raw Pos", 10);
+			_DebugLogger.SetDebugNameV3("HMD MC Pos", 11);
 
-			DebugLogger.SetDebugNameV3("HMD Raw PosVel", 12);
-			DebugLogger.SetDebugNameV3("HMD MC PosVel", 13);
+			_DebugLogger.SetDebugNameV3("HMD Raw PosVel", 12);
+			_DebugLogger.SetDebugNameV3("HMD MC PosVel", 13);
 
-			DebugLogger.SetDebugNameV3("HMD Raw PosAcc", 14);
-			DebugLogger.SetDebugNameV3("HMD MC PosAcc", 15);
+			_DebugLogger.SetDebugNameV3("HMD Raw PosAcc", 14);
+			_DebugLogger.SetDebugNameV3("HMD MC PosAcc", 15);
 
-			DebugLogger.SetDebugNameV3("HMD Raw RotVel", 16);
-			DebugLogger.SetDebugNameV3("HMD MC RotVel", 17);
+			_DebugLogger.SetDebugNameV3("HMD Raw RotVel", 16);
+			_DebugLogger.SetDebugNameV3("HMD MC RotVel", 17);
 
-			DebugLogger.SetDebugNameV3("HMD Raw RotAcc", 18);
-			DebugLogger.SetDebugNameV3("HMD MC RotAcc", 19);
+			_DebugLogger.SetDebugNameV3("HMD Raw RotAcc", 18);
+			_DebugLogger.SetDebugNameV3("HMD MC RotAcc", 19);
 
+			_DebugLogger.SetDebugNameQ4("Ref Raw Rot", 0);
+			_DebugLogger.SetDebugNameQ4("Ref Filter Rot", 1);
 
-			DebugLogger.SetDebugNameQ4("Ref Raw Rot", 0);
-			DebugLogger.SetDebugNameQ4("Ref Filter Rot", 1);
+			_DebugLogger.SetDebugNameQ4("HMD Raw Rot", 2);
+			_DebugLogger.SetDebugNameQ4("HMD MC Rot", 3);
 
-			DebugLogger.SetDebugNameQ4("HMD Raw Rot", 2);
-			DebugLogger.SetDebugNameQ4("HMD MC Rot", 3);
-
-			DebugLogger.SetLPFValue(LPF_Beta);
+			_DebugLogger.SetLPFValue(_LpfBeta);
 		}
 
 		bool MotionCompensationManager::StartDebugData()
 		{
-			if (_motionCompensationMode == MotionCompensationMode::ReferenceTracker && !DebugLogger.IsRunning())
+			if (_Mode == MotionCompensationMode::ReferenceTracker && !_DebugLogger.IsRunning())
 			{
 				InitDebugData();
-				DebugLogger.Start();
+				_DebugLogger.Start();
 				return true;
 			}
 
@@ -92,95 +91,94 @@ namespace vrmotioncompensation
 
 		void MotionCompensationManager::StopDebugData()
 		{
-			DebugLogger.Stop();
+			_DebugLogger.Stop();
 			WriteDebugData();
 		}
 
-		bool MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice)
+		bool MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode, int McDevice, int RtDevice)
 		{
 			if (Mode == MotionCompensationMode::ReferenceTracker)
 			{
 				_RefPoseValid = false;
 				_RefPoseValidCounter = 0;
-				_motionCompensationZeroPoseValid = false;
-				_motionCompensationEnabled = true;
+				_ZeroPoseValid = false;
+				_Enabled = true;
 				
-				setAlpha(_samples);
+				setAlpha(_Samples);
 			}
 			else
 			{
-				_motionCompensationEnabled = false;
+				_Enabled = false;
 			}
 
-			MCdeviceID = MCdevice;
-			RTdeviceID = RTdevice;
-			_motionCompensationMode = Mode;
+			_McDeviceID = McDevice;
+			_RtDeviceID = RtDevice;
+			_Mode = Mode;
 
 			return true;
 		}
 
 		void MotionCompensationManager::setNewMotionCompensatedDevice(int MCdevice)
 		{
-			MCdeviceID = MCdevice;
+			_McDeviceID = MCdevice;
 		}
 
 		void MotionCompensationManager::setNewReferenceTracker(int RTdevice)
 		{
-			RTdeviceID = RTdevice;
+			_RtDeviceID = RTdevice;
 			_RefPoseValid = false;
-			_motionCompensationZeroPoseValid = false;
+			_ZeroPoseValid = false;
 		}
 
 		void MotionCompensationManager::setAlpha(uint32_t samples)
 		{
-			_samples = samples;
-			_alpha = 2.0 / (1.0 + (double)samples);
+			_Samples = samples;
+			_Alpha = 2.0 / (1.0 + (double)samples);
 		}
 
 		void MotionCompensationManager::setZeroMode(bool setZero)
 		{
 			_SetZeroMode = setZero;
 
-			_motionCompensationRefPosVel = { 0, 0, 0 };
-			_motionCompensationRefRotVel = { 0, 0, 0 };
-
-			_motionCompensationRefPosAcc = { 0, 0, 0 };
-			_motionCompensationRefRotAcc = { 0, 0, 0 };
+			_zeroVec(_RefVel);
+			_zeroVec(_RefRotVel);
+			_zeroVec(_RefAcc);
+			_zeroVec(_RefRotAcc);
 		}
 
 		void MotionCompensationManager::setOffsets(vr::HmdVector3d_t offsets)
 		{
-			_offset = offsets;
-			*_poffset = _offset;
+			_Offset = offsets;
+			*_Poffset = _Offset;
 		}
 
-		bool MotionCompensationManager::_isMotionCompensationZeroPoseValid()
+		bool MotionCompensationManager::isZeroPoseValid()
 		{
-			return _motionCompensationZeroPoseValid;
+			return _ZeroPoseValid;
 		}
 
-		void MotionCompensationManager::_resetMotionCompensationZeroPose()
+		void MotionCompensationManager::resetZeroPose()
 		{
-			_motionCompensationZeroPoseValid = false;
+			_ZeroPoseValid = false;
 		}
 
-		void MotionCompensationManager::_setMotionCompensationZeroPose(const vr::DriverPose_t& pose)
+		void MotionCompensationManager::setZeroPose(const vr::DriverPose_t& pose)
 		{
 			// convert pose from driver space to app space
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
 
 			// Save zero points
 			_ZeroLock.lock();
-			_motionCompensationZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
-			_motionCompensationZeroRot = tmpConj * pose.qRotation;			
+			_ZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
+			_ZeroRot = tmpConj * pose.qRotation;			
 
-			DebugLogger.SetZeroPos(_motionCompensationZeroPos, pose.vecPosition, _motionCompensationZeroRot, pose.qRotation);
+			_DebugLogger.SetZeroPos(_ZeroPos, pose.vecPosition, _ZeroRot, pose.qRotation);
 
-			_motionCompensationZeroPoseValid = true;
+			_ZeroPoseValid = true;
 			_ZeroLock.unlock();
 		}
 
-		void MotionCompensationManager::_updateMotionCompensationRefPose(const vr::DriverPose_t& pose)
+		void MotionCompensationManager::updateRefPose(const vr::DriverPose_t& pose)
 		{
 			// From https://github.com/ValveSoftware/driver_hydra/blob/master/drivers/driver_hydra/driver_hydra.cpp Line 835:
 			// "True acceleration is highly volatile, so it's not really reasonable to
@@ -196,117 +194,105 @@ namespace vrmotioncompensation
 
 			// Oculus devices do use acceleration. It also seems that the HMD uses theses values for render-prediction
 
-			vr::HmdVector3d_t Filter_VecVelocity = { 0, 0, 0 };
-			vr::HmdVector3d_t Filter_VecAcceleration = { 0, 0, 0 };
+			vr::HmdVector3d_t Filter_vecPosition = { 0, 0, 0 };
+			vr::HmdVector3d_t Filter_vecVelocity = { 0, 0, 0 };
+			vr::HmdVector3d_t Filter_vecAcceleration = { 0, 0, 0 };
 			vr::HmdVector3d_t Filter_vecAngularVelocity = { 0, 0, 0 };
 			vr::HmdVector3d_t Filter_vecAngularAcceleration = { 0, 0, 0 };
 			vr::HmdVector3d_t RotEulerFilter = { 0, 0, 0 };
 
 			// Get current time in microseconds and convert it to seconds
 			long long now = std::chrono::duration_cast <std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-			double tdiff = (double)(now - _RefTrackerLastTime) / 1.0E6 + (pose.poseTimeOffset - RefTrackerlastPose.poseTimeOffset);
+			double tdiff = (double)(now - _RefTrackerLastTime) / 1.0E6 + (pose.poseTimeOffset - _RefTrackerLastPose.poseTimeOffset);
 
 			// Position
 			// Add a exponential median average filter
-			if (_samples >= 2)
+			if (_Samples >= 2)
 			{
 				// ----------------------------------------------------------------------------------------------- //
 				// ----------------------------------------------------------------------------------------------- //
 				// Position
-				_Filter_vecPosition_1.v[0] = DEMA(pose.vecPosition[0], 0);
-				_Filter_vecPosition_1.v[1] = DEMA(pose.vecPosition[1], 1);
-				_Filter_vecPosition_1.v[2] = DEMA(pose.vecPosition[2], 2);
+				Filter_vecPosition.v[0] = DEMA(pose.vecPosition[0], 0);
+				Filter_vecPosition.v[1] = DEMA(pose.vecPosition[1], 1);
+				Filter_vecPosition.v[2] = DEMA(pose.vecPosition[2], 2);
 
 				// ----------------------------------------------------------------------------------------------- //
 				// ----------------------------------------------------------------------------------------------- //
 				// Velocity and acceleration
 				if (!_SetZeroMode)
 				{
-					Filter_VecVelocity.v[0] = vecVelocity(tdiff, _Filter_vecPosition_1.v[0], RefTrackerlastPose.vecPosition[0]);
-					Filter_VecVelocity.v[1] = vecVelocity(tdiff, _Filter_vecPosition_1.v[1], RefTrackerlastPose.vecPosition[1]);
-					Filter_VecVelocity.v[2] = vecVelocity(tdiff, _Filter_vecPosition_1.v[2], RefTrackerlastPose.vecPosition[2]);
+					Filter_vecVelocity.v[0] = vecVelocity(tdiff, Filter_vecPosition.v[0], _RefTrackerLastPose.vecPosition[0]);
+					Filter_vecVelocity.v[1] = vecVelocity(tdiff, Filter_vecPosition.v[1], _RefTrackerLastPose.vecPosition[1]);
+					Filter_vecVelocity.v[2] = vecVelocity(tdiff, Filter_vecPosition.v[2], _RefTrackerLastPose.vecPosition[2]);
 
-					Filter_VecAcceleration.v[0] = vecAcceleration(tdiff, Filter_VecVelocity.v[0], RefTrackerlastPose.vecVelocity[0]);
-					Filter_VecAcceleration.v[1] = vecAcceleration(tdiff, Filter_VecVelocity.v[1], RefTrackerlastPose.vecVelocity[1]);
-					Filter_VecAcceleration.v[2] = vecAcceleration(tdiff, Filter_VecVelocity.v[2], RefTrackerlastPose.vecVelocity[2]);
+					Filter_vecAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecVelocity.v[0], _RefTrackerLastPose.vecVelocity[0]);
+					Filter_vecAcceleration.v[1] = vecAcceleration(tdiff, Filter_vecVelocity.v[1], _RefTrackerLastPose.vecVelocity[1]);
+					Filter_vecAcceleration.v[2] = vecAcceleration(tdiff, Filter_vecVelocity.v[2], _RefTrackerLastPose.vecVelocity[2]);
 				}
 			}
 			else
 			{
-				_Filter_vecPosition_1.v[0] = pose.vecPosition[0];
-				_Filter_vecPosition_1.v[1] = pose.vecPosition[1];
-				_Filter_vecPosition_1.v[2] = pose.vecPosition[2];
-
-				Filter_VecVelocity.v[0] = pose.vecVelocity[0];
-				Filter_VecVelocity.v[1] = pose.vecVelocity[1];
-				Filter_VecVelocity.v[2] = pose.vecVelocity[2];
+				_copyVec(Filter_vecPosition, pose.vecPosition);
+				_copyVec(Filter_vecVelocity, pose.vecVelocity);
 			}
 
 			// convert pose from driver space to app space
 			vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
 			_RefLock.lock();
-			_motionCompensationRefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _Filter_vecPosition_1, true) - pose.vecWorldFromDriverTranslation;
+			_RefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecPosition, true) - pose.vecWorldFromDriverTranslation;
 			_RefLock.unlock();
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
 			// Rotation
-			if (LPF_Beta <= 0.9999)
+			if (_LpfBeta <= 0.9999)
 			{
 				// 1st stage
-				_Filter_rotPosition_1 = lowPassFilterQuaternion(pose.qRotation, _Filter_rotPosition_1);
+				_Filter_rotPosition[0] = lowPassFilterQuaternion(pose.qRotation, _Filter_rotPosition[0]);
 
 				// 2nd stage
-				_Filter_rotPosition_2 = lowPassFilterQuaternion(_Filter_rotPosition_1, _Filter_rotPosition_2);
+				_Filter_rotPosition[1] = lowPassFilterQuaternion(_Filter_rotPosition[0], _Filter_rotPosition[1]);
 
 				
-				vr::HmdVector3d_t RotEulerFilter = ToEulerAngles(_Filter_rotPosition_2);
+				vr::HmdVector3d_t RotEulerFilter = toEulerAngles(_Filter_rotPosition[1]);
 
 				if (!_SetZeroMode)
 				{
-					Filter_vecAngularVelocity.v[0] = rotVelocity(tdiff, RotEulerFilter.v[0], RotEulerFilterOld.v[0]);
-					Filter_vecAngularVelocity.v[1] = rotVelocity(tdiff, RotEulerFilter.v[1], RotEulerFilterOld.v[1]);
-					Filter_vecAngularVelocity.v[2] = rotVelocity(tdiff, RotEulerFilter.v[2], RotEulerFilterOld.v[2]);
+					Filter_vecAngularVelocity.v[0] = rotVelocity(tdiff, RotEulerFilter.v[0], _RotEulerFilterOld.v[0]);
+					Filter_vecAngularVelocity.v[1] = rotVelocity(tdiff, RotEulerFilter.v[1], _RotEulerFilterOld.v[1]);
+					Filter_vecAngularVelocity.v[2] = rotVelocity(tdiff, RotEulerFilter.v[2], _RotEulerFilterOld.v[2]);
 
-					Filter_vecAngularAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[0], RefTrackerlastPose.vecAngularVelocity[0]);
-					Filter_vecAngularAcceleration.v[1] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[1], RefTrackerlastPose.vecAngularVelocity[1]);
-					Filter_vecAngularAcceleration.v[2] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[2], RefTrackerlastPose.vecAngularVelocity[2]);
+					Filter_vecAngularAcceleration.v[0] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[0], _RefTrackerLastPose.vecAngularVelocity[0]);
+					Filter_vecAngularAcceleration.v[1] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[1], _RefTrackerLastPose.vecAngularVelocity[1]);
+					Filter_vecAngularAcceleration.v[2] = vecAcceleration(tdiff, Filter_vecAngularVelocity.v[2], _RefTrackerLastPose.vecAngularVelocity[2]);
 				}
 			}
 			else
 			{
-				_Filter_rotPosition_2 = pose.qRotation;
+				_Filter_rotPosition[1] = pose.qRotation;
 
-				Filter_vecAngularVelocity.v[0] = pose.vecAngularVelocity[0];
-				Filter_vecAngularVelocity.v[1] = pose.vecAngularVelocity[1];
-				Filter_vecAngularVelocity.v[2] = pose.vecAngularVelocity[2];
-
-				Filter_vecAngularAcceleration.v[0] = pose.vecAngularAcceleration[0];
-				Filter_vecAngularAcceleration.v[1] = pose.vecAngularAcceleration[1];
-				Filter_vecAngularAcceleration.v[2] = pose.vecAngularAcceleration[2];
+				_copyVec(Filter_vecAngularVelocity, pose.vecAngularVelocity);
+				_copyVec(Filter_vecAngularAcceleration, pose.vecAngularAcceleration);
 			}
 
 			// calculate orientation difference and its inverse
-			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition_2;
+			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition[1];
 			_RefLock.lock();
 			_ZeroLock.lock();
-			_motionCompensationRefRot = poseWorldRot * vrmath::quaternionConjugate(_motionCompensationZeroRot);
-			_motionCompensationRefRotInv = vrmath::quaternionConjugate(_motionCompensationRefRot);
+			_RefRot = poseWorldRot * vrmath::quaternionConjugate(_ZeroRot);
+			_RefRotInv = vrmath::quaternionConjugate(_RefRot);
 			_ZeroLock.unlock();
 			_RefLock.unlock();
 
 			if (!_SetZeroMode)
 			{
-				// Convert velocity and acceleration values into app space and undo device rotation
-				vr::HmdQuaternion_t tmpRot = tmpConj * vrmath::quaternionConjugate(_Filter_rotPosition_2);
-				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
-
+				// Convert velocity and acceleration values into app space
 				_RefVelLock.lock();
-				_motionCompensationRefPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecVelocity);
-				_motionCompensationRefRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularVelocity);
+				_RefVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecVelocity, true);
+				_RefRotVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAngularVelocity, true);
 
-				_motionCompensationRefPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_VecAcceleration);
-				_motionCompensationRefRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, Filter_vecAngularAcceleration);
+				_RefAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAcceleration, true);
+				_RefRotAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecAngularAcceleration, true);
 				_RefVelLock.unlock();
 			}
 
@@ -323,58 +309,48 @@ namespace vrmotioncompensation
 			}			
 
 			// Save last rotation and pose
-			RotEulerFilterOld = RotEulerFilter;
-			RefTrackerlastPose = pose;
+			_RotEulerFilterOld = RotEulerFilter;
+			_RefTrackerLastPose = pose;
 
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
 			// Debug
-			if (DebugLogger.IsRunning())
+			if (_DebugLogger.IsRunning())
 			{
-				DebugLogger.CountUp();
+				_DebugLogger.CountUp();
 
-				DebugLogger.AddDebugData(pose.vecPosition, 0);
-				DebugLogger.AddDebugData(_Filter_vecPosition_1, 1);
+				_DebugLogger.AddDebugData(pose.vecPosition, 0);
+				_DebugLogger.AddDebugData(Filter_vecPosition, 1);
+				_DebugLogger.AddDebugData(pose.vecVelocity, 2);
+				_DebugLogger.AddDebugData(Filter_vecVelocity, 3);
+				_DebugLogger.AddDebugData(pose.vecAcceleration, 4);
+				_DebugLogger.AddDebugData(_RefAcc, 5);
+				_DebugLogger.AddDebugData(pose.vecAngularVelocity, 6);
+				_DebugLogger.AddDebugData(Filter_vecAngularVelocity, 7);
+				_DebugLogger.AddDebugData(pose.vecAngularAcceleration, 8);
+				_DebugLogger.AddDebugData(_RefRotAcc, 9);
+				_DebugLogger.AddDebugData(pose.qRotation, 0);
+				_DebugLogger.AddDebugData(_Filter_rotPosition[1], 1);
 
-				DebugLogger.AddDebugData(pose.vecVelocity, 2);
-				DebugLogger.AddDebugData(Filter_VecVelocity, 3);
-
-				DebugLogger.AddDebugData(pose.vecAcceleration, 4);
-				DebugLogger.AddDebugData(_motionCompensationRefPosAcc, 5);
-
-				DebugLogger.AddDebugData(pose.vecAngularVelocity, 6);
-				DebugLogger.AddDebugData(Filter_vecAngularVelocity, 7);
-
-				DebugLogger.AddDebugData(pose.vecAngularAcceleration, 8);
-				DebugLogger.AddDebugData(_motionCompensationRefRotAcc, 9);
-
-				DebugLogger.AddDebugData(pose.qRotation, 0);
-				DebugLogger.AddDebugData(_Filter_rotPosition_2, 1);
-
-				DebugLogger.SetInSync(true);
+				_DebugLogger.SetInSync(true);
 			}
 			// ----------------------------------------------------------------------------------------------- //
 			// ----------------------------------------------------------------------------------------------- //
 			// Debug End
 		}
 
-		bool MotionCompensationManager::_applyMotionCompensation(vr::DriverPose_t& pose)
+		bool MotionCompensationManager::applyMotionCompensation(vr::DriverPose_t& pose)
 		{
-			if (_motionCompensationEnabled && _motionCompensationZeroPoseValid && _RefPoseValid)
+			if (_Enabled && _ZeroPoseValid && _RefPoseValid)
 			{
-				if (DebugLogger.IsRunning() && DebugLogger.IsInSync())
+				if (_DebugLogger.IsRunning() && _DebugLogger.IsInSync())
 				{
-					DebugLogger.AddDebugData(pose.vecPosition, 10);
-
-					DebugLogger.AddDebugData(pose.vecVelocity, 12);
-
-					DebugLogger.AddDebugData(pose.vecAcceleration, 14);
-
-					DebugLogger.AddDebugData(pose.vecAngularVelocity, 16);
-
-					DebugLogger.AddDebugData(pose.vecAngularAcceleration, 18);
-
-					DebugLogger.AddDebugData(pose.qRotation, 2);
+					_DebugLogger.AddDebugData(pose.vecPosition, 10);
+					_DebugLogger.AddDebugData(pose.vecVelocity, 12);
+					_DebugLogger.AddDebugData(pose.vecAcceleration, 14);
+					_DebugLogger.AddDebugData(pose.vecAngularVelocity, 16);
+					_DebugLogger.AddDebugData(pose.vecAngularAcceleration, 18);
+					_DebugLogger.AddDebugData(pose.qRotation, 2);
 				}
 
 				// All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
@@ -386,52 +362,38 @@ namespace vrmotioncompensation
 				vr::HmdQuaternion_t poseWorldRot = tmpConj * pose.qRotation;
 				_RefLock.lock();
 				_ZeroLock.lock();
-				vr::HmdVector3d_t compensatedPoseWorldPos = _motionCompensationZeroPos + vrmath::quaternionRotateVector(_motionCompensationRefRot, _motionCompensationRefRotInv, poseWorldPos - _motionCompensationRefPos, true);
+				vr::HmdVector3d_t compensatedPoseWorldPos = _ZeroPos + vrmath::quaternionRotateVector(_RefRot, _RefRotInv, poseWorldPos - _RefPos, true);
 				_ZeroLock.unlock();
-				vr::HmdQuaternion_t compensatedPoseWorldRot = _motionCompensationRefRotInv * poseWorldRot;
+				vr::HmdQuaternion_t compensatedPoseWorldRot = _RefRotInv * poseWorldRot;
 				_RefLock.unlock();
-
-				// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
-				vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
-				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
 
 				if (_SetZeroMode)
 				{
-					pose.vecVelocity[0] = 0.0;
-					pose.vecVelocity[1] = 0.0;
-					pose.vecVelocity[2] = 0.0;
-
-					pose.vecAngularVelocity[0] = 0.0;
-					pose.vecAngularVelocity[1] = 0.0;
-					pose.vecAngularVelocity[2] = 0.0;
-
-					pose.vecAcceleration[0] = 0.0;
-					pose.vecAcceleration[1] = 0.0;
-					pose.vecAcceleration[2] = 0.0;
-
-					pose.vecAngularAcceleration[0] = 0.0;
-					pose.vecAngularAcceleration[1] = 0.0;
-					pose.vecAngularAcceleration[2] = 0.0;
+					_zeroVec(pose.vecVelocity);
+					_zeroVec(pose.vecAcceleration);
+					_zeroVec(pose.vecAngularVelocity);
+					_zeroVec(pose.vecAngularAcceleration);
 				}
 				else
 				{
+					// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
 					_RefVelLock.lock();
-					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosVel);
+					vr::HmdVector3d_t tmpPosVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefVel);
 					pose.vecVelocity[0] -= tmpPosVel.v[0];
 					pose.vecVelocity[1] -= tmpPosVel.v[1];
 					pose.vecVelocity[2] -= tmpPosVel.v[2];
 
-					vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotVel);
+					vr::HmdVector3d_t tmpRotVel = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefRotVel);
 					pose.vecAngularVelocity[0] -= tmpRotVel.v[0];
 					pose.vecAngularVelocity[1] -= tmpRotVel.v[1];
 					pose.vecAngularVelocity[2] -= tmpRotVel.v[2];
 
-					vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefPosAcc);
+					vr::HmdVector3d_t tmpPosAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefAcc);
 					pose.vecAcceleration[0] -= tmpPosAcc.v[0];
 					pose.vecAcceleration[1] -= tmpPosAcc.v[1];
 					pose.vecAcceleration[2] -= tmpPosAcc.v[2];
 
-					vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(tmpRot, tmpRotInv, _motionCompensationRefRotAcc);
+					vr::HmdVector3d_t tmpRotAcc = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, _RefRotAcc);
 					pose.vecAngularAcceleration[0] -= tmpRotAcc.v[0];
 					pose.vecAngularAcceleration[1] -= tmpRotAcc.v[1];
 					pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];
@@ -446,21 +408,21 @@ namespace vrmotioncompensation
 				pose.vecPosition[1] = adjPoseDriverPos.v[1];
 				pose.vecPosition[2] = adjPoseDriverPos.v[2];
 
-				if (DebugLogger.IsRunning() && DebugLogger.IsInSync())
+				if (_DebugLogger.IsRunning() && _DebugLogger.IsInSync())
 				{
-					DebugLogger.AddDebugData(pose.vecPosition, 11);
+					_DebugLogger.AddDebugData(pose.vecPosition, 11);
 
-					DebugLogger.AddDebugData(pose.vecVelocity, 13);
+					_DebugLogger.AddDebugData(pose.vecVelocity, 13);
 
-					DebugLogger.AddDebugData(pose.vecAcceleration, 15);
+					_DebugLogger.AddDebugData(pose.vecAcceleration, 15);
 
-					DebugLogger.AddDebugData(pose.vecAngularVelocity, 17);
+					_DebugLogger.AddDebugData(pose.vecAngularVelocity, 17);
 
-					DebugLogger.AddDebugData(pose.vecAngularAcceleration, 19);
+					_DebugLogger.AddDebugData(pose.vecAngularAcceleration, 19);
 
-					DebugLogger.AddDebugData(pose.qRotation, 3);
+					_DebugLogger.AddDebugData(pose.qRotation, 3);
 
-					DebugLogger.SetInSync(false);
+					_DebugLogger.SetInSync(false);
 				}
 			}
 			return true;
@@ -501,7 +463,7 @@ namespace vrmotioncompensation
 
 			if (time != (double)0.0)
 			{
-				NewVelocity = (1 - AngleDifference(vecAngle, Old_vecAngle)) / time;
+				NewVelocity = (1 - angleDifference(vecAngle, Old_vecAngle)) / time;
 			}
 
 			return NewVelocity;
@@ -510,9 +472,9 @@ namespace vrmotioncompensation
 		// Low Pass Filter for 3d Vectors
 		double MotionCompensationManager::DEMA(const double RawData, int Axis)
 		{			
-			_FilterOld_vecPosition_1.v[Axis] += _alpha * (RawData - _FilterOld_vecPosition_1.v[Axis]);
-			_FilterOld_vecPosition_2.v[Axis] += _alpha * (_FilterOld_vecPosition_1.v[Axis] - _FilterOld_vecPosition_2.v[Axis]);
-			return 2 * _FilterOld_vecPosition_1.v[Axis] - _FilterOld_vecPosition_2.v[Axis];
+			_Filter_vecPosition[0].v[Axis] += _Alpha * (RawData - _Filter_vecPosition[1].v[Axis]);
+			_Filter_vecPosition[1].v[Axis] += _Alpha * (_Filter_vecPosition[0].v[Axis] - _Filter_vecPosition[1].v[Axis]);
+			return 2 * _Filter_vecPosition[0].v[Axis] - _Filter_vecPosition[1].v[Axis];
 		}
 
 		// Low Pass Filter for 3d Vectors
@@ -520,9 +482,9 @@ namespace vrmotioncompensation
 		{
 			vr::HmdVector3d_t RetVal;
 
-			RetVal.v[0] = SmoothData.v[0] - (LPF_Beta * (SmoothData.v[0] - RawData[0]));
-			RetVal.v[1] = SmoothData.v[1] - (LPF_Beta * (SmoothData.v[1] - RawData[1]));
-			RetVal.v[2] = SmoothData.v[2] - (LPF_Beta * (SmoothData.v[2] - RawData[2]));
+			RetVal.v[0] = SmoothData.v[0] - (_LpfBeta * (SmoothData.v[0] - RawData[0]));
+			RetVal.v[1] = SmoothData.v[1] - (_LpfBeta * (SmoothData.v[1] - RawData[1]));
+			RetVal.v[2] = SmoothData.v[2] - (_LpfBeta * (SmoothData.v[2] - RawData[2]));
 
 			return RetVal;
 		}
@@ -532,9 +494,9 @@ namespace vrmotioncompensation
 		{
 			vr::HmdVector3d_t RetVal;
 
-			RetVal.v[0] = SmoothData.v[0] - (LPF_Beta * (SmoothData.v[0] - RawData.v[0]));
-			RetVal.v[1] = SmoothData.v[1] - (LPF_Beta * (SmoothData.v[1] - RawData.v[1]));
-			RetVal.v[2] = SmoothData.v[2] - (LPF_Beta * (SmoothData.v[2] - RawData.v[2]));
+			RetVal.v[0] = SmoothData.v[0] - (_LpfBeta * (SmoothData.v[0] - RawData.v[0]));
+			RetVal.v[1] = SmoothData.v[1] - (_LpfBeta * (SmoothData.v[1] - RawData.v[1]));
+			RetVal.v[2] = SmoothData.v[2] - (_LpfBeta * (SmoothData.v[2] - RawData.v[2]));
 
 			return RetVal;
 		}
@@ -542,11 +504,11 @@ namespace vrmotioncompensation
 		// Low Pass Filter for quaternion
 		vr::HmdQuaternion_t MotionCompensationManager::lowPassFilterQuaternion(vr::HmdQuaternion_t RawData, vr::HmdQuaternion_t SmoothData)
 		{
-			return Slerp(SmoothData, RawData, LPF_Beta);
+			return slerp(SmoothData, RawData, _LpfBeta);
 		}
 
 		// Spherical Linear Interpolation for Quaternions
-		vr::HmdQuaternion_t MotionCompensationManager::Slerp(vr::HmdQuaternion_t q1, vr::HmdQuaternion_t q2, double lambda)
+		vr::HmdQuaternion_t MotionCompensationManager::slerp(vr::HmdQuaternion_t q1, vr::HmdQuaternion_t q2, double lambda)
 		{
 			vr::HmdQuaternion_t qr;
 
@@ -588,7 +550,7 @@ namespace vrmotioncompensation
 		}
 
 		// Convert Quaternion to Euler Angles in Radians
-		vr::HmdVector3d_t MotionCompensationManager::ToEulerAngles(vr::HmdQuaternion_t q)
+		vr::HmdVector3d_t MotionCompensationManager::toEulerAngles(vr::HmdQuaternion_t q)
 		{
 			vr::HmdVector3d_t angles;
 
@@ -618,22 +580,22 @@ namespace vrmotioncompensation
 		}
 
 		// Returns the shortest difference between to angles
-		const double MotionCompensationManager::AngleDifference(double Raw, double New)
+		const double MotionCompensationManager::angleDifference(double Raw, double New)
 		{
 			double diff = fmod((New - Raw + (double)180), (double)360) - (double)180;
 			return diff < -(double)180 ? diff + (double)360 : diff;
 		}
 
-		vr::HmdVector3d_t MotionCompensationManager::Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
+		vr::HmdVector3d_t MotionCompensationManager::transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
 		{
 			// point is the user-input offset to the controller
 			// VecRotation and VecPosition is the current reference-pose (Controller or input from Mover)
 			vr::HmdQuaternion_t quat = vrmath::quaternionFromYawPitchRoll(VecRotation.v[0], VecRotation.v[1], VecRotation.v[2]);
-			Transform(quat, VecPosition, point);
+			transform(quat, VecPosition, point);
 		}
 
 		// Calculates the new coordinates of 'point', moved and rotated by VecRotation and VecPosition
-		vr::HmdVector3d_t MotionCompensationManager::Transform(vr::HmdQuaternion_t quat, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
+		vr::HmdVector3d_t MotionCompensationManager::transform(vr::HmdQuaternion_t quat, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
 		{			
 			vr::HmdVector3d_t translation = vrmath::quaternionRotateVector(quat, VecPosition);
 
@@ -641,7 +603,7 @@ namespace vrmotioncompensation
 		}
 
 		// 
-		vr::HmdVector3d_t MotionCompensationManager::Transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t centerOfRotation, vr::HmdVector3d_t point)
+		vr::HmdVector3d_t MotionCompensationManager::transform(vr::HmdVector3d_t VecRotation, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t centerOfRotation, vr::HmdVector3d_t point)
 		{
 			// point is the user-input offset to the controller
 			// VecRotation and VecPosition is the current rig-pose

@@ -281,7 +281,7 @@ namespace vrmotioncompensation
 													   << ", Z: " << message.msg.dm_SetMotionCompensationProperties.offsets.v[2];
 										LOG(INFO) << "End of property listing";
 
-										serverDriver->motionCompensation().setLPFBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
+										serverDriver->motionCompensation().setLpfBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
 										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
 										serverDriver->motionCompensation().setZeroMode(message.msg.dm_SetMotionCompensationProperties.setZero);
 										serverDriver->motionCompensation().setOffsets(message.msg.dm_SetMotionCompensationProperties.offsets);
@@ -314,7 +314,7 @@ namespace vrmotioncompensation
 									{
 										LOG(INFO) << "Resetting reference zero pose";
 
-										serverDriver->motionCompensation()._resetMotionCompensationZeroPose();
+										serverDriver->motionCompensation().resetZeroPose();
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}
