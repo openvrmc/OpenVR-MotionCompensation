@@ -404,9 +404,7 @@ namespace vrmotioncompensation
 				// convert back to driver space
 				pose.qRotation = pose.qWorldFromDriverRotation * compensatedPoseWorldRot;
 				vr::HmdVector3d_t adjPoseDriverPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, compensatedPoseWorldPos + pose.vecWorldFromDriverTranslation);
-				pose.vecPosition[0] = adjPoseDriverPos.v[0];
-				pose.vecPosition[1] = adjPoseDriverPos.v[1];
-				pose.vecPosition[2] = adjPoseDriverPos.v[2];
+				_copyVec(pose.vecPosition, adjPoseDriverPos.v);
 
 				if (_DebugLogger.IsRunning() && _DebugLogger.IsInSync())
 				{
