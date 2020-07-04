@@ -227,14 +227,6 @@ MyStackViewPage
                     {
                         deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not set device mode:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
                     }
-                    /*if (!DeviceManipulationTabController.sendMCSettings())
-                    {
-                        deviceManipulationMessageDialog.showMessage("Set Device Mode", "Could not send Settings:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
-                    }*/
-                    /*if (!DeviceManipulationTabController.setDebugMode(true))
-                    {
-                        deviceManipulationMessageDialog.showMessage("Debug logger", "Could not start or stop logging:\n" + DeviceManipulationTabController.getDeviceModeErrorString())
-                    }*/
                 }
             }
         }

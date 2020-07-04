@@ -595,57 +595,6 @@ MyStackViewPage
 				Layout.fillWidth: true
 			}
 		}
-		/*MyOffsetGroupBox
-        {
-            boxTitle: "HMD to Reference Offset"
-            id: hmdtoReferenceOffsetBox
-			height: 90
-            setTranslationOffset: function(x, y, z)
-            {
-                DeviceManipulationTabController.setHMDtoRefOffset(x, y, z)
-            }
-            updateValues: function()
-            {
-                var hasChanged = false
-
-				value = DeviceManipulationTabController.getHMDtoRefOffset(0)
-				if (offsetX != value)
-                {
-                    offsetX = value
-                    hasChanged = true
-                }
-
-                value = DeviceManipulationTabController.getHMDtoRefOffset(1)
-                if (offsetY != value)
-                {
-                    offsetY = value
-                    hasChanged = true
-                }
-
-                value = DeviceManipulationTabController.getHMDtoRefOffset(2)
-                if (offsetZ != value)
-                {
-                    offsetZ = value
-                    hasChanged = true
-                }
-
-                if (hasChanged)
-                {
-                    updateGUI()
-                }
-            }
-		}*/
-
-		/*RowLayout
-        {
-            Rectangle
-            {
-                Layout.topMargin: 25
-                color: "#ffffff"
-                height: 1
-                Layout.fillWidth: true
-            }
-		}*/
 
         RowLayout
         {
@@ -690,7 +639,7 @@ MyStackViewPage
 				Layout.leftMargin: 20
 				Layout.topMargin: 0
 				Layout.bottomMargin: 0
-				imagesource : "octicons-trashcan.png"
+				imagesource : "qrc:///octicons-trashcan.png"
 				onClicked:
 				{
 					DeviceManipulationTabController.removeKey(0);
@@ -733,7 +682,7 @@ MyStackViewPage
 				Layout.leftMargin: 20
 				Layout.topMargin: 0
 				Layout.bottomMargin: 0
-				imagesource : "octicons-trashcan.png"
+				imagesource : "qrc:///octicons-trashcan.png"
 				onClicked:
 				{
 					DeviceManipulationTabController.removeKey(1);
@@ -796,14 +745,4 @@ MyStackViewPage
 		btn_enableMC.text = DeviceManipulationTabController.getModifiers_AsString(0) + DeviceManipulationTabController.getKey_AsString(0);
 		btn_setZeroPose.text = DeviceManipulationTabController.getModifiers_AsString(1) + DeviceManipulationTabController.getKey_AsString(1);
 	}
-
-	/*function setTranslationOffset(x, y, z)
-	{
-		DeviceManipulationTabController.setHMDtoRefTranslationOffset(x, y, z)
-	}
-
-	function setRotationOffset(p, y, r)
-	{
-		DeviceManipulationTabController.setHMDtoRefRotationOffset(p, y, r)
-	}*/
 }
