@@ -25,4 +25,15 @@ namespace vrmotioncompensation
 		MotionCompensationDeviceMode deviceMode;
 	};
 
+	struct MMFstruct_v1
+	{
+		vr::HmdVector3d_t Translation;
+		vr::HmdVector3d_t Rotation;
+		vr::HmdQuaternion_t QRotation;
+		uint32_t Flags_1;
+		uint32_t Flags_2;
+		double Reserved_double[10];
+		int Reserved_int[10];
+	};
+
 } // end namespace vrmotioncompensation
