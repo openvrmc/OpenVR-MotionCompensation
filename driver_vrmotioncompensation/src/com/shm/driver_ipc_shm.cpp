@@ -256,6 +256,7 @@ namespace vrmotioncompensation
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while setting device into motion compensation mode: Error code " << (int)resp.status;
+										LOG(ERROR) << "MCdeviceID: " << message.msg.dm_MotionCompensationMode.MCdeviceId << ", RTdeviceID: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
 									}
 
 									if (resp.messageId != 0/* && resp.status != ipc::ReplyStatus::Ok*/)

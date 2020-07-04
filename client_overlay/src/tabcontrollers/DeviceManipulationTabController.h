@@ -58,17 +58,21 @@ namespace motioncompensation
 		ShortcutStruct shortcut[2];
 
 		// Device and ID storage
-		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;
+		std::vector<std::shared_ptr<DeviceInfo>> deviceInfos;		// Holds all device infos. The index represents the OpenVR ID. Therefore there are many empty fields in this array
 		std::map<uint32_t, uint32_t> TrackerArrayIdToDeviceId;
 		std::map<uint32_t, uint32_t> HMDArrayIdToDeviceId;
 
 		// Settings
 		vrmotioncompensation::MotionCompensationMode _motionCompensationMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+		QString _RefTrackerSerial = "";
+		QString _HMDSerial = "";
 		double _LPFBeta = 0.2;
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
-		vr::HmdVector3d_t _offset = { 0, 0, 0 };
+		vr::HmdVector3d_t _offsetTranslation = { 0, 0, 0 };
+		vr::HmdVector3d_t _offsetRotation = { 0, 0, 0 };
 		bool _MotionCompensationIsOn = false;
+
 
 		// Debug
 		int DebugLoggerStatus = 0;		// 0 = Off; 1 = Standby; 2 = Running
@@ -128,14 +132,17 @@ namespace motioncompensation
 		// Getter and setter related to the HMD and Tracker drop downs
 		Q_INVOKABLE void setTrackerArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE int getTrackerDeviceID(unsigned ArrayID);
+		/*Q_INVOKABLE*/ void setReferenceTracker(unsigned openVRId);
 
 		Q_INVOKABLE void setHMDArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE int getHMDDeviceID(unsigned ArrayID);
+		/*Q_INVOKABLE*/ void setHMD(unsigned openVRId);
 
 		// General functions
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
 		void toggleMotionCompensationMode();
 		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);
+		bool applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation);
 		void resetRefZeroPose();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 
@@ -152,8 +159,14 @@ namespace motioncompensation
 		Q_INVOKABLE void increaseLPFBeta(double value);
 		Q_INVOKABLE void increaseSamples(int value);
 
-		Q_INVOKABLE void setHMDtoRefOffset(double x, double y, double z);
-		Q_INVOKABLE double getHMDtoRefOffset(unsigned axis);
+		Q_INVOKABLE void setHMDtoRefTranslationOffset(unsigned axis, double value);
+		Q_INVOKABLE void setHMDtoRefRotationOffset(unsigned axis, double value);
+
+		Q_INVOKABLE void increaseRefTranslationOffset(unsigned axis, double value);
+		Q_INVOKABLE void increaseRefRotationOffset(unsigned axis, double value);
+
+		Q_INVOKABLE double getHMDtoRefTranslationOffset(unsigned axis);
+		Q_INVOKABLE double getHMDtoRefRotationOffset(unsigned axis);
 
 		Q_INVOKABLE void setMotionCompensationMode(unsigned NewMode);
 		Q_INVOKABLE int getMotionCompensationMode();
@@ -169,6 +182,7 @@ namespace motioncompensation
 		void deviceCountChanged();
 		void deviceInfoChanged(unsigned index);
 		void settingChanged();
+		void offsetChanged();
 		void debugModeChanged();
 	};
 } // namespace motioncompensation

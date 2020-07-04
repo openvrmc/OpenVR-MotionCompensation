@@ -34,7 +34,7 @@ namespace motioncompensation
 		this->parent = parent;
 		this->widget = widget;
 
-		//Fill the array with default data
+		// Fill the array with default data
 		for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i)
 		{
 			deviceInfos.push_back(std::make_shared<DeviceInfo>());
@@ -56,10 +56,10 @@ namespace motioncompensation
 				unsigned i = 0;
 				for (auto info : deviceInfos)
 				{
-					//Has the device mode changed?
+					// Has the device mode changed?
 					bool hasDeviceInfoChanged = updateDeviceInfo(i);
 
-					//Has the connection status changed?
+					// Has the connection status changed?
 					unsigned status = devicePoses[info->openvrId].bDeviceIsConnected ? 0 : 1;
 					if (info->deviceMode == vrmotioncompensation::MotionCompensationDeviceMode::Default && info->deviceStatus != status)
 					{
@@ -67,7 +67,7 @@ namespace motioncompensation
 						hasDeviceInfoChanged = true;
 					}
 
-					//Push changes to UI
+					// Push changes to UI
 					if (hasDeviceInfoChanged)
 					{
 						emit deviceInfoChanged(i);
@@ -105,7 +105,7 @@ namespace motioncompensation
 						info->deviceClass = deviceClass;
 						char buffer[vr::k_unMaxPropertyStringSize];
 
-						//Get and save the serial number
+						// Get and save the serial number
 						vr::ETrackedPropertyError pError = vr::TrackedProp_Success;
 						vr::VRSystem()->GetStringTrackedDeviceProperty(id, vr::Prop_SerialNumber_String, buffer, vr::k_unMaxPropertyStringSize, &pError);
 						if (pError == vr::TrackedProp_Success)
@@ -118,7 +118,7 @@ namespace motioncompensation
 							LOG(ERROR) << "Could not get serial of device " << id;
 						}
 
-						//Get and save the current device mode
+						// Get and save the current device mode
 						try
 						{
 							vrmotioncompensation::DeviceInfo info2;
@@ -130,7 +130,7 @@ namespace motioncompensation
 							LOG(ERROR) << "Exception caught while getting device info: " << e.what();
 						}
 
-						//Store the found info
+						// Store the found info
 						deviceInfos[id] = info;
 						LOG(INFO) << "Found device: id " << info->openvrId << ", class " << info->deviceClass << ", serial " << info->serial;
 
@@ -164,8 +164,22 @@ namespace motioncompensation
 	{
 		QSettings* settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
+		
+		// Load serials
+		_HMDSerial = settings->value("motionCompensationHMDSerial", "").toString();
+		_RefTrackerSerial = settings->value("motionCompensationRefTrackerSerial", "").toString();
+
+		// Load filter settings
 		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
 		_samples = settings->value("motionCompensationSamples", 100).toUInt();
+
+		// Load offset settings
+		_offsetTranslation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
+		_offsetTranslation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
+		_offsetTranslation.v[2] = settings->value("motionCompensationOffsetTranslation_Z", 0.0).toDouble();
+		_offsetRotation.v[0] = settings->value("motionCompensationOffsetRotation_P", 0.0).toDouble();
+		_offsetRotation.v[1] = settings->value("motionCompensationOffsetRotation_Y", 0.0).toDouble();
+		_offsetRotation.v[2] = settings->value("motionCompensationOffsetRotation_R", 0.0).toDouble();
 
 		// Load shortcuts
 		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_0_key", Qt::Key::Key_unknown).toInt();
@@ -177,22 +191,39 @@ namespace motioncompensation
 		newKey(1, shortcutKey, shortcutMod_2);
 
 		settings->endGroup();
-
-		LOG(INFO) << "Loading Data; LPF Beta: " << _LPFBeta << "; samples: " << _samples;
+		LOG(INFO) << "Loading saved Settings";
 	}
 
 	void DeviceManipulationTabController::saveMotionCompensationSettings()
 	{
-		LOG(INFO) << "Saving Data; LPF Beta: " << _LPFBeta << ", samples: " << _samples;
+		LOG(INFO) << "Saving Settings";
 
 		QSettings* settings = OverlayController::appSettings();
 		settings->beginGroup("deviceManipulationSettings");
+		
+		// Save serials
+		settings->setValue("motionCompensationHMDSerial", _HMDSerial);
+		settings->setValue("motionCompensationRefTrackerSerial", _RefTrackerSerial);
+
+		// Save filter settings
 		settings->setValue("motionCompensationLPFBeta", _LPFBeta);
 		settings->setValue("motionCompensationSamples", _samples);
+
+		// Save offset settings
+		settings->setValue("motionCompensationOffsetTranslation_X", _offsetTranslation.v[0]);
+		settings->setValue("motionCompensationOffsetTranslation_Y", _offsetTranslation.v[1]);
+		settings->setValue("motionCompensationOffsetTranslation_Z", _offsetTranslation.v[2]);
+		settings->setValue("motionCompensationOffsetRotation_P", _offsetRotation.v[0]);
+		settings->setValue("motionCompensationOffsetRotation_Y", _offsetRotation.v[1]);
+		settings->setValue("motionCompensationOffsetRotation_R", _offsetRotation.v[2]);
+		
+		// Save shortcuts
 		settings->setValue("shortcut_0_key", getKey_AsKey(0));
 		settings->setValue("shortcut_0_mod", (int)getModifiers_AsModifiers(0));
 		settings->setValue("shortcut_1_key", getKey_AsKey(1));
 		settings->setValue("shortcut_1_mod", (int)getModifiers_AsModifiers(1));
+
+
 		settings->endGroup();
 		settings->sync();
 	}
@@ -370,6 +401,11 @@ namespace motioncompensation
 		return -1;
 	}
 
+	void DeviceManipulationTabController::setReferenceTracker(unsigned openVRId)
+	{
+		_RefTrackerSerial = QString::fromStdString(deviceInfos[openVRId]->serial);
+	}
+
 	void DeviceManipulationTabController::setHMDArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
 		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
@@ -388,6 +424,11 @@ namespace motioncompensation
 		return -1;
 	}
 	
+	void DeviceManipulationTabController::setHMD(unsigned openVRId)
+	{
+		_HMDSerial = QString::fromStdString(deviceInfos[openVRId]->serial);
+	}
+
 	bool DeviceManipulationTabController::updateDeviceInfo(unsigned OpenVRId)
 	{
 		bool retval = false;
@@ -416,13 +457,43 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::toggleMotionCompensationMode()
 	{
-		int MCindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
-		int RTindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
+		int MCid = -1;
+		int RTid = -1;
 
-		LOG(DEBUG) << "Got these index for HMD selection: " << MCindex;
-		LOG(DEBUG) << "Got these index for controller selection: " << RTindex;
+		LOG(DEBUG) << "ToggleMC: HMD Serial: " << _HMDSerial.toStdString();
+		LOG(DEBUG) << "ToggleMC: Ref Tracker Serial: " << _RefTrackerSerial.toStdString();
 
-		applySettings(MCindex, RTindex, !_MotionCompensationIsOn);
+		// If the dashboard is not open, we need to refresh the device list
+		// New connected devices are otherwise not displayed
+		if (!parent->isDashboardVisible() || !parent->isDesktopMode())
+		{
+			SearchDevices();
+		}
+
+		// Search for the correct serial number and save its OpenVR Id.
+		if (_RefTrackerSerial != "" && _HMDSerial != "")
+		{
+			for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
+			{
+				if (deviceInfos[i]->serial.compare(_HMDSerial.toStdString()) == 0)
+				{
+					MCid = i;
+				}
+				if (deviceInfos[i]->serial.compare(_RefTrackerSerial.toStdString()) == 0)
+				{
+					RTid = i;
+				}
+			}
+		}
+
+		if (MCid >= 0 && RTid >= 0 && MCid != RTid)
+		{
+			LOG(DEBUG) << "ToggleMC: Found both devices. HMD OVRID: " << MCid << ". Ref Tracker OVRID: " << RTid;
+
+			applySettings_ovrid(MCid, RTid, !_MotionCompensationIsOn);
+		}
+
+		//int MCindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
 	}
 
 	// Enables or disables the motion compensation for the selected device
@@ -496,6 +567,11 @@ namespace motioncompensation
 			return false;
 		}
 
+		return applySettings_ovrid(MCindex, RTindex, EnableMotionCompensation);
+	}
+
+	bool DeviceManipulationTabController::applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation)
+	{
 		try
 		{
 			vrmotioncompensation::MotionCompensationMode NewMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
@@ -513,37 +589,37 @@ namespace motioncompensation
 			}
 
 			// Send new mode
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCindex]->openvrId, deviceInfos[RTindex]->openvrId, NewMode);
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
 
 			// Send settings
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offsetTranslation);
 		}
-		catch (vrmotioncompensation::vrmotioncompensation_exception & e)
+		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
 			switch (e.errorcode)
 			{
-				case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
-				{
-					m_deviceModeErrorString = "Not an error";
-				} break;
-				case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
-				{
-					m_deviceModeErrorString = "Invalid Id";
-				} break;
-				case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
-				{
-					m_deviceModeErrorString = "Device not found";
-				} break;
-				default:
-				{
-					m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
-				} break;
+			case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+			{
+				m_deviceModeErrorString = "Not an error";
+			} break;
+			case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
+			{
+				m_deviceModeErrorString = "Invalid Id";
+			} break;
+			case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
+			{
+				m_deviceModeErrorString = "Device not found";
+			} break;
+			default:
+			{
+				m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
+			} break;
 			}
 			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
 
 			return false;
 		}
-		catch (std::exception & e)
+		catch (std::exception& e)
 		{
 			m_deviceModeErrorString = "Unknown exception";
 			LOG(ERROR) << "Unknown exception caught while setting device mode: " << e.what();
@@ -552,6 +628,9 @@ namespace motioncompensation
 		}
 
 		_MotionCompensationIsOn = EnableMotionCompensation;
+
+		setHMD(MCid);
+		setReferenceTracker(RTid);
 
 		saveMotionCompensationSettings();
 
@@ -674,14 +753,38 @@ namespace motioncompensation
 		emit settingChanged();
 	}
 
-	void DeviceManipulationTabController::setHMDtoRefOffset(double x, double y, double z)
+	void DeviceManipulationTabController::setHMDtoRefTranslationOffset(unsigned axis, double value)
 	{
-		_offset = { x, y, z };
+		_offsetTranslation.v[axis] = value;
 	}
 
-	double DeviceManipulationTabController::getHMDtoRefOffset(unsigned axis)
+	void DeviceManipulationTabController::setHMDtoRefRotationOffset(unsigned axis, double value)
 	{
-		return _offset.v[axis];
+		_offsetRotation.v[axis] = value;
+	}
+
+	void DeviceManipulationTabController::increaseRefTranslationOffset(unsigned axis, double value)
+	{
+		_offsetTranslation.v[axis] += value;
+
+		emit offsetChanged();
+	}
+
+	void DeviceManipulationTabController::increaseRefRotationOffset(unsigned axis, double value)
+	{
+		_offsetRotation.v[axis] += value;
+
+		emit offsetChanged();
+	}
+
+	double DeviceManipulationTabController::getHMDtoRefTranslationOffset(unsigned axis)
+	{
+		return _offsetTranslation.v[axis];
+	}
+
+	double DeviceManipulationTabController::getHMDtoRefRotationOffset(unsigned axis)
+	{
+		return _offsetRotation.v[axis];
 	}
 
 	void DeviceManipulationTabController::setMotionCompensationMode(unsigned NewMode)

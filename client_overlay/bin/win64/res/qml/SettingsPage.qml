@@ -11,6 +11,9 @@ MyStackViewPage
 	height: 800
     headerText: "Settings"
 
+	property double offsetRotationStep: 0.001
+	property double offsetTranslationStep : 0.001
+
     content: ColumnLayout
     {
 		MyNewKeyBinding
@@ -202,8 +205,397 @@ MyStackViewPage
             }
         }
 
-        // Offset settings
-        MyOffsetGroupBox
+		// Set Vel + Acc to zero
+		RowLayout
+		{
+		spacing: 18
+			MyText
+			{
+				text: "Set Velocity and Acceleration to zero:"
+			}
+
+			Item
+			{
+				Layout.preferredWidth: 80
+			}
+
+			CheckBox
+			{
+				id: setZeroCheckBox
+				onCheckedChanged:
+				{
+					DeviceManipulationTabController.setZeroMode(setZeroCheckBox.checked)
+				}
+			}
+		}
+
+		// Start of section "Offsets"
+		RowLayout
+		{
+			Rectangle
+			{
+				Layout.topMargin: 0
+				height: 1
+				border.color: "#ffffff"
+				Layout.fillWidth: true
+			}
+		}
+
+		RowLayout
+		{
+			MyText
+			{
+				text: "Offsets for virtual Driver"
+				horizontalAlignment: Text.AlignLeft
+				//Layout.preferredWidth: 80
+				Layout.leftMargin: 12
+			}
+		}
+
+		// X, Y and Z offsets
+		RowLayout
+		{
+			GridLayout
+			{
+				columns: 12
+
+				MyText
+				{
+					text: "X:"
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 70
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: xMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(0, -offsetTranslationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: xInputField
+					text: "0.000"
+					keyBoardUID: 30
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefTranslationOffset(0, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(0).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: xPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(0, offsetTranslationStep);
+					}
+				}
+
+				MyText
+				{
+					text: "Y:"
+					Layout.fillWidth: true
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 40
+					Layout.leftMargin: 12
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: yMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(1, -offsetTranslationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: yInputField
+					text: "0.000"
+					keyBoardUID: 31
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefTranslationOffset(1, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(1).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: yPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(1, offsetTranslationStep);
+					}
+				}
+
+				MyText
+				{
+					text: "Z:"
+					Layout.fillWidth: true
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 40
+					Layout.leftMargin: 12
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: zMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(2, -offsetTranslationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: zInputField
+					text: "0.000"
+					keyBoardUID: 32
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefTranslationOffset(2, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(2).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: zPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefTranslationOffset(2, offsetTranslationStep);
+					}
+				}
+			}
+		}
+
+		// Pitch, Yaw and Roll offsets
+		RowLayout
+		{
+			GridLayout
+			{
+				columns: 12
+
+				MyText
+				{
+					text: "Pitch:"
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 70
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: pitchMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(0, -offsetRotationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: pitchInputField
+					text: "0.000"
+					keyBoardUID: 33
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefRotationOffset(0, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefRotationOffset(0).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: pitchPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(0, offsetRotationStep);
+					}
+				}
+
+				MyText
+				{
+					text: "Yaw:"
+					Layout.fillWidth: true
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 40
+					Layout.leftMargin: 12
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: yawMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(1, -offsetRotationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: yawInputField
+					text: "0.000"
+					keyBoardUID: 34
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefRotationOffset(1, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefRotationOffset(1).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: yawPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(1, offsetRotationStep);
+					}
+				}
+
+				MyText
+				{
+					text: "Roll:"
+					Layout.fillWidth: true
+					horizontalAlignment: Text.AlignRight
+					Layout.preferredWidth: 40
+					Layout.leftMargin: 12
+					Layout.rightMargin: 12
+				}
+
+				MyPushButton2
+				{
+					id: rollMinusButton
+					Layout.preferredWidth: 40
+					text: "-"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(2, -offsetRotationStep);
+					}
+				}
+
+				MyTextField
+				{
+					id: rollInputField
+					text: "0.000"
+					keyBoardUID: 35
+					Layout.preferredWidth: 140
+					Layout.leftMargin: 10
+					Layout.rightMargin: 10
+					horizontalAlignment: Text.AlignHCenter
+					function onInputEvent(input)
+					{
+						var val = parseFloat(input)
+						if (!isNaN(val))
+						{
+							DeviceManipulationTabController.setHMDtoRefRotationOffset(2, val.toFixed(3))
+						}
+
+						text = DeviceManipulationTabController.getHMDtoRefRotationOffset(2).toFixed(3)
+					}
+				}
+
+				MyPushButton2
+				{
+					id: rollPlusButton
+					Layout.preferredWidth: 40
+					text: "+"
+					onClicked:
+					{
+						DeviceManipulationTabController.increaseRefRotationOffset(2, offsetRotationStep);
+					}
+				}
+			}
+		}
+
+		// End of section "Offsets"
+		RowLayout
+		{
+			Rectangle
+			{
+				Layout.topMargin: 0
+				height: 1
+				border.color: "#ffffff"
+				Layout.fillWidth: true
+			}
+		}
+		/*MyOffsetGroupBox
         {
             boxTitle: "HMD to Reference Offset"
             id: hmdtoReferenceOffsetBox
@@ -242,9 +634,9 @@ MyStackViewPage
                     updateGUI()
                 }
             }
-        }
+		}*/
 
-        RowLayout
+		/*RowLayout
         {
             Rectangle
             {
@@ -253,31 +645,7 @@ MyStackViewPage
                 height: 1
                 Layout.fillWidth: true
             }
-        }
-
-        // Set Vel + Acc to zero
-        RowLayout
-        {
-        spacing: 18
-            MyText
-            {
-                text: "Set Velocity and Acceleration to zero:"
-            }
-
-            Item
-            {
-                Layout.preferredWidth: 80
-            }
-
-            CheckBox
-            {
-                id: setZeroCheckBox
-                onCheckedChanged:
-                {
-                    DeviceManipulationTabController.setZeroMode(setZeroCheckBox.checked)
-                }
-            }
-        }
+		}*/
 
         RowLayout
         {
@@ -394,6 +762,7 @@ MyStackViewPage
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
             samplesInputField.text = DeviceManipulationTabController.getSamples()
 			refreshButtonText()
+			updateOffsets()
         }
 
         Connections
@@ -404,12 +773,37 @@ MyStackViewPage
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
                 samplesInputField.text = DeviceManipulationTabController.getSamples()
             }
+
+			onOffsetChanged:
+			{
+				updateOffsets()
+			}
         }
     }
+
+	function updateOffsets()
+	{
+		xInputField.text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(0).toFixed(3)
+		yInputField.text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(1).toFixed(3)
+		zInputField.text = DeviceManipulationTabController.getHMDtoRefTranslationOffset(2).toFixed(3)
+		pitchInputField.text = DeviceManipulationTabController.getHMDtoRefRotationOffset(0).toFixed(3)
+		yawInputField.text = DeviceManipulationTabController.getHMDtoRefRotationOffset(1).toFixed(3)
+		rollInputField.text = DeviceManipulationTabController.getHMDtoRefRotationOffset(2).toFixed(3)
+	}
 
 	function refreshButtonText()
 	{
 		btn_enableMC.text = DeviceManipulationTabController.getModifiers_AsString(0) + DeviceManipulationTabController.getKey_AsString(0);
 		btn_setZeroPose.text = DeviceManipulationTabController.getModifiers_AsString(1) + DeviceManipulationTabController.getKey_AsString(1);
 	}
+
+	/*function setTranslationOffset(x, y, z)
+	{
+		DeviceManipulationTabController.setHMDtoRefTranslationOffset(x, y, z)
+	}
+
+	function setRotationOffset(p, y, r)
+	{
+		DeviceManipulationTabController.setHMDtoRefRotationOffset(p, y, r)
+	}*/
 }
