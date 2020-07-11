@@ -13,6 +13,8 @@ MyStackViewPage
 
 	property double offsetRotationStep: 0.001
 	property double offsetTranslationStep : 0.001
+	property double autoRepeat_Delay: 300
+	property double autoRepeat_Interval: 25
 
     content: ColumnLayout
     {
@@ -90,7 +92,7 @@ MyStackViewPage
                 id: lpfBetaIncreaseButton
                 Layout.leftMargin: 0
                 Layout.preferredWidth: 45
-                text: "-"
+				text: "-"
                 onClicked:
                 {
                     DeviceManipulationTabController.increaseLPFBeta(-0.01);
@@ -271,7 +273,10 @@ MyStackViewPage
 				{
 					id: xMinusButton
 					Layout.preferredWidth: 40
-					text: "-"
+					text: "-"					
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(0, -offsetTranslationStep);
@@ -304,6 +309,9 @@ MyStackViewPage
 					id: xPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(0, offsetTranslationStep);
@@ -325,6 +333,9 @@ MyStackViewPage
 					id: yMinusButton
 					Layout.preferredWidth: 40
 					text: "-"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(1, -offsetTranslationStep);
@@ -357,6 +368,9 @@ MyStackViewPage
 					id: yPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(1, offsetTranslationStep);
@@ -378,6 +392,9 @@ MyStackViewPage
 					id: zMinusButton
 					Layout.preferredWidth: 40
 					text: "-"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(2, -offsetTranslationStep);
@@ -410,6 +427,9 @@ MyStackViewPage
 					id: zPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefTranslationOffset(2, offsetTranslationStep);
@@ -438,6 +458,9 @@ MyStackViewPage
 					id: pitchMinusButton
 					Layout.preferredWidth: 40
 					text: "-"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(0, -offsetRotationStep);
@@ -470,6 +493,9 @@ MyStackViewPage
 					id: pitchPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(0, offsetRotationStep);
@@ -491,6 +517,9 @@ MyStackViewPage
 					id: yawMinusButton
 					Layout.preferredWidth: 40
 					text: "-"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(1, -offsetRotationStep);
@@ -523,6 +552,9 @@ MyStackViewPage
 					id: yawPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(1, offsetRotationStep);
@@ -544,6 +576,9 @@ MyStackViewPage
 					id: rollMinusButton
 					Layout.preferredWidth: 40
 					text: "-"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(2, -offsetRotationStep);
@@ -576,6 +611,9 @@ MyStackViewPage
 					id: rollPlusButton
 					Layout.preferredWidth: 40
 					text: "+"
+					autoRepeat: true
+					autoRepeatDelay: autoRepeat_Delay
+					autoRepeatInterval: autoRepeat_Interval
 					onClicked:
 					{
 						DeviceManipulationTabController.increaseRefRotationOffset(2, offsetRotationStep);

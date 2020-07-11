@@ -39,6 +39,7 @@ namespace vrmotioncompensation
 		{
 			Translation = { 0, 0, 0 };
 			Rotation = { 0, 0, 0 };
+			QRotation = { 0, 0, 0, 0 };
 			Flags_1 = 0;
 			Flags_2 = 0;
 		}
