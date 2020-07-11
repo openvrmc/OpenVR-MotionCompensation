@@ -351,4 +351,112 @@ namespace vrmath
 		result.m[2][3] = a.m[2][3];
 		return result;
 	}
+
+	inline vr::HmdMatrix34_t translate34(const vr::HmdMatrix34_t& m, float dX, float dY, float dZ)
+	{ 
+		vr::HmdMatrix34_t result = m;
+		result.m[0][3] += dX;
+		result.m[1][3] += dY;
+		result.m[2][3] += dZ;
+
+		return result;
+	}
+
+	inline vr::HmdMatrix34_t scale34(const vr::HmdMatrix34_t& m, float sX, float sY, float sZ)
+	{
+		vr::HmdMatrix34_t result = m;
+		result.m[0][0] *= sX;
+		result.m[1][1] *= sY;
+		result.m[2][2] *= sZ;
+
+		return result;
+	}
+
+	inline vr::HmdMatrix34_t multiply34(const vr::HmdMatrix34_t& source, const vr::HmdMatrix34_t& m2)
+	{
+		vr::HmdMatrix34_t result = { 0 };
+
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				for (int inner = 0; inner < 3; inner++)
+				{
+					result.m[i][j] += source.m[i][inner] * m2.m[inner][j];
+				}				
+			}
+
+			result.m[i][3] = source.m[i][3];
+
+		}
+
+		return result;
+	}
+
+	inline vr::HmdMatrix34_t rotate34_x(const vr::HmdMatrix34_t& m, float degrees)
+	{
+		vr::HmdMatrix34_t result = { 0 };
+
+		if (degrees == 0) return result;
+
+		float radians = 6.283185308f / (360.0f / degrees);
+		float c = cos(radians);
+		float s = sin(radians);
+
+		result.m[0][0] = 1.f;
+		result.m[1][1] = c;
+		result.m[1][2] = -s;
+		result.m[2][1] = s;
+		result.m[2][2] = c;
+		result.m[2][3] = 1.f;
+		
+
+		result = multiply34(m, result);
+
+		return result;
+	}
+
+	inline vr::HmdMatrix34_t rotate34_y(const vr::HmdMatrix34_t& m, float degrees)
+	{
+		vr::HmdMatrix34_t result = { 0 };
+
+		if (degrees == 0) return result;
+
+		float radians = 6.283185308f / (360.0f / degrees);
+		float c = cos(radians);
+		float s = sin(radians);
+
+		result.m[0][0] = c;
+		result.m[0][2] = s;
+		result.m[1][1] = 1.f;
+		result.m[2][0] = -s;
+		result.m[2][2] = c;		
+		result.m[2][3] = 1.f;
+
+		result = multiply34(result, m);
+
+		return result;
+	}
+
+	inline vr::HmdMatrix34_t rotate34_z(const vr::HmdMatrix34_t& m, float degrees)
+	{
+		vr::HmdMatrix34_t result = { 0 };
+
+		if (degrees == 0) return result;
+
+		float radians = 6.283185308f / (360.0f / degrees);
+		float c = cos(radians);
+		float s = sin(radians);
+
+		result.m[0][0] = c;
+		result.m[0][1] = -s;
+		result.m[1][0] = s;
+		result.m[1][1] = c;
+		result.m[2][2] = 1.f;
+		result.m[2][3] = 1.f;
+
+		result = multiply34(result, m);
+
+		return result;
+	}
 }

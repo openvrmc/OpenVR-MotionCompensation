@@ -99,7 +99,7 @@ namespace vrmotioncompensation
 			double LPFBeta;
 			uint32_t samples;
 			bool setZero;
-			vr::HmdVector3d_t offsets;
+			MMFstruct_v1 offsets;
 		};
 
 		struct Request_DeviceManipulation_ResetRefZeroPose

@@ -156,7 +156,7 @@ namespace vrmotioncompensation
 
 		void setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode = MotionCompensationMode::Disabled, bool modal = true);
 
-		void setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, vr::HmdVector3d_t offsets);
+		void setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, MMFstruct_v1 offsets);
 
 		void VRMotionCompensation::resetRefZeroPose();
 

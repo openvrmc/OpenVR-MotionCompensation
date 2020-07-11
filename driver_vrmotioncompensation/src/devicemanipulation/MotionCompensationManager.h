@@ -89,7 +89,7 @@ namespace vrmotioncompensation
 
 			void setZeroMode(bool setZero);
 
-			void setOffsets(vr::HmdVector3d_t offsets);
+			void setOffsets(MMFstruct_v1 offsets);
 
 			bool isZeroPoseValid();
 			
@@ -203,8 +203,9 @@ namespace vrmotioncompensation
 			MotionCompensationMode _Mode = MotionCompensationMode::Disabled;			
 			
 			// Offset data
-			vr::HmdVector3d_t _Offset = { 0, 0, 0 };
-			vr::HmdVector3d_t* _Poffset = nullptr;
+			MMFstruct_v1 _Offset;
+			//vr::HmdVector3d_t* _Poffset = nullptr;
+			MMFstruct_v1* _Poffset = nullptr;
 
 			// Zero position
 			vr::HmdVector3d_t _ZeroPos = { 0, 0, 0 };

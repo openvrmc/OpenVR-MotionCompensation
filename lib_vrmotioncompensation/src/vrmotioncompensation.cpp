@@ -387,7 +387,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, vr::HmdVector3d_t offsets)
+	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, MMFstruct_v1 offsets)
 	{
 		if (_ipcServerQueue)
 		{

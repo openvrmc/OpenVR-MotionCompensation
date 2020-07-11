@@ -34,6 +34,14 @@ namespace vrmotioncompensation
 		uint32_t Flags_2;
 		double Reserved_double[10];
 		int Reserved_int[10];
+
+		MMFstruct_v1()
+		{
+			Translation = { 0, 0, 0 };
+			Rotation = { 0, 0, 0 };
+			Flags_1 = 0;
+			Flags_2 = 0;
+		}
 	};
 
 } // end namespace vrmotioncompensation

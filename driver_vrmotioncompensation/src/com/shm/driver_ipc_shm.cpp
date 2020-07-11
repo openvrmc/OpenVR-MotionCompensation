@@ -277,9 +277,12 @@ namespace vrmotioncompensation
 										LOG(INFO) << "LPF_Beta: " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
 										LOG(INFO) << "samples: " << message.msg.dm_SetMotionCompensationProperties.samples;
 										LOG(INFO) << "set Zero: " << message.msg.dm_SetMotionCompensationProperties.setZero;
-										LOG(INFO) << "offset X: " << message.msg.dm_SetMotionCompensationProperties.offsets.v[0] 
-													   << ", Y: " << message.msg.dm_SetMotionCompensationProperties.offsets.v[1]
-													   << ", Z: " << message.msg.dm_SetMotionCompensationProperties.offsets.v[2];
+										LOG(INFO) << "offset X: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[0] 
+													   << ", Y: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[1]
+													   << ", Z: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[2];
+										LOG(INFO) << "offset Pitch: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[0]
+													   << ", Yaw: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[1]
+													   << ", Roll: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[2];
 										LOG(INFO) << "End of property listing";
 
 										serverDriver->motionCompensation().setLpfBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);

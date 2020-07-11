@@ -174,12 +174,12 @@ namespace motioncompensation
 		_samples = settings->value("motionCompensationSamples", 100).toUInt();
 
 		// Load offset settings
-		_offsetTranslation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
-		_offsetTranslation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
-		_offsetTranslation.v[2] = settings->value("motionCompensationOffsetTranslation_Z", 0.0).toDouble();
-		_offsetRotation.v[0] = settings->value("motionCompensationOffsetRotation_P", 0.0).toDouble();
-		_offsetRotation.v[1] = settings->value("motionCompensationOffsetRotation_Y", 0.0).toDouble();
-		_offsetRotation.v[2] = settings->value("motionCompensationOffsetRotation_R", 0.0).toDouble();
+		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
+		_offset.Translation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
+		_offset.Translation.v[2] = settings->value("motionCompensationOffsetTranslation_Z", 0.0).toDouble();
+		_offset.Rotation.v[0] = settings->value("motionCompensationOffsetRotation_P", 0.0).toDouble();
+		_offset.Rotation.v[1] = settings->value("motionCompensationOffsetRotation_Y", 0.0).toDouble();
+		_offset.Rotation.v[2] = settings->value("motionCompensationOffsetRotation_R", 0.0).toDouble();
 
 		// Load shortcuts
 		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_0_key", Qt::Key::Key_unknown).toInt();
@@ -210,12 +210,12 @@ namespace motioncompensation
 		settings->setValue("motionCompensationSamples", _samples);
 
 		// Save offset settings
-		settings->setValue("motionCompensationOffsetTranslation_X", _offsetTranslation.v[0]);
-		settings->setValue("motionCompensationOffsetTranslation_Y", _offsetTranslation.v[1]);
-		settings->setValue("motionCompensationOffsetTranslation_Z", _offsetTranslation.v[2]);
-		settings->setValue("motionCompensationOffsetRotation_P", _offsetRotation.v[0]);
-		settings->setValue("motionCompensationOffsetRotation_Y", _offsetRotation.v[1]);
-		settings->setValue("motionCompensationOffsetRotation_R", _offsetRotation.v[2]);
+		settings->setValue("motionCompensationOffsetTranslation_X", _offset.Translation.v[0]);
+		settings->setValue("motionCompensationOffsetTranslation_Y", _offset.Translation.v[1]);
+		settings->setValue("motionCompensationOffsetTranslation_Z", _offset.Translation.v[2]);
+		settings->setValue("motionCompensationOffsetRotation_P", _offset.Rotation.v[0]);
+		settings->setValue("motionCompensationOffsetRotation_Y", _offset.Rotation.v[1]);
+		settings->setValue("motionCompensationOffsetRotation_R", _offset.Rotation.v[2]);
 		
 		// Save shortcuts
 		settings->setValue("shortcut_0_key", getKey_AsKey(0));
@@ -592,7 +592,7 @@ namespace motioncompensation
 			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
 
 			// Send settings
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offsetTranslation);
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -755,36 +755,36 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::setHMDtoRefTranslationOffset(unsigned axis, double value)
 	{
-		_offsetTranslation.v[axis] = value;
+		_offset.Translation.v[axis] = value;
 	}
 
 	void DeviceManipulationTabController::setHMDtoRefRotationOffset(unsigned axis, double value)
 	{
-		_offsetRotation.v[axis] = value;
+		_offset.Rotation.v[axis] = value;
 	}
 
 	void DeviceManipulationTabController::increaseRefTranslationOffset(unsigned axis, double value)
 	{
-		_offsetTranslation.v[axis] += value;
+		_offset.Translation.v[axis] += value;
 
 		emit offsetChanged();
 	}
 
 	void DeviceManipulationTabController::increaseRefRotationOffset(unsigned axis, double value)
 	{
-		_offsetRotation.v[axis] += value;
+		_offset.Rotation.v[axis] += value;
 
 		emit offsetChanged();
 	}
 
 	double DeviceManipulationTabController::getHMDtoRefTranslationOffset(unsigned axis)
 	{
-		return _offsetTranslation.v[axis];
+		return _offset.Translation.v[axis];
 	}
 
 	double DeviceManipulationTabController::getHMDtoRefRotationOffset(unsigned axis)
 	{
-		return _offsetRotation.v[axis];
+		return _offset.Rotation.v[axis];
 	}
 
 	void DeviceManipulationTabController::setMotionCompensationMode(unsigned NewMode)

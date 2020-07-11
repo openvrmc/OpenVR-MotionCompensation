@@ -69,8 +69,7 @@ namespace motioncompensation
 		double _LPFBeta = 0.2;
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
-		vr::HmdVector3d_t _offsetTranslation = { 0, 0, 0 };
-		vr::HmdVector3d_t _offsetRotation = { 0, 0, 0 };
+		vrmotioncompensation::MMFstruct_v1 _offset;
 		bool _MotionCompensationIsOn = false;
 
 

@@ -21,7 +21,7 @@ namespace vrmotioncompensation
 				_region = { _shdmem, boost::interprocess::read_write };
 
 				// get pointer address and fill it with data
-				_Poffset = static_cast<vr::HmdVector3d_t*>(_region.get_address());
+				_Poffset = static_cast<MMFstruct_v1*>(_region.get_address());
 				*_Poffset = _Offset;
 				LOG(INFO) << "Shared memory OVRMC_MMF created";
 			}
@@ -145,7 +145,7 @@ namespace vrmotioncompensation
 			_zeroVec(_RefRotAcc);
 		}
 
-		void MotionCompensationManager::setOffsets(vr::HmdVector3d_t offsets)
+		void MotionCompensationManager::setOffsets(MMFstruct_v1 offsets)
 		{
 			_Offset = offsets;
 			*_Poffset = _Offset;
