@@ -451,10 +451,7 @@ namespace motioncompensation
 	{
 		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
 
-		vr::HmdVector2_t emptyvec = { 0 , 0 };
-		vr::HmdRect2_t empty;
-		empty.vTopLeft = emptyvec;
-		empty.vBottomRight = emptyvec;
+		vr::HmdRect2_t empty = { 0 };
 
 		vr::VROverlay()->SetKeyboardPositionForOverlay(m_ulOverlayHandle, empty);
 
