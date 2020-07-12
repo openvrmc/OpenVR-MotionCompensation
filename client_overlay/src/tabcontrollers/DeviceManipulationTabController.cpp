@@ -43,6 +43,8 @@ namespace motioncompensation
 		LOG(DEBUG) << "deviceInfos size: " << deviceInfos.size();
 
 		SearchDevices();
+
+		parent->vrMotionCompensation().setOffsets(_offset);
 	}
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
@@ -592,7 +594,7 @@ namespace motioncompensation
 			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
 
 			// Send settings
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _offset);
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -756,16 +758,19 @@ namespace motioncompensation
 	void DeviceManipulationTabController::setHMDtoRefTranslationOffset(unsigned axis, double value)
 	{
 		_offset.Translation.v[axis] = value;
+		parent->vrMotionCompensation().setOffsets(_offset);
 	}
 
 	void DeviceManipulationTabController::setHMDtoRefRotationOffset(unsigned axis, double value)
 	{
 		_offset.Rotation.v[axis] = value;
+		parent->vrMotionCompensation().setOffsets(_offset);
 	}
 
 	void DeviceManipulationTabController::increaseRefTranslationOffset(unsigned axis, double value)
 	{
 		_offset.Translation.v[axis] += value;
+		parent->vrMotionCompensation().setOffsets(_offset);
 
 		emit offsetChanged();
 	}
@@ -773,6 +778,7 @@ namespace motioncompensation
 	void DeviceManipulationTabController::increaseRefRotationOffset(unsigned axis, double value)
 	{
 		_offset.Rotation.v[axis] += value;
+		parent->vrMotionCompensation().setOffsets(_offset);
 
 		emit offsetChanged();
 	}

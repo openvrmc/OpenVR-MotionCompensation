@@ -22,6 +22,7 @@ namespace vrmotioncompensation
 			DeviceManipulation_MotionCompensationMode,
 			DeviceManipulation_SetMotionCompensationProperties,
 			DeviceManipulation_ResetRefZeroPose,
+			DeviceManipulation_SetOffsets,
 			DebugLogger_Settings,
 		};
 
@@ -99,13 +100,20 @@ namespace vrmotioncompensation
 			double LPFBeta;
 			uint32_t samples;
 			bool setZero;
-			MMFstruct_v1 offsets;
+			//MMFstruct_v1 offsets;
 		};
 
 		struct Request_DeviceManipulation_ResetRefZeroPose
 		{
 			uint32_t clientId;
 			uint32_t messageId;			// Used to associate with Reply
+		};
+
+		struct Request_DeviceManipulation_SetOffsets
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+			MMFstruct_v1 offsets;
 		};
 
 		struct Request_DebugLogger_Settings
@@ -146,6 +154,7 @@ namespace vrmotioncompensation
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
 				Request_DeviceManipulation_ResetRefZeroPose dm_ResetRefZeroPose;
+				Request_DeviceManipulation_SetOffsets dm_SetOffsets;
 				Request_DebugLogger_Settings dl_Settings;
 				MsgUnion()
 				{

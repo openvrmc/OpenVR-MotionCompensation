@@ -131,11 +131,11 @@ namespace motioncompensation
 		// Getter and setter related to the HMD and Tracker drop downs
 		Q_INVOKABLE void setTrackerArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE int getTrackerDeviceID(unsigned ArrayID);
-		/*Q_INVOKABLE*/ void setReferenceTracker(unsigned openVRId);
+		void setReferenceTracker(unsigned openVRId);
 
 		Q_INVOKABLE void setHMDArrayID(unsigned deviceID, unsigned ArrayID);
 		Q_INVOKABLE int getHMDDeviceID(unsigned ArrayID);
-		/*Q_INVOKABLE*/ void setHMD(unsigned openVRId);
+		void setHMD(unsigned openVRId);
 
 		// General functions
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);

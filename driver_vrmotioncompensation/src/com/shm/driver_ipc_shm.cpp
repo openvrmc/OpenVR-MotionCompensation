@@ -277,18 +277,11 @@ namespace vrmotioncompensation
 										LOG(INFO) << "LPF_Beta: " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
 										LOG(INFO) << "samples: " << message.msg.dm_SetMotionCompensationProperties.samples;
 										LOG(INFO) << "set Zero: " << message.msg.dm_SetMotionCompensationProperties.setZero;
-										LOG(INFO) << "offset X: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[0] 
-													   << ", Y: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[1]
-													   << ", Z: " << message.msg.dm_SetMotionCompensationProperties.offsets.Translation.v[2];
-										LOG(INFO) << "offset Pitch: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[0]
-													   << ", Yaw: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[1]
-													   << ", Roll: " << message.msg.dm_SetMotionCompensationProperties.offsets.Rotation.v[2];
 										LOG(INFO) << "End of property listing";
 
 										serverDriver->motionCompensation().setLpfBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
 										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
 										serverDriver->motionCompensation().setZeroMode(message.msg.dm_SetMotionCompensationProperties.setZero);
-										serverDriver->motionCompensation().setOffsets(message.msg.dm_SetMotionCompensationProperties.offsets);
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}
@@ -335,6 +328,34 @@ namespace vrmotioncompensation
 									if (resp.messageId != 0)
 									{
 										_this->sendReply(message.msg.dm_SetMotionCompensationProperties.clientId, resp);
+									}
+								}
+								break;
+
+								case ipc::RequestType::DeviceManipulation_SetOffsets:
+								{
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dm_SetOffsets.messageId;
+									auto serverDriver = ServerDriver::getInstance();
+									if (serverDriver)
+									{
+										serverDriver->motionCompensation().setOffsets(message.msg.dm_SetOffsets.offsets);
+
+										resp.status = ipc::ReplyStatus::Ok;
+									}
+									else
+									{
+										resp.status = ipc::ReplyStatus::UnknownError;
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while setting offsets: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dm_SetOffsets.clientId, resp);
 									}
 								}
 								break;
