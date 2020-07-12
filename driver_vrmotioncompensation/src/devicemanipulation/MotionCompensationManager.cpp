@@ -448,7 +448,7 @@ namespace vrmotioncompensation
 
 			if (time != (double)0.0)
 			{
-				NewAcceleration = (vecVelocity - vecVelocity) / time;
+				NewAcceleration = (vecVelocity - Old_vecVelocity) / time;
 			}
 
 			return NewAcceleration;
