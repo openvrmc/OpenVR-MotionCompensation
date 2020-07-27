@@ -17,13 +17,13 @@ namespace vrmotioncompensation
 			try
 			{
 				// create shared memory
-				_shdmem = { boost::interprocess::open_or_create, "OVRMC_MMF", boost::interprocess::read_write, 4096 };
+				_shdmem = { boost::interprocess::open_or_create, "OVRMC_MMFv1", boost::interprocess::read_write, 4096 };
 				_region = { _shdmem, boost::interprocess::read_write };
 
 				// get pointer address and fill it with data
-				_Poffset = static_cast<MMFstruct_v1*>(_region.get_address());
+				_Poffset = static_cast<MMFstruct_OVRMC_v1*>(_region.get_address());
 				*_Poffset = _Offset;
-				LOG(INFO) << "Shared memory OVRMC_MMF created";
+				LOG(INFO) << "Shared memory OVRMC_MMFv1 created";
 			}
 			catch (boost::interprocess::interprocess_exception & e)
 			{				
@@ -145,7 +145,7 @@ namespace vrmotioncompensation
 			_zeroVec(_RefRotAcc);
 		}
 
-		void MotionCompensationManager::setOffsets(MMFstruct_v1 offsets)
+		void MotionCompensationManager::setOffsets(MMFstruct_OVRMC_v1 offsets)
 		{
 			_Offset = offsets;
 			*_Poffset = _Offset;

@@ -487,7 +487,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::setOffsets(MMFstruct_v1 offsets)
+	void VRMotionCompensation::setOffsets(MMFstruct_OVRMC_v1 offsets)
 	{
 		if (_ipcServerQueue)
 		{

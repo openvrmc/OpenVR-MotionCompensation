@@ -160,7 +160,7 @@ namespace vrmotioncompensation
 
 		void resetRefZeroPose();
 
-		void setOffsets(MMFstruct_v1 offsets);
+		void setOffsets(MMFstruct_OVRMC_v1 offsets);
 
 		void startDebugLogger(bool enable, bool modal = true);
 

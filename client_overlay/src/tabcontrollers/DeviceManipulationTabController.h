@@ -69,7 +69,7 @@ namespace motioncompensation
 		double _LPFBeta = 0.2;
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
-		vrmotioncompensation::MMFstruct_v1 _offset;
+		vrmotioncompensation::MMFstruct_OVRMC_v1 _offset;
 		bool _MotionCompensationIsOn = false;
 
 

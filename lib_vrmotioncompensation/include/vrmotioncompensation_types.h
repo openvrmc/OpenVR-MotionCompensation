@@ -25,7 +25,7 @@ namespace vrmotioncompensation
 		MotionCompensationDeviceMode deviceMode;
 	};
 
-	struct MMFstruct_v1
+	struct MMFstruct_OVRMC_v1
 	{
 		vr::HmdVector3d_t Translation;
 		vr::HmdVector3d_t Rotation;
@@ -35,7 +35,7 @@ namespace vrmotioncompensation
 		double Reserved_double[10];
 		int Reserved_int[10];
 
-		MMFstruct_v1()
+		MMFstruct_OVRMC_v1()
 		{
 			Translation = { 0, 0, 0 };
 			Rotation = { 0, 0, 0 };
