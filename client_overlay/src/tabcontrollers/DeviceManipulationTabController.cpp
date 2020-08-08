@@ -183,7 +183,11 @@ namespace motioncompensation
 		_offset.Rotation.v[1] = settings->value("motionCompensationOffsetRotation_Y", 0.0).toDouble();
 		_offset.Rotation.v[2] = settings->value("motionCompensationOffsetRotation_R", 0.0).toDouble();
 
+		settings->endGroup();
+
 		// Load shortcuts
+		settings->beginGroup("motionCompensationShortcuts");
+
 		Qt::Key shortcutKey = (Qt::Key)settings->value("shortcut_0_key", Qt::Key::Key_unknown).toInt();
 		Qt::KeyboardModifiers shortcutMod = settings->value("shortcut_0_mod", Qt::KeyboardModifier::NoModifier).toInt();
 		newKey(0, shortcutKey, shortcutMod);
@@ -218,13 +222,23 @@ namespace motioncompensation
 		settings->setValue("motionCompensationOffsetRotation_P", _offset.Rotation.v[0]);
 		settings->setValue("motionCompensationOffsetRotation_Y", _offset.Rotation.v[1]);
 		settings->setValue("motionCompensationOffsetRotation_R", _offset.Rotation.v[2]);
-		
+
+		saveMotionCompensationShortcuts();
+
+		settings->endGroup();
+		settings->sync();	
+	}
+
+	void DeviceManipulationTabController::saveMotionCompensationShortcuts()
+	{
+		QSettings* settings = OverlayController::appSettings();
+		settings->beginGroup("motionCompensationShortcuts");
+
 		// Save shortcuts
 		settings->setValue("shortcut_0_key", getKey_AsKey(0));
 		settings->setValue("shortcut_0_mod", (int)getModifiers_AsModifiers(0));
 		settings->setValue("shortcut_1_key", getKey_AsKey(1));
 		settings->setValue("shortcut_1_mod", (int)getModifiers_AsModifiers(1));
-
 
 		settings->endGroup();
 		settings->sync();
@@ -270,6 +284,8 @@ namespace motioncompensation
 			shortcut[id].modifiers = modifier;
 
 			shortcut[id].shortcut->setShortcut(QKeySequence(key + modifier));
+
+			saveMotionCompensationShortcuts();
 		}
 	}
 
@@ -674,6 +690,11 @@ namespace motioncompensation
 		return m_deviceModeErrorString;
 	}
 	
+	bool DeviceManipulationTabController::isDesktopModeActive()
+	{
+		return parent->isDesktopMode();
+	}
+
 	bool DeviceManipulationTabController::setLPFBeta(double value)
 	{
 		// A few checks if the user input is valid

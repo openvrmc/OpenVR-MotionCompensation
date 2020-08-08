@@ -16,6 +16,17 @@ MyStackViewPage
 	property double autoRepeat_Delay: 300
 	property double autoRepeat_Interval: 25
 
+	// Generic popup
+    MyDialogOkPopup
+    {
+        id: deviceManipulationMessageDialog
+        function showMessage(title, text)
+        {
+            dialogTitle = title
+            dialogText = text
+            open()
+        }
+    }
     content: ColumnLayout
     {
 		MyNewKeyBinding
@@ -634,6 +645,7 @@ MyStackViewPage
 			}
 		}
 
+		// Hotkeys
         RowLayout
         {
             MyText
@@ -665,7 +677,14 @@ MyStackViewPage
 				text: ""
 				onClicked:
 				{
-					keybinding.showPopup(0);
+					if (DeviceManipulationTabController.isDesktopModeActive())
+					{
+						keybinding.showPopup(0);
+					}
+					else
+					{
+						deviceManipulationMessageDialog.showMessage("Shortcuts", "Due to SteamVR limitations, shortcuts\ncan only be set in desktop mode!")
+					}					
 				}
 			}
 
@@ -677,7 +696,7 @@ MyStackViewPage
 				Layout.leftMargin: 20
 				Layout.topMargin: 0
 				Layout.bottomMargin: 0
-				imagesource : "qrc:///octicons-trashcan.png"
+				imagesource : "octicons-trashcan.png"
 				onClicked:
 				{
 					DeviceManipulationTabController.removeKey(0);
@@ -708,7 +727,14 @@ MyStackViewPage
 				text: ""
 				onClicked:
 				{
-					keybinding.showPopup(1);
+					if (DeviceManipulationTabController.isDesktopModeActive())
+					{
+						keybinding.showPopup(1);
+					}
+					else
+					{
+						deviceManipulationMessageDialog.showMessage("Shortcuts", "Due to SteamVR limitations, shortcuts\ncan only be set in desktop mode!")
+					}
 				}
 			}
 
@@ -720,7 +746,7 @@ MyStackViewPage
 				Layout.leftMargin: 20
 				Layout.topMargin: 0
 				Layout.bottomMargin: 0
-				imagesource : "qrc:///octicons-trashcan.png"
+				imagesource : "octicons-trashcan.png"
 				onClicked:
 				{
 					DeviceManipulationTabController.removeKey(1);

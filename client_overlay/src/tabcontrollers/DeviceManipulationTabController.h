@@ -104,6 +104,8 @@ namespace motioncompensation
 
 		void saveMotionCompensationSettings();
 
+		void saveMotionCompensationShortcuts();
+
 		// Shortcut related functions
 		void InitShortcuts();
 		void NewShortcut(int id, void (DeviceManipulationTabController::* method)(), QString description);
@@ -144,6 +146,7 @@ namespace motioncompensation
 		bool applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation);
 		void resetRefZeroPose();
 		Q_INVOKABLE QString getDeviceModeErrorString();
+		Q_INVOKABLE bool isDesktopModeActive();
 
 		// Settings
 		Q_INVOKABLE bool setLPFBeta(double value);
