@@ -223,10 +223,10 @@ namespace motioncompensation
 		settings->setValue("motionCompensationOffsetRotation_Y", _offset.Rotation.v[1]);
 		settings->setValue("motionCompensationOffsetRotation_R", _offset.Rotation.v[2]);
 
-		saveMotionCompensationShortcuts();
-
 		settings->endGroup();
-		settings->sync();	
+		settings->sync();
+
+		saveMotionCompensationShortcuts();			
 	}
 
 	void DeviceManipulationTabController::saveMotionCompensationShortcuts()
