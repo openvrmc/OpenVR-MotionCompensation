@@ -16,7 +16,7 @@
 #include <vrmotioncompensation_types.h>
 #include <ipc_protocol.h>
 #include <codecvt>
-
+#include "openvr_math.h"
 
 
 // application namespace
@@ -451,28 +451,9 @@ namespace motioncompensation
 	{
 		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
 
-		// Fix copied from https://github.com/OpenVR-Advanced-Settings/OpenVR-AdvancedSettings/blob/master/src/overlaycontroller.cpp
-		auto m_trackingUniverse = vr::VRCompositor()->GetTrackingSpace();
+		vr::HmdRect2_t empty = { 0 };
 
-		vr::EVROverlayError overlayerror;
-
-		// System Overlay Key
-		const auto systemOverlayKey = std::string("system.systemui");
-		vr::VROverlayHandle_t systemOverlayHandle;
-		overlayerror = vr::VROverlay()->FindOverlay(systemOverlayKey.c_str(), &systemOverlayHandle);
-
-		if (overlayerror != vr::VROverlayError_None)
-		{
-			return;
-			LOG(ERROR) << "Could not find system.systemui overlay";
-		}
-
-		// Move the keyboard a bit below the Steam UI
-		vr::HmdMatrix34_t overlayPos;
-		vr::VROverlay()->GetOverlayTransformAbsolute(systemOverlayHandle, &m_trackingUniverse, &overlayPos);
-		overlayPos.m[1][3] = overlayPos.m[1][3] - 1.0f;
-
-		vr::VROverlay()->SetKeyboardTransformAbsolute(m_trackingUniverse, &overlayPos);
+		vr::VROverlay()->SetKeyboardPositionForOverlay(m_ulOverlayHandle, empty);
 
 		LOG(TRACE) << "Showing Keyboard";
 	}

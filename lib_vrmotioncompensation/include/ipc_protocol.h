@@ -21,6 +21,8 @@ namespace vrmotioncompensation
 			DeviceManipulation_GetDeviceInfo,
 			DeviceManipulation_MotionCompensationMode,
 			DeviceManipulation_SetMotionCompensationProperties,
+			DeviceManipulation_ResetRefZeroPose,
+			DeviceManipulation_SetOffsets,
 			DebugLogger_Settings,
 		};
 
@@ -42,7 +44,7 @@ namespace vrmotioncompensation
 			AlreadyInUse,
 			InvalidType,
 			NotFound,
-			TooManyDevices,
+			SharedMemoryError,
 			InvalidVersion,
 			MissingProperty,
 			InvalidOperation,
@@ -79,7 +81,7 @@ namespace vrmotioncompensation
 		{
 			uint32_t clientId;
 			uint32_t messageId;			// Used to associate with Reply
-			uint32_t deviceId;
+			uint32_t OpenVRId;
 		};
 
 		struct Request_DeviceManipulation_MotionCompensationMode
@@ -96,6 +98,22 @@ namespace vrmotioncompensation
 			uint32_t clientId;
 			uint32_t messageId;			// Used to associate with Reply
 			double LPFBeta;
+			uint32_t samples;
+			bool setZero;
+			//MMFstruct_v1 offsets;
+		};
+
+		struct Request_DeviceManipulation_ResetRefZeroPose
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+		};
+
+		struct Request_DeviceManipulation_SetOffsets
+		{
+			uint32_t clientId;
+			uint32_t messageId;			// Used to associate with Reply
+			MMFstruct_OVRMC_v1 offsets;
 		};
 
 		struct Request_DebugLogger_Settings
@@ -135,6 +153,8 @@ namespace vrmotioncompensation
 				Request_OpenVR_GenericDeviceIdMessage ovr_GenericDeviceIdMessage;
 				Request_DeviceManipulation_MotionCompensationMode dm_MotionCompensationMode;
 				Request_DeviceManipulation_SetMotionCompensationProperties dm_SetMotionCompensationProperties;
+				Request_DeviceManipulation_ResetRefZeroPose dm_ResetRefZeroPose;
+				Request_DeviceManipulation_SetOffsets dm_SetOffsets;
 				Request_DebugLogger_Settings dl_Settings;
 				MsgUnion()
 				{
@@ -155,7 +175,7 @@ namespace vrmotioncompensation
 
 		struct Reply_DeviceManipulation_GetDeviceInfo
 		{
-			uint32_t deviceId;
+			uint32_t OpenVRId;
 			vr::ETrackedDeviceClass deviceClass;
 			MotionCompensationDeviceMode deviceMode;
 		};

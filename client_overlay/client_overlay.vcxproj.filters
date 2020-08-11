@@ -7,9 +7,6 @@
     <ClCompile Include="Release\moc_overlaycontroller.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Release\moc_DeviceManipulationTabController.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\tabcontrollers\DeviceManipulationTabController.cpp">
       <Filter>src\tabcontrollers</Filter>
     </ClCompile>
@@ -19,6 +16,21 @@
     <ClCompile Include="src\overlaycontroller.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\QGlobalShortcut\qglobalshortcut.cpp">
+      <Filter>QGlobalShortcut</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_qglobalshortcut.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_qglobalshortcut.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_DeviceManipulationTabController.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_DeviceManipulationTabController.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="src\tabcontrollers\DeviceManipulationTabController.h">
@@ -26,6 +38,9 @@
     </CustomBuild>
     <CustomBuild Include="src\overlaycontroller.h">
       <Filter>src</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\QGlobalShortcut\qglobalshortcut.h">
+      <Filter>QGlobalShortcut</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +59,9 @@
     </Filter>
     <Filter Include="src\tabcontrollers">
       <UniqueIdentifier>{66df1593-7e1b-4abf-96e9-9a5f4e1cd7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QGlobalShortcut">
+      <UniqueIdentifier>{b7191caa-8e17-4ef2-93cd-aab093dd9a07}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +96,15 @@
       <Filter>qml</Filter>
     </None>
     <None Include="bin\win64\res\qml\MyTextField.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyOffsetGroupBox.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\SettingsPage.qml">
+      <Filter>qml</Filter>
+    </None>
+    <None Include="bin\win64\res\qml\MyNewKeyBinding.qml">
       <Filter>qml</Filter>
     </None>
   </ItemGroup>

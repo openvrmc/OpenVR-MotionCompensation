@@ -23,7 +23,6 @@ namespace vrmotioncompensation
 			bool m_isValid = false;
 			ServerDriver* m_parent;
 			MotionCompensationManager& m_motionCompensationManager;
-			std::recursive_mutex _mutex;
 			vr::ETrackedDeviceClass m_eDeviceClass = vr::TrackedDeviceClass_Invalid;
 			uint32_t m_openvrId = vr::k_unTrackedDeviceIndexInvalid;
 			std::string m_serialNumber;
@@ -74,7 +73,7 @@ namespace vrmotioncompensation
 
 			bool handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize);
 
-			vr::HmdVector3d_t ToEulerAngles(vr::HmdQuaternion_t q);
+			//vr::HmdVector3d_t ToEulerAngles(vr::HmdQuaternion_t q);
 		};
 	} // end namespace driver
 } // end namespace vrmotioncompensation

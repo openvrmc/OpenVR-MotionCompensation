@@ -23,7 +23,6 @@ namespace vrmotioncompensation
 
 		bool DeviceManipulationHandle::handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize)
 		{
-			std::lock_guard<std::recursive_mutex> lock(_mutex);
 
 			if (m_deviceMode == MotionCompensationDeviceMode::ReferenceTracker)
 			{ 
@@ -31,14 +30,14 @@ namespace vrmotioncompensation
 				if (newPose.poseIsValid && newPose.result == vr::TrackingResult_Running_OK)
 				{
 					//Set the Zero-Point for the reference tracker if not done yet
-					if (!m_motionCompensationManager._isMotionCompensationZeroPoseValid())
+					if (!m_motionCompensationManager.isZeroPoseValid())
 					{						
-						m_motionCompensationManager._setMotionCompensationZeroPose(newPose);
+						m_motionCompensationManager.setZeroPose(newPose);
 					}
 					else
 					{
 						//Update reference tracker position
-						m_motionCompensationManager._updateMotionCompensationRefPose(newPose);
+						m_motionCompensationManager.updateRefPose(newPose);
 					}
 				}
 			}
@@ -47,7 +46,7 @@ namespace vrmotioncompensation
 				//Check if the pose is valid to prevent unwanted jitter and movement
 				if (newPose.poseIsValid && newPose.result == vr::TrackingResult_Running_OK)
 				{
-					m_motionCompensationManager._applyMotionCompensation(newPose);
+					m_motionCompensationManager.applyMotionCompensation(newPose);
 				}
 			}
 
@@ -56,8 +55,6 @@ namespace vrmotioncompensation
 
 		void DeviceManipulationHandle::setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode)
 		{
-			std::lock_guard<std::recursive_mutex> lock(_mutex);
-
 			m_deviceMode = DeviceMode;
 		}
 	} // end namespace driver

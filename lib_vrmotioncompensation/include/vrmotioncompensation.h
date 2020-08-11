@@ -124,6 +124,11 @@ namespace vrmotioncompensation
 		using vrmotioncompensation_exception::vrmotioncompensation_exception;
 	};
 
+	class vrmotioncompensation_sharedmemoryerror : public vrmotioncompensation_exception
+	{
+		using vrmotioncompensation_exception::vrmotioncompensation_exception;
+	};
+
 	class vrmotioncompensation_alreadyinuse : public vrmotioncompensation_exception
 	{
 		using vrmotioncompensation_exception::vrmotioncompensation_exception;
@@ -151,7 +156,11 @@ namespace vrmotioncompensation
 
 		void setDeviceMotionCompensationMode(uint32_t MCdeviceId, uint32_t RTdeviceId, MotionCompensationMode Mode = MotionCompensationMode::Disabled, bool modal = true);
 
-		void setLPFBeta(double value, bool modal = true);
+		void setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero);
+
+		void resetRefZeroPose();
+
+		void setOffsets(MMFstruct_OVRMC_v1 offsets);
 
 		void startDebugLogger(bool enable, bool modal = true);
 

@@ -28,27 +28,6 @@ namespace vrmotioncompensation
 			}
 		}
 
-		void IpcShmCommunicator::sendReplySetMotionCompensationMode(bool success)
-		{
-			if (_setMotionCompensationMessageId != 0)
-			{
-				ipc::Reply resp(ipc::ReplyType::GenericReply);
-				resp.messageId = _setMotionCompensationMessageId;
-
-				if (success)
-				{
-					resp.status = ipc::ReplyStatus::Ok;
-				}
-				else
-				{
-					resp.status = ipc::ReplyStatus::NotTracking;
-				}
-
-				sendReply(_setMotionCompensationClientId, resp);
-			}
-			_setMotionCompensationMessageId = 0;
-		}
-
 		void IpcShmCommunicator::_ipcThreadFunc(IpcShmCommunicator* _this, ServerDriver* driver)
 		{
 			_this->_ipcThreadRunning = true;
@@ -151,30 +130,31 @@ namespace vrmotioncompensation
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
 									resp.messageId = message.msg.ovr_GenericDeviceIdMessage.messageId;
 
-									if (message.msg.ovr_GenericDeviceIdMessage.deviceId >= vr::k_unMaxTrackedDeviceCount)
+									if (message.msg.ovr_GenericDeviceIdMessage.OpenVRId >= vr::k_unMaxTrackedDeviceCount)
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
 									}
 									else
 									{
-										DeviceManipulationHandle* info = driver->getDeviceManipulationHandleById(message.msg.ovr_GenericDeviceIdMessage.deviceId);
+										DeviceManipulationHandle* info = driver->getDeviceManipulationHandleById(message.msg.ovr_GenericDeviceIdMessage.OpenVRId);
 										if (!info)
 										{
 											resp.status = ipc::ReplyStatus::NotFound;
+											resp.msg.dm_deviceInfo.deviceClass = vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid;
 										}
 										else
 										{
 											resp.status = ipc::ReplyStatus::Ok;
-											resp.msg.dm_deviceInfo.deviceId = message.msg.ovr_GenericDeviceIdMessage.deviceId;
+											resp.msg.dm_deviceInfo.OpenVRId = message.msg.ovr_GenericDeviceIdMessage.OpenVRId;
 											resp.msg.dm_deviceInfo.deviceMode = info->getDeviceMode();
 											resp.msg.dm_deviceInfo.deviceClass = info->deviceClass();
 										}
 									}
 
-									if (resp.status != ipc::ReplyStatus::Ok)
+									/*if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while getting device info: Error code " << (int)resp.status;
-									}
+									}*/
 
 									if (resp.messageId != 0)
 									{
@@ -185,11 +165,12 @@ namespace vrmotioncompensation
 
 								case ipc::RequestType::DeviceManipulation_MotionCompensationMode:
 								{
-									//Create reply message
+									// Create reply message
 									ipc::Reply resp(ipc::ReplyType::GenericReply);
 									resp.messageId = message.msg.dm_MotionCompensationMode.messageId;
 
-									if (message.msg.dm_MotionCompensationMode.MCdeviceId >= vr::k_unMaxTrackedDeviceCount || message.msg.dm_MotionCompensationMode.RTdeviceId >= vr::k_unMaxTrackedDeviceCount)
+									if (message.msg.dm_MotionCompensationMode.MCdeviceId > vr::k_unMaxTrackedDeviceCount ||
+										(message.msg.dm_MotionCompensationMode.RTdeviceId > vr::k_unMaxTrackedDeviceCount && message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker))
 									{
 										resp.status = ipc::ReplyStatus::InvalidId;
 									}
@@ -214,7 +195,7 @@ namespace vrmotioncompensation
 												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
 													LOG(INFO) << "Setting driver into motion compensation mode";
-													
+
 													//Check if an old device needs a mode change
 													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
 													{
@@ -228,7 +209,7 @@ namespace vrmotioncompensation
 															//Set new MCdevice to motion compensated
 															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 															serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
-														}														
+														}
 
 														//New RTdevice is different from old
 														if (serverDriver->motionCompensation().getRTdeviceID() != RTdeviceID)
@@ -275,6 +256,7 @@ namespace vrmotioncompensation
 									if (resp.status != ipc::ReplyStatus::Ok)
 									{
 										LOG(ERROR) << "Error while setting device into motion compensation mode: Error code " << (int)resp.status;
+										LOG(ERROR) << "MCdeviceID: " << message.msg.dm_MotionCompensationMode.MCdeviceId << ", RTdeviceID: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
 									}
 
 									if (resp.messageId != 0/* && resp.status != ipc::ReplyStatus::Ok*/)
@@ -291,8 +273,15 @@ namespace vrmotioncompensation
 									auto serverDriver = ServerDriver::getInstance();
 									if (serverDriver)
 									{
-										LOG(INFO) << "Setting driver motion compensation properties: LPF_Beta = " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
-										serverDriver->motionCompensation().setLPFBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
+										LOG(INFO) << "Setting driver motion compensation properties:";
+										LOG(INFO) << "LPF_Beta: " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
+										LOG(INFO) << "samples: " << message.msg.dm_SetMotionCompensationProperties.samples;
+										LOG(INFO) << "set Zero: " << message.msg.dm_SetMotionCompensationProperties.setZero;
+										LOG(INFO) << "End of property listing";
+
+										serverDriver->motionCompensation().setLpfBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
+										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
+										serverDriver->motionCompensation().setZeroMode(message.msg.dm_SetMotionCompensationProperties.setZero);
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}
@@ -309,6 +298,64 @@ namespace vrmotioncompensation
 									if (resp.messageId != 0)
 									{
 										_this->sendReply(message.msg.dm_SetMotionCompensationProperties.clientId, resp);
+									}
+								}
+								break;
+
+								case ipc::RequestType::DeviceManipulation_ResetRefZeroPose:
+								{
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dm_SetMotionCompensationProperties.messageId;
+									auto serverDriver = ServerDriver::getInstance();
+									if (serverDriver)
+									{
+										LOG(INFO) << "Resetting reference zero pose";
+
+										serverDriver->motionCompensation().resetZeroPose();
+
+										resp.status = ipc::ReplyStatus::Ok;
+									}
+									else
+									{
+										resp.status = ipc::ReplyStatus::UnknownError;
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while setting motion compensation properties: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dm_SetMotionCompensationProperties.clientId, resp);
+									}
+								}
+								break;
+
+								case ipc::RequestType::DeviceManipulation_SetOffsets:
+								{
+									ipc::Reply resp(ipc::ReplyType::GenericReply);
+									resp.messageId = message.msg.dm_SetOffsets.messageId;
+									auto serverDriver = ServerDriver::getInstance();
+									if (serverDriver)
+									{
+										serverDriver->motionCompensation().setOffsets(message.msg.dm_SetOffsets.offsets);
+
+										resp.status = ipc::ReplyStatus::Ok;
+									}
+									else
+									{
+										resp.status = ipc::ReplyStatus::UnknownError;
+									}
+
+									if (resp.status != ipc::ReplyStatus::Ok)
+									{
+										LOG(ERROR) << "Error while setting offsets: Error code " << (int)resp.status;
+									}
+
+									if (resp.messageId != 0)
+									{
+										_this->sendReply(message.msg.dm_SetOffsets.clientId, resp);
 									}
 								}
 								break;
