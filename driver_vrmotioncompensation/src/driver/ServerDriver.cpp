@@ -45,8 +45,8 @@ namespace vrmotioncompensation
 		void ServerDriver::hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceActivated(" << serverDriver << ", " << version << ", " << unObjectId << ")";
-			
-			//Search for the activated device
+
+			// Search for the activated device
 			auto i = _deviceManipulationHandles.find(serverDriver);
 
 			if (i != _deviceManipulationHandles.end())
@@ -55,7 +55,8 @@ namespace vrmotioncompensation
 				handle->setOpenvrId(unObjectId);
 				_openvrIdDeviceManipulationHandle[unObjectId] = handle.get();
 
-				LOG(INFO) << "Successfully added device " << handle->serialNumber() << " (OpenVR Id: " << handle->openvrId() << ")";
+				//LOG(INFO) << "Successfully added device " << handle->serialNumber() << " (OpenVR Id: " << handle->openvrId() << ")";
+				LOG(INFO) << "Successfully added device " << _openvrIdDeviceManipulationHandle[unObjectId]->serialNumber() << " (OpenVR Id: " << _openvrIdDeviceManipulationHandle[unObjectId]->openvrId() << ")";
 			}
 		}
 
@@ -72,7 +73,7 @@ namespace vrmotioncompensation
 			}
 			else
 			{
-				LOG(ERROR) << "Error while initialising minHook: " << MH_StatusToString(mhError);
+				LOG(ERROR) << "Error while initializing minHook: " << MH_StatusToString(mhError);
 			}
 
 			LOG(DEBUG) << "Initialize driver context.";
@@ -116,18 +117,24 @@ namespace vrmotioncompensation
 
 			std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
 
-			if (_openvrIdDeviceManipulationHandle[unWhichDevice] && _openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
+			if (_openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
 			{
-				return _openvrIdDeviceManipulationHandle[unWhichDevice];
+				if (_openvrIdDeviceManipulationHandle[unWhichDevice])
+				{
+					return _openvrIdDeviceManipulationHandle[unWhichDevice];
+				}
+				else
+				{
+					LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is NULL. unWhichDevice: " << unWhichDevice;
+				}
+			}
+			else
+			{
+				LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is not valid. unWhichDevice: " << unWhichDevice;
 			}
 
 			return nullptr;
 		}
-
-		/*void ServerDriver::sendReplySetMotionCompensationMode(bool success)
-		{
-			shmCommunicator.sendReplySetMotionCompensationMode(success);
-		}*/
 
 	} // end namespace driver
 } // end namespace vrmotioncompensation

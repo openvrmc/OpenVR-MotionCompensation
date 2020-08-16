@@ -39,6 +39,8 @@ namespace vrmotioncompensation
 				return m_isValid;
 			}
 
+			void setValid(bool isValid);
+
 			vr::ETrackedDeviceClass deviceClass() const
 			{
 				return m_eDeviceClass;
