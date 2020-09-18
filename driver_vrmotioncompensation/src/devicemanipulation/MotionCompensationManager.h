@@ -204,7 +204,6 @@ namespace vrmotioncompensation
 			
 			// Offset data
 			MMFstruct_OVRMC_v1 _Offset;
-			//vr::HmdVector3d_t* _Poffset = nullptr;
 			MMFstruct_OVRMC_v1* _Poffset = nullptr;
 
 			// Zero position

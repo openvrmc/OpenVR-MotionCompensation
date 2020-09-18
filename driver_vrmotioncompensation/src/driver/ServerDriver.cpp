@@ -109,6 +109,7 @@ namespace vrmotioncompensation
 		// Call frequency: ~93Hz
 		void ServerDriver::RunFrame()
 		{
+
 		}
 
 		DeviceManipulationHandle* ServerDriver::getDeviceManipulationHandleById(uint32_t unWhichDevice)
