@@ -27,8 +27,8 @@ namespace vrmotioncompensation
 
 	struct MMFstruct_OVRMC_v1
 	{
-		#define FLAG_ENABLE_MC		0
-		#define FLAG_RESETZEROPOSE	1
+		/*#define FLAG_ENABLE_MC		0
+		#define FLAG_RESETZEROPOSE	1*/
 
 		vr::HmdVector3d_t Translation;
 		vr::HmdVector3d_t Rotation;
