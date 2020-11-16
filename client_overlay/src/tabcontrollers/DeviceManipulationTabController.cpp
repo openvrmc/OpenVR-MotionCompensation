@@ -96,7 +96,7 @@ namespace motioncompensation
 			// Get some infos about the found devices
 			for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
 			{
-				auto deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
+				vr::ETrackedDeviceClass deviceClass = vr::VRSystem()->GetTrackedDeviceClass(id);
 
 				if (deviceClass != vr::TrackedDeviceClass_Invalid && deviceInfos[id]->deviceClass == vr::TrackedDeviceClass_Invalid)
 				{
@@ -146,6 +146,8 @@ namespace motioncompensation
 				// Remove all map entries
 				TrackerArrayIdToDeviceId.clear();
 				HMDArrayIdToDeviceId.clear();
+
+				// Create new maps
 				emit deviceCountChanged();
 			}
 		}
@@ -517,6 +519,9 @@ namespace motioncompensation
 	// Enables or disables the motion compensation for the selected device
 	bool DeviceManipulationTabController::applySettings(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation)
 	{
+		unsigned RTid = 0;
+		unsigned MCid = 0;
+
 		// A few checks if the user input is valid
 		if (MCindex < 0)
 		{
@@ -527,7 +532,7 @@ namespace motioncompensation
 		auto search = HMDArrayIdToDeviceId.find(MCindex);
 		if (search != HMDArrayIdToDeviceId.end())
 		{
-			MCindex = search->second;
+			MCid = search->second;
 		}
 		else
 		{
@@ -535,9 +540,9 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got these internal array IDs for HMD: " << MCindex;
+		LOG(DEBUG) << "Got these OpenVR IDs for HMD: " << MCid;
 
-		// Input validation for tracker - not needed with Mover integration
+		// Input validation for tracker
 		if (_motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
 		{
 			if (RTindex < 0)
@@ -550,7 +555,7 @@ namespace motioncompensation
 			search = TrackerArrayIdToDeviceId.find(RTindex);
 			if (search != TrackerArrayIdToDeviceId.end())
 			{
-				RTindex = search->second;
+				RTid = search->second;
 			}
 			else
 			{
@@ -558,34 +563,34 @@ namespace motioncompensation
 				return false;
 			}
 
-			LOG(DEBUG) << "Got these internal array IDs for Tracker: " << RTindex;
+			LOG(DEBUG) << "Got these OpenVR IDs for Tracker: " << RTid;
 
-			if (MCindex == RTindex)
+			if (MCid == RTid)
 			{
 				m_deviceModeErrorString = "\"Device\" and \"Reference Tracker\" cannot be the same!";
 				return false;
 			}
 
-			if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+			if (deviceInfos[RTid]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
 			{
 				m_deviceModeErrorString = "\"Reference Tracker\" cannot be a HMD!";
 				return false;
 			}
 
-			if (deviceInfos[RTindex]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
+			if (deviceInfos[RTid]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
 			{
 				m_deviceModeErrorString = "\"Reference Tracker\" is invalid!";
 				return false;
 			}
 		}
 
-		if (deviceInfos[MCindex]->deviceClass != vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+		if (deviceInfos[MCid]->deviceClass != vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
 		{
 			m_deviceModeErrorString = "\"Device\" is not a HMD!";
 			return false;
 		}
 
-		return applySettings_ovrid(MCindex, RTindex, EnableMotionCompensation);
+		return applySettings_ovrid(MCid, RTid, EnableMotionCompensation);
 	}
 
 	bool DeviceManipulationTabController::applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation)

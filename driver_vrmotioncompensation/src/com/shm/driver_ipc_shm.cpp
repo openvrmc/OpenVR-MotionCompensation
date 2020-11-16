@@ -182,8 +182,14 @@ namespace vrmotioncompensation
 										int MCdeviceID = message.msg.dm_MotionCompensationMode.MCdeviceId;
 										int RTdeviceID = message.msg.dm_MotionCompensationMode.RTdeviceId;
 
-										if (!MCdevice || !RTdevice)
+										if (!MCdevice)
 										{
+											LOG(ERROR) << "DeviceManipulation_MotionCompensationMode: MCdevice not found";
+											resp.status = ipc::ReplyStatus::NotFound;
+										}
+										else if (!RTdevice)
+										{
+											LOG(ERROR) << "DeviceManipulation_MotionCompensationMode: RTdevice not found";
 											resp.status = ipc::ReplyStatus::NotFound;
 										}
 										else
@@ -196,40 +202,40 @@ namespace vrmotioncompensation
 												{
 													LOG(INFO) << "Setting driver into motion compensation mode";
 
-													//Check if an old device needs a mode change
+													// Check if an old device needs a mode change
 													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
 													{
-														//New MCdevice is different from old
+														// New MCdevice is different from old
 														if (serverDriver->motionCompensation().getMCdeviceID() != MCdeviceID)
 														{
-															//Set old MCdevice to default
+															// Set old MCdevice to default
 															DeviceManipulationHandle* OldMCdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getMCdeviceID());
 															OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-															//Set new MCdevice to motion compensated
+															// Set new MCdevice to motion compensated
 															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 															serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
 														}
 
-														//New RTdevice is different from old
+														// New RTdevice is different from old
 														if (serverDriver->motionCompensation().getRTdeviceID() != RTdeviceID)
 														{
-															//Set old RTdevice to default
+															// Set old RTdevice to default
 															DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
 															OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-															//Set new RTdevice to reference tracker
+															// Set new RTdevice to reference tracker
 															RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
 															serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
 														}
 													}
 													else
 													{
-														//Activate motion compensation mode for specified device
+														// Activate motion compensation mode for specified device
 														MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 														RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
 
-														//Set motion compensation mode
+														// Set motion compensation mode
 														serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, MCdeviceID, RTdeviceID);
 													}
 												}
@@ -240,7 +246,7 @@ namespace vrmotioncompensation
 													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
 
-													//Reset and set some vars for every device
+													// Reset and set some vars for every device
 													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled, -1, -1);
 												}
 
@@ -259,7 +265,7 @@ namespace vrmotioncompensation
 										LOG(ERROR) << "MCdeviceID: " << message.msg.dm_MotionCompensationMode.MCdeviceId << ", RTdeviceID: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
 									}
 
-									if (resp.messageId != 0/* && resp.status != ipc::ReplyStatus::Ok*/)
+									if (resp.messageId != 0)
 									{
 										_this->sendReply(message.msg.dm_MotionCompensationMode.clientId, resp);
 									}

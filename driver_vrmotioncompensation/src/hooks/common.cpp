@@ -4,6 +4,7 @@
 #include "IVRDriverContextHooks.h"
 #include "IVRServerDriverHost004Hooks.h"
 #include "IVRServerDriverHost005Hooks.h"
+#include "IVRServerDriverHost006Hooks.h"
 #include "ITrackedDeviceServerDriver005Hooks.h"
 
 
@@ -27,6 +28,10 @@ namespace vrmotioncompensation
 			else if (interfaceVersion.compare("IVRServerDriverHost_005") == 0)
 			{
 				retval = IVRServerDriverHost005Hooks::createHooks(interfaceRef);
+			}
+			else if (interfaceVersion.compare("IVRServerDriverHost_006") == 0)
+			{
+				retval = IVRServerDriverHost006Hooks::createHooks(interfaceRef);
 			}
 			else if (interfaceVersion.compare("ITrackedDeviceServerDriver_005") == 0)
 			{

@@ -449,7 +449,7 @@ namespace motioncompensation
 
 	void OverlayController::showKeyboard(QString existingText, unsigned long userValue)
 	{
-		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), false, userValue);
+		vr::VROverlay()->ShowKeyboardForOverlay(m_ulOverlayHandle, vr::k_EGamepadTextInputModeNormal, vr::k_EGamepadTextInputLineModeSingleLine, vr::EKeyboardFlags::KeyboardFlag_Modal, "Motion Compensation Overlay", 1024, existingText.toStdString().c_str(), userValue);
 
 		vr::HmdRect2_t empty = { 0 };
 

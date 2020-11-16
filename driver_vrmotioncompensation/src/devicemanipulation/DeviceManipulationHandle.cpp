@@ -21,6 +21,11 @@ namespace vrmotioncompensation
 		{
 		}
 
+		void DeviceManipulationHandle::setValid(bool isValid)
+		{
+			m_isValid = isValid;
+		}
+
 		bool DeviceManipulationHandle::handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize)
 		{
 

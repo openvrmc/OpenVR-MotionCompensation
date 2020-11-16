@@ -147,6 +147,8 @@ namespace vrmotioncompensation
 
 		void MotionCompensationManager::setOffsets(MMFstruct_OVRMC_v1 offsets)
 		{
+			//_Offset.Translation = offsets.Translation;
+			//_Offset.Rotation = offsets.Rotation;
 			_Offset = offsets;
 			*_Poffset = _Offset;
 		}
@@ -427,7 +429,14 @@ namespace vrmotioncompensation
 
 		void MotionCompensationManager::runFrame()
 		{
+			/*if (_Offset.Flags_1 & (1 << FLAG_ENABLE_MC) && _Mode == MotionCompensationMode::Disabled)
+			{
 
+			}
+			else if (!(_Offset.Flags_1 & (1 << FLAG_ENABLE_MC)) && _Mode == MotionCompensationMode::ReferenceTracker)
+			{
+				setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, -1, -1);
+			}*/
 		}
 
 		double MotionCompensationManager::vecVelocity(double time, const double vecPosition, const double Old_vecPosition)
