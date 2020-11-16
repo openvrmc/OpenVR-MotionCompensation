@@ -87,7 +87,6 @@ namespace vrmotioncompensation
 			{
 				return m_motionCompensation;
 			}
-			//void sendReplySetMotionCompensationMode(bool success);
 
 			//// function hooks related ////
 			void hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass& eDeviceClass, void* pDriver);
@@ -106,8 +105,7 @@ namespace vrmotioncompensation
 			std::recursive_mutex _deviceManipulationHandlesMutex;
 			std::map<void*, std::shared_ptr<DeviceManipulationHandle>> _deviceManipulationHandles;
 			DeviceManipulationHandle* _openvrIdDeviceManipulationHandle[vr::k_unMaxTrackedDeviceCount];
-			//std::map<void*, DeviceManipulationHandle*> _ptrToDeviceManipulationHandleMap;
-			//std::map<uint64_t, DeviceManipulationHandle*> _inputComponentToDeviceManipulationHandleMap;
+			int _deviceVersionMap[vr::k_unMaxTrackedDeviceCount];
 
 			//// motion compensation related ////
 			MotionCompensationManager m_motionCompensation;

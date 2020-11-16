@@ -12,6 +12,7 @@ namespace vrmotioncompensation
 		{
 			singleton = this;
 			memset(_openvrIdDeviceManipulationHandle, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
+			memset(_deviceVersionMap, 0, sizeof(int) * vr::k_unMaxTrackedDeviceCount);
 		}
 
 		ServerDriver::~ServerDriver()
@@ -23,9 +24,20 @@ namespace vrmotioncompensation
 		{
 			if (_openvrIdDeviceManipulationHandle[unWhichDevice] && _openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
 			{
-				return _openvrIdDeviceManipulationHandle[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
-			}
+				if (_deviceVersionMap[unWhichDevice] == 0)
+				{
+					_deviceVersionMap[unWhichDevice] = version;
+				}
 
+				LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated(version:" << version << ", deviceId:" << unWhichDevice << ", first used version: " << _deviceVersionMap[unWhichDevice] << ")";
+				
+				if (_deviceVersionMap[unWhichDevice] == version)
+				{
+					return _openvrIdDeviceManipulationHandle[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
+				}
+
+				LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated called for wrong version, ignoring ";
+			}
 			return true;
 		}
 
