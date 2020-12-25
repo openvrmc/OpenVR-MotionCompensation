@@ -597,7 +597,7 @@ namespace vrmotioncompensation
 			// point is the user-input offset to the controller
 			// VecRotation and VecPosition is the current reference-pose (Controller or input from Mover)
 			vr::HmdQuaternion_t quat = vrmath::quaternionFromYawPitchRoll(VecRotation.v[0], VecRotation.v[1], VecRotation.v[2]);
-			transform(quat, VecPosition, point);
+			return transform(quat, VecPosition, point);
 		}
 
 		// Calculates the new coordinates of 'point', moved and rotated by VecRotation and VecPosition
