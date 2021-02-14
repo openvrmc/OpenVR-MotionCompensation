@@ -174,8 +174,8 @@ namespace motioncompensation
 		_RefTrackerSerial = settings->value("motionCompensationRefTrackerSerial", "").toString();
 
 		// Load filter settings
-		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
-		_samples = settings->value("motionCompensationSamples", 100).toUInt();
+		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.85).toDouble();
+		_samples = settings->value("motionCompensationSamples", 12).toUInt();
 
 		// Load offset settings
 		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
