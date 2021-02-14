@@ -81,8 +81,8 @@
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>libvrmotioncompensation</TargetName>
-    <IncludePath>..\third-party\boost_1_72_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\third-party\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\third-party\boost_1_75_0;$(IncludePath)</IncludePath>
+    <LibraryPath>..\third-party\boost_1_75_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
