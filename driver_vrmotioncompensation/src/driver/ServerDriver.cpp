@@ -29,14 +29,14 @@ namespace vrmotioncompensation
 					_deviceVersionMap[unWhichDevice] = version;
 				}
 
-				LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated(version:" << version << ", deviceId:" << unWhichDevice << ", first used version: " << _deviceVersionMap[unWhichDevice] << ")";
+				//LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated(version:" << version << ", deviceId:" << unWhichDevice << ", first used version: " << _deviceVersionMap[unWhichDevice] << ")";
 				
 				if (_deviceVersionMap[unWhichDevice] == version)
 				{
 					return _openvrIdDeviceManipulationHandle[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
 				}
 
-				LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated called for wrong version, ignoring ";
+				//LOG(TRACE) << "ServerDriver::hooksTrackedDevicePoseUpdated called for wrong version, ignoring ";
 			}
 			return true;
 		}
@@ -113,7 +113,7 @@ namespace vrmotioncompensation
 			LOG(TRACE) << "ServerDriver::Cleanup()";
 			_driverContextHooks.reset();
 			MH_Uninitialize();
-			m_motionCompensation.StopDebugData();
+			//m_motionCompensation.StopDebugData();
 			shmCommunicator.shutdown();
 			VR_CLEANUP_SERVER_DRIVER_CONTEXT();
 		}
