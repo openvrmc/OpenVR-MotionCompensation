@@ -1,5 +1,3 @@
-#define ELPP_THREAD_SAFE
-
 #include "logging.h"
 
 const char* logConfigFileName = "logging.conf";

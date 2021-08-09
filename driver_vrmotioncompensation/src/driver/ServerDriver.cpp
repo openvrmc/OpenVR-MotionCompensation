@@ -113,7 +113,6 @@ namespace vrmotioncompensation
 			LOG(TRACE) << "ServerDriver::Cleanup()";
 			_driverContextHooks.reset();
 			MH_Uninitialize();
-			//m_motionCompensation.StopDebugData();
 			shmCommunicator.shutdown();
 			VR_CLEANUP_SERVER_DRIVER_CONTEXT();
 		}

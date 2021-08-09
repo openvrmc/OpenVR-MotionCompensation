@@ -107,7 +107,7 @@ namespace vrmotioncompensation
 
 			// Save zero points
 			_ZeroLock.lock();
-			_ZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
+			_ZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) + pose.vecWorldFromDriverTranslation;
 			_ZeroRot = tmpConj * pose.qRotation;			
 
 			_ZeroPoseValid = true;
@@ -176,7 +176,7 @@ namespace vrmotioncompensation
 
 			// convert pose from driver space to app space
 			_RefLock.lock();
-			_RefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecPosition, true) - pose.vecWorldFromDriverTranslation;
+			_RefPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, Filter_vecPosition, true) + pose.vecWorldFromDriverTranslation;
 			_RefLock.unlock();
 
 			// ----------------------------------------------------------------------------------------------- //
@@ -257,7 +257,7 @@ namespace vrmotioncompensation
 				// All filter calculations are done within the function for the reference tracker, because the HMD position is updated 3x more often.
 				// Convert pose from driver space to app space
 				vr::HmdQuaternion_t tmpConj = vrmath::quaternionConjugate(pose.qWorldFromDriverRotation);
-				vr::HmdVector3d_t poseWorldPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) - pose.vecWorldFromDriverTranslation;
+				vr::HmdVector3d_t poseWorldPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, true) + pose.vecWorldFromDriverTranslation;
 
 				// Do motion compensation
 				vr::HmdQuaternion_t poseWorldRot = tmpConj * pose.qRotation;
@@ -308,7 +308,7 @@ namespace vrmotioncompensation
 
 				// convert back to driver space
 				pose.qRotation = pose.qWorldFromDriverRotation * compensatedPoseWorldRot;
-				vr::HmdVector3d_t adjPoseDriverPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, compensatedPoseWorldPos + pose.vecWorldFromDriverTranslation);
+				vr::HmdVector3d_t adjPoseDriverPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, compensatedPoseWorldPos - pose.vecWorldFromDriverTranslation, true);
 				_copyVec(pose.vecPosition, adjPoseDriverPos.v);
 			}
 			return true;

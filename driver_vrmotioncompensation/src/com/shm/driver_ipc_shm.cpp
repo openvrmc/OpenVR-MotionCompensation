@@ -201,6 +201,8 @@ namespace vrmotioncompensation
 												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
 													LOG(INFO) << "Setting driver into motion compensation mode";
+													LOG(INFO) << "Tracker OpenVR Id: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
+													LOG(INFO) << "HMD OpenVR Id: " << message.msg.dm_MotionCompensationMode.MCdeviceId;
 
 													// Check if an old device needs a mode change
 													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
