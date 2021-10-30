@@ -25,8 +25,8 @@ namespace vrmotioncompensation
 				*_Poffset = _Offset;
 				LOG(INFO) << "Shared memory OVRMC_MMFv1 created";
 			}
-			catch (boost::interprocess::interprocess_exception & e)
-			{				
+			catch (boost::interprocess::interprocess_exception& e)
+			{
 				LOG(ERROR) << "Could not create or open shared memory. Error code " << e.get_error_code();
 			}
 		}
@@ -39,7 +39,7 @@ namespace vrmotioncompensation
 				_RefPoseValidCounter = 0;
 				_ZeroPoseValid = false;
 				_Enabled = true;
-				
+
 				setAlpha(_Samples);
 			}
 			else
@@ -108,7 +108,7 @@ namespace vrmotioncompensation
 			// Save zero points
 			_ZeroLock.lock();
 			_ZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, false) + pose.vecWorldFromDriverTranslation;
-			_ZeroRot = tmpConj * pose.qRotation;			
+			_ZeroRot = pose.qWorldFromDriverRotation * pose.qRotation;
 
 			_ZeroPoseValid = true;
 			_ZeroLock.unlock();
@@ -190,7 +190,7 @@ namespace vrmotioncompensation
 				// 2nd stage
 				_Filter_rotPosition[1] = lowPassFilterQuaternion(_Filter_rotPosition[0], _Filter_rotPosition[1]);
 
-				
+
 				vr::HmdVector3d_t RotEulerFilter = toEulerAngles(_Filter_rotPosition[1]);
 
 				if (!_SetZeroMode)
@@ -213,7 +213,7 @@ namespace vrmotioncompensation
 			}
 
 			// calculate orientation difference and its inverse
-			vr::HmdQuaternion_t poseWorldRot = tmpConj * _Filter_rotPosition[1];
+			vr::HmdQuaternion_t poseWorldRot = pose.qWorldFromDriverRotation * _Filter_rotPosition[1];
 			_RefLock.lock();
 			_ZeroLock.lock();
 			_RefRot = poseWorldRot * vrmath::quaternionConjugate(_ZeroRot);
@@ -243,7 +243,7 @@ namespace vrmotioncompensation
 			else
 			{
 				_RefPoseValidCounter++;
-			}			
+			}
 
 			// Save last rotation and pose
 			_RotEulerFilterOld = RotEulerFilter;
@@ -260,7 +260,7 @@ namespace vrmotioncompensation
 				vr::HmdVector3d_t poseWorldPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, false) + pose.vecWorldFromDriverTranslation;
 
 				// Do motion compensation
-				vr::HmdQuaternion_t poseWorldRot = tmpConj * pose.qRotation;
+				vr::HmdQuaternion_t poseWorldRot = pose.qWorldFromDriverRotation * pose.qRotation;
 				_RefLock.lock();
 				_ZeroLock.lock();
 				vr::HmdVector3d_t compensatedPoseWorldPos = _ZeroPos + vrmath::quaternionRotateVector(_RefRot, _RefRotInv, poseWorldPos - _RefPos, true);
@@ -269,9 +269,6 @@ namespace vrmotioncompensation
 				_RefLock.unlock();
 
 				// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
-				vr::HmdQuaternion_t tmpRot = pose.qWorldFromDriverRotation * pose.qRotation;
-				vr::HmdQuaternion_t tmpRotInv = vrmath::quaternionConjugate(tmpRot);
-
 				if (_SetZeroMode)
 				{
 					_zeroVec(pose.vecVelocity);
@@ -304,10 +301,10 @@ namespace vrmotioncompensation
 					pose.vecAngularAcceleration[2] -= tmpRotAcc.v[2];
 					_RefVelLock.unlock();
 				}
-				
+
 
 				// convert back to driver space
-				pose.qRotation = pose.qWorldFromDriverRotation * compensatedPoseWorldRot;
+				pose.qRotation = tmpConj * compensatedPoseWorldRot;
 				vr::HmdVector3d_t adjPoseDriverPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, compensatedPoseWorldPos - pose.vecWorldFromDriverTranslation, true);
 				_copyVec(pose.vecPosition, adjPoseDriverPos.v);
 			}
@@ -329,7 +326,7 @@ namespace vrmotioncompensation
 		double MotionCompensationManager::vecVelocity(double time, const double vecPosition, const double Old_vecPosition)
 		{
 			double NewVelocity = 0.0;
-			
+
 			if (time != (double)0.0)
 			{
 				NewVelocity = (vecPosition - Old_vecPosition) / time;
@@ -364,7 +361,7 @@ namespace vrmotioncompensation
 
 		// Low Pass Filter for 3d Vectors
 		double MotionCompensationManager::DEMA(const double RawData, int Axis)
-		{			
+		{
 			_Filter_vecPosition[0].v[Axis] += _Alpha * (RawData - _Filter_vecPosition[1].v[Axis]);
 			_Filter_vecPosition[1].v[Axis] += _Alpha * (_Filter_vecPosition[0].v[Axis] - _Filter_vecPosition[1].v[Axis]);
 			return 2 * _Filter_vecPosition[0].v[Axis] - _Filter_vecPosition[1].v[Axis];
@@ -406,13 +403,13 @@ namespace vrmotioncompensation
 			vr::HmdQuaternion_t qr;
 
 			double dotproduct = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
-			
+
 			// if q1 and q2 are the same, we can return either of the values
 			if (dotproduct >= 1.0 || dotproduct <= -1.0)
 			{
 				return q1;
 			}
-			
+
 			double theta, st, sut, sout, coeff1, coeff2;
 
 			// algorithm adapted from Shoemake's paper
@@ -489,7 +486,7 @@ namespace vrmotioncompensation
 
 		// Calculates the new coordinates of 'point', moved and rotated by VecRotation and VecPosition
 		vr::HmdVector3d_t MotionCompensationManager::transform(vr::HmdQuaternion_t quat, vr::HmdVector3d_t VecPosition, vr::HmdVector3d_t point)
-		{			
+		{
 			vr::HmdVector3d_t translation = vrmath::quaternionRotateVector(quat, VecPosition);
 
 			return vrmath::quaternionRotateVector(quat, point) + translation;
