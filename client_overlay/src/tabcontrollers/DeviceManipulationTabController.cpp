@@ -174,8 +174,8 @@ namespace motioncompensation
 		_RefTrackerSerial = settings->value("motionCompensationRefTrackerSerial", "").toString();
 
 		// Load filter settings
-		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.2).toDouble();
-		_samples = settings->value("motionCompensationSamples", 100).toUInt();
+		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.85).toDouble();
+		_samples = settings->value("motionCompensationSamples", 12).toUInt();
 
 		// Load offset settings
 		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
@@ -540,7 +540,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got these OpenVR IDs for HMD: " << MCid;
+		LOG(DEBUG) << "Got this OpenVR ID for HMD: " << MCid;
 
 		// Input validation for tracker
 		if (_motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
@@ -563,7 +563,7 @@ namespace motioncompensation
 				return false;
 			}
 
-			LOG(DEBUG) << "Got these OpenVR IDs for Tracker: " << RTid;
+			LOG(DEBUG) << "Got this OpenVR ID for Tracker: " << RTid;
 
 			if (MCid == RTid)
 			{

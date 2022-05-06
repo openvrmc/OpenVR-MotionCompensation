@@ -201,6 +201,8 @@ namespace vrmotioncompensation
 												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
 													LOG(INFO) << "Setting driver into motion compensation mode";
+													LOG(INFO) << "Tracker OpenVR Id: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
+													LOG(INFO) << "HMD OpenVR Id: " << message.msg.dm_MotionCompensationMode.MCdeviceId;
 
 													// Check if an old device needs a mode change
 													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
@@ -375,7 +377,7 @@ namespace vrmotioncompensation
 									{
 										if (message.msg.dl_Settings.enabled)
 										{
-											if (!serverDriver->motionCompensation().StartDebugData())
+											/*if (!serverDriver->motionCompensation().StartDebugData())
 											{
 												LOG(INFO) << "Could not start debug logger: Motion Compensation must be enabled";
 												resp.status = ipc::ReplyStatus::InvalidId;
@@ -385,12 +387,13 @@ namespace vrmotioncompensation
 												LOG(INFO) << "Debug logger enabled";
 												LOG(INFO) << "Max debug data points = " << message.msg.dl_Settings.MaxDebugPoints;
 												resp.status = ipc::ReplyStatus::Ok;
-											}	
+											}	*/
+											resp.status = ipc::ReplyStatus::Ok;
 										}
 										else
 										{
 											LOG(INFO) << "Debug logger disabled";
-											serverDriver->motionCompensation().StopDebugData();
+											//serverDriver->motionCompensation().StopDebugData();
 											resp.status = ipc::ReplyStatus::Ok;
 										}
 									}

@@ -64,8 +64,8 @@
     <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\third-party\boost_1_72_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\third-party\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\third-party\boost_1_75_0;$(IncludePath)</IncludePath>
+    <LibraryPath>..\third-party\boost_1_75_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -99,6 +99,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>

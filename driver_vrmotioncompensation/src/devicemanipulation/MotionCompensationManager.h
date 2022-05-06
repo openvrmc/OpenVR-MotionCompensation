@@ -23,6 +23,45 @@ namespace vrmotioncompensation
 
 		class Spinlock
 		{
+			// Source: https://rigtorp.se/spinlock/
+			std::atomic<bool> lock_ = { 0 };
+		
+		public:
+			void lock() noexcept
+			{
+				for (;;)
+				{
+					// Optimistically assume the lock is free on the first try
+					if (!lock_.exchange(true, std::memory_order_acquire))
+					{
+						return;
+					}
+					// Wait for lock to be released without generating cache misses
+					while (lock_.load(std::memory_order_relaxed))
+					{
+						// Issue X86 PAUSE or ARM YIELD instruction to reduce contention between
+						// hyper-threads
+						YieldProcessor();
+					}
+				}
+			}
+
+			bool try_lock() noexcept
+			{
+				// First do a relaxed load to check if lock is free in order to prevent
+				// unnecessary cache misses if someone does while(!try_lock())
+				return !lock_.load(std::memory_order_relaxed) &&
+					!lock_.exchange(true, std::memory_order_acquire);
+			}
+
+			void unlock() noexcept
+			{
+				lock_.store(false, std::memory_order_release);
+			}
+		};
+
+		/*class Spinlock
+		{
 			std::atomic_flag _Flag = ATOMIC_FLAG_INIT;
 
 		public:
@@ -41,18 +80,12 @@ namespace vrmotioncompensation
 				_Flag.clear(std::memory_order_release);
 			}
 			
-		};
+		};*/
 
 		class MotionCompensationManager
 		{
 		public:
-			MotionCompensationManager(ServerDriver* parent);/* : m_parent(parent)
-			{
-			}*/
-			
-			bool StartDebugData();
-
-			void StopDebugData();
+			MotionCompensationManager(ServerDriver* parent);
 
 			bool setMotionCompensationMode(MotionCompensationMode Mode, int MCdevice, int RTdevice);
 
@@ -103,11 +136,7 @@ namespace vrmotioncompensation
 
 			void runFrame();
 
-		private:
-
-			void InitDebugData();
-			void WriteDebugData();
-			
+		private:			
 			double vecVelocity(double time, const double vecPosition, const double Old_vecPosition);
 
 			double vecAcceleration(double time, const double vecVelocity, const double Old_vecVelocity);
@@ -189,8 +218,6 @@ namespace vrmotioncompensation
 			long long _RefTrackerLastTime = -1;
 			vr::DriverPose_t _RefTrackerLastPose;
 			vr::HmdVector3d_t _RotEulerFilterOld = {0, 0, 0};
-
-			Debugger _DebugLogger;
 
 			double _LpfBeta = 0.2;
 			double _Alpha = -1.0;
