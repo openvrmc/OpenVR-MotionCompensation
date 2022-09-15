@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\third-party\easylogging++\easylogging++.cc" />
     <ClCompile Include="src\devicemanipulation\Debugger.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\hooks\ITrackedDeviceServerDriver005Hooks.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="src\hooks\IVRServerDriverHost006Hooks.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\third-party\easylogging++\easylogging++.h" />
     <ClInclude Include="src\com\shm\driver_ipc_shm.h" />
     <ClInclude Include="src\devicemanipulation\Debugger.h" />
     <ClInclude Include="src\devicemanipulation\DeviceManipulationHandle.h" />
@@ -85,8 +87,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\openvr</OPENVR_ROOT>
-    <BOOST_ROOT>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0</BOOST_ROOT>
-    <BOOST_LIB>$(MSBuildProjectDirectory)\..\third-party\boost_1_63_0\lib64-msvc-14.0</BOOST_LIB>
+    <BOOST_ROOT>$(MSBuildProjectDirectory)\..\third-party\boost_1_80_0</BOOST_ROOT>
+    <BOOST_LIB>$(MSBuildProjectDirectory)\..\third-party\boost_1_80_0\lib64-msvc-14.2</BOOST_LIB>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -117,8 +119,8 @@
     <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>driver_00vrmotioncompensation</TargetName>
-    <IncludePath>D:\Programmierung\VR\boost_1_72_0\boost;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Programmierung\VR\boost_1_80_0\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Programmierung\VR\boost_1_80_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -131,8 +133,8 @@
     <OutDir>$(SolutionDir)\$(ProjectName)\bin\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>driver_00vrmotioncompensation</TargetName>
-    <IncludePath>..\third-party\boost_1_75_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\third-party\boost_1_75_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\third-party\boost_1_80_0;$(IncludePath)</IncludePath>
+    <LibraryPath>..\third-party\boost_1_80_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -158,13 +160,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;DRIVER_VRINPUTEMULATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_72_0;..\lib_vrinputemulator\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_80_0;..\lib_vrinputemulator\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(OPENVR_ROOT)\lib\win64;$(BOOST_LIB);..\third-party\MinHook\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Programmierung\VR\boost_1_80_0\stage\lib;$(OPENVR_ROOT)\lib\win64;$(BOOST_LIB);..\third-party\MinHook\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libMinHook-x64-v141-mtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -190,14 +192,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRIVER_VRINPUTEMULATOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRIVER_VRINPUTEMULATOR_EXPORTS;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\third-party\boost_1_72_0;..\lib_vrmotioncompensation\include;$(OPENVR_ROOT)\headers;..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\third-party\boost_1_80_0;..\lib_vrmotioncompensation\include;$(OPENVR_ROOT)\headers;..\third-party\easylogging++;..\third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
