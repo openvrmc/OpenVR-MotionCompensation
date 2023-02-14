@@ -6,7 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_overlay", "client_overlay\client_overlay.vcxproj", "{33E075DB-922D-3252-976E-46B5721DC3DE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{05AC9994-2B63-4DE5-ABF3-95CE346F3A64} = {05AC9994-2B63-4DE5-ABF3-95CE346F3A64}
-		{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A} = {AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_vrmotioncompensation", "driver_vrmotioncompensation\driver_vrmotioncompensation.vcxproj", "{AF6FBE95-527D-499B-9ABD-3A47E9E84C8A}"
@@ -56,7 +55,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9465DA5B-21F6-46AA-8620-B7544DA98D0F}
 		Qt5Version = msvc2017_64
+		SolutionGuid = {9465DA5B-21F6-46AA-8620-B7544DA98D0F}
 	EndGlobalSection
 EndGlobal
