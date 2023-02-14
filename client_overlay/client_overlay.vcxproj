@@ -78,7 +78,7 @@
 		$(QTDIR)\include\QtMultimedia;
 		$(QTDIR)\include\QtQuick;
 		$(QTDIR)\include\QtGui;
-		$(OPENVR_ROOT)\headers;
+		$(OPENVR_ROOT);
 		$(QTDIR)\include\QtCore;
 		$(QTDIR)\include\QtWidgets;
 		$(QTDIR)\include\QtQml;
@@ -105,8 +105,26 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\Release\lib\x64\libvrmotioncompensation.lib;$(QTDIR)\lib\qtmain.lib;shell32.lib;$(OPENVR_ROOT)\lib\win64\openvr_api.lib;$(QTDIR)\lib\Qt5Quick.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Qml.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\Qt5Multimedia.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Multimedia.lib;Qt5MultimediaWidgets.lib;Qt5Qml.lib;Qt5Quick.lib;Qt5QuickWidgets.lib;Qt5QuickControls2.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.19041.0\um\x64;$(BOOST_LIB);$(QTDIR)\lib;$(OPENVR_ROOT)\lib\win64;..\Release\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+		..\Release\lib\x64\libvrmotioncompensation.lib;
+		$(QTDIR)\lib\qtmain.lib;
+		shell32.lib;
+		$(OPENVR_ROOT)\lib\win64\openvr_api.lib;
+		$(QTDIR)\lib\Qt5Quick.lib;
+		$(QTDIR)\lib\Qt5Widgets.lib;
+		$(QTDIR)\lib\Qt5Gui.lib;
+		$(QTDIR)\lib\Qt5Qml.lib;
+		$(QTDIR)\lib\
+		Qt5Network.lib;
+		$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\Qt5Multimedia.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Multimedia.lib;Qt5MultimediaWidgets.lib;Qt5Qml.lib;Qt5Quick.lib;Qt5QuickWidgets.lib;Qt5QuickControls2.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+		C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.19041.0\um\x64;
+		$(BOOST_LIB);
+		$(QTDIR)\lib;
+		$(OPENVR_ROOT)\lib\win64;
+		..\Release\lib\x64;
+		%(AdditionalLibraryDirectories)
+	  </AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
