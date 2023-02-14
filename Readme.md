@@ -35,12 +35,20 @@ Confirmed Working With..
 
 ## Building
 
-1. Set up include and additional dep directories in Visual Studio project settings.
-2. Install Boost v1.72+ and grab the openvr headers from somewhere. They should be included in "./openvr" in this repo.
-3. Check macros for $(QTDIR), $(OPENVR_ROOT), $(BOOST_ROOT), and $(BOOST_LIB) and others in each .vcxproj file.
+### Dependencies
+1. Boost C++ Libraries 1.72 for MSVC 14 64-bit. You can get these from https://sourceforge.net/projects/boost/
+2. Qt Framework 5 with MSVC 2019 support (you may drop everything else). You can get the free Open-Source SDK from https://www.qt.io/download-open-source
+3. OpenVR headers. You can get these in the included directory or at https://github.com/ValveSoftware/openvr/
+
+### Build requirements
+1. Set Visual Studio to Release/x64 target.
+2. Set up the include and additional dependency directories in Visual Studio project settings. 
+3. This requires particularly to set the $(QTDIR), $(OPENVR_ROOT), $(BOOST_ROOT), and $(BOOST_LIB) macros correctly.
+These are defined in the *.vcxproj files.
 4. Build solution in Visual Studio (tested with VS2022 and MSVC v147)
-5. Run OpenVR-MotionCompensation\client_overlay\bin\windeployqt
-6. Copy binaries as instructed above.
+5. Edit the path to your Qt install in ./client_overlay/bin/windeployqt.bat
+6. Run windeployqt.bat
+7. Copy binaries as instructed above.
 
 # To-Do
 

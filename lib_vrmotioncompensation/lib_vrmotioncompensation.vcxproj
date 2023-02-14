@@ -95,10 +95,10 @@
     <TargetName>libvrinputemulator</TargetName>
   </PropertyGroup>
   <PropertyGroup>
-    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\third-party\openvr</OPENVR_ROOT>
-    <BOOST_ROOT>C:\boost_1_79_0</BOOST_ROOT>
-    <BOOST_LIB>C:\boost_1_79_0\lib64-msvc-14.3</BOOST_LIB>
-    <QTDIR>C:\Qt\Qt5.12.12\5.12.12\msvc2017_64</QTDIR>
+    <OPENVR_ROOT>$(SolutionDir)third-party\openvr</OPENVR_ROOT>
+    <BOOST_ROOT>C:\local\boost_1_72_0</BOOST_ROOT>
+    <BOOST_LIB>C:\local\boost_1_72_0\lib64-msvc-14.3</BOOST_LIB>
+    <QTDIR>C:\Qt\Qt5.15.8\5.15.8\msvc2019_64</QTDIR>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
