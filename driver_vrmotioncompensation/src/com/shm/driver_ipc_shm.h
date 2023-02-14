@@ -22,6 +22,11 @@ namespace vrmotioncompensation
 		// forward declarations
 		class ServerDriver;
 
+		// This class handles setting up the server and receiving messages from the client (the SteamVR overlay).
+		// Mainly, it receives a request for information about an OpenVR device, where it passes along the DeviceManipulationHandle
+		// OR, it recieves a request to set MotionCompensation to true. In this case, it sets the flag in the DeviceManipulationHandle for the
+		//	MC and RT devices, and it forwards the OpenVR IDs to the MotionCompensationManager that is attached to the ServerDriver.
+		// I'm guessing the MotionCompensationManager then does it's magic on the set device if the MotionCompensationMode flag is enabled there.
 		class IpcShmCommunicator
 		{
 		public:

@@ -36,7 +36,7 @@ Confirmed Working With..
 ## Building
 
 1. Set up include and additional dep directories in Visual Studio project settings.
-2. Install Boost v1.72+ and grab the openvr headers from somewhere. Openvr_driver.h
+2. Install Boost v1.72+ and grab the openvr headers from somewhere. They should be included in "./openvr" in this repo.
 3. Check macros for $(QTDIR), $(OPENVR_ROOT), $(BOOST_ROOT), and $(BOOST_LIB) and others in each .vcxproj file.
 4. Build solution in Visual Studio (tested with VS2022 and MSVC v147)
 5. Run OpenVR-MotionCompensation\client_overlay\bin\windeployqt

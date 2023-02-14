@@ -52,6 +52,8 @@ namespace vrmotioncompensation
 			return retval;
 		}
 
+		// THOMAS: Here we create a copy of the original driver's pose; leaving that untouched. The copy is then forwarded to our manipulation and modified directly.
+		// The modified pose then get returned to the original caller.
 		void IVRServerDriverHost006Hooks::_trackedDevicePoseUpdated(void* _this, uint32_t unWhichDevice, const vr::DriverPose_t& newPose, uint32_t unPoseStructSize)
 		{
 			// Call rates:

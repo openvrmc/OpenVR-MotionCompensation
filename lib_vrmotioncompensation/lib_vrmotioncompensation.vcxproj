@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -74,15 +74,15 @@
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>libvrinputemulator</TargetName>
-    <IncludePath>D:\Programmierung\VR\boost_1_80_0;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programmierung\VR\boost_1_80_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Programmierung\VR\boost_1_72_0;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Programmierung\VR\boost_1_72_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>libvrmotioncompensation</TargetName>
-    <IncludePath>..\third-party\boost_1_80_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\third-party\boost_1_80_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\third-party\boost_1_75_0;$(IncludePath)</IncludePath>
+    <LibraryPath>..\third-party\boost_1_75_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\lib\$(Platform)\</OutDir>
@@ -95,9 +95,10 @@
     <TargetName>libvrinputemulator</TargetName>
   </PropertyGroup>
   <PropertyGroup>
-    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\openvr</OPENVR_ROOT>
-    <BOOST_ROOT>$(MSBuildProjectDirectory)\..\third-party\boost_1_80_0</BOOST_ROOT>
-    <BOOST_LIB>$(MSBuildProjectDirectory)\..\third-party\boost_1_80_0\lib64-msvc-14.0</BOOST_LIB>
+    <OPENVR_ROOT>$(MSBuildProjectDirectory)\..\third-party\openvr</OPENVR_ROOT>
+    <BOOST_ROOT>C:\boost_1_79_0</BOOST_ROOT>
+    <BOOST_LIB>C:\boost_1_79_0\lib64-msvc-14.3</BOOST_LIB>
+    <QTDIR>C:\Qt\Qt5.12.12\5.12.12\msvc2017_64</QTDIR>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,7 +123,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Programmierung\VR\boost_1_80_0;.\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\TvanG\ResearchDev\OpenVR-AdvancedSettings\third-party\openvr\headers;C:\boost_1_79_0;D:\Programmierung\VR\boost_1_72_0;.\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -160,7 +161,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\include;$(OPENVR_ROOT)\headers;..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);.\include;..\third-party\openvr\headers;..\third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

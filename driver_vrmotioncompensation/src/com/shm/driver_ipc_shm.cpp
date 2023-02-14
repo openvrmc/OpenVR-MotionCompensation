@@ -200,12 +200,16 @@ namespace vrmotioncompensation
 											{
 												if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::ReferenceTracker)
 												{
-													LOG(INFO) << "Setting driver into motion compensation mode";
-													LOG(INFO) << "Tracker OpenVR Id: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
-													LOG(INFO) << "HMD OpenVR Id: " << message.msg.dm_MotionCompensationMode.MCdeviceId;
+													LOG(INFO) << "Setting MCManager (ServerDriver) into motion compensation mode for device OpenVR ID: " << message.msg.dm_MotionCompensationMode.MCdeviceId;
+													LOG(INFO) << "Reference Tracker OpenVR ID: " << message.msg.dm_MotionCompensationMode.RTdeviceId;
 
 													// Check if an old device needs a mode change
-													if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
+													// This should be False on first start because MotionCompensationMode is set to Disabled by default.
+													// THOMAS: This will break if we are adding multiple devices.
+													// THOMAS: The intended functionality here seems to be to let users change the MC or RT device and then press Apply.
+													// THOMAS: Solution to enable multiple devices: Remove the if/else and always add MC to the requested device. Client needs to disable all devices manually.
+													// THOMAS: In the future, submitting a list of MC devices from client would be better.
+													/*if (serverDriver->motionCompensation().getMotionCompensationMode() == MotionCompensationMode::ReferenceTracker)
 													{
 														// New MCdevice is different from old
 														if (serverDriver->motionCompensation().getMCdeviceID() != MCdeviceID)
@@ -216,7 +220,7 @@ namespace vrmotioncompensation
 
 															// Set new MCdevice to motion compensated
 															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
-															serverDriver->motionCompensation().setNewReferenceTracker(MCdeviceID);
+															serverDriver->motionCompensation().setNewMotionCompensatedDevice(MCdeviceID);  // Bug? Was setNewReferenceTracker before. Fixed.
 														}
 
 														// New RTdevice is different from old
@@ -231,6 +235,8 @@ namespace vrmotioncompensation
 															serverDriver->motionCompensation().setNewReferenceTracker(RTdeviceID);
 														}
 													}
+													// THOMAS: This should always be called on first start, since the statement above is False.
+													// If we request MC for multiple devices, what happens to the RTdevice, which will have the same DeviceManipulationHandle?
 													else
 													{
 														// Activate motion compensation mode for specified device
@@ -239,14 +245,21 @@ namespace vrmotioncompensation
 
 														// Set motion compensation mode
 														serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, MCdeviceID, RTdeviceID);
-													}
+													}*/
+													// Activate motion compensation mode for specified device
+													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
+													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);
+
+													// Set motion compensation mode
+													// THOMAS: Technically, we only have to do this once.
+													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::ReferenceTracker, MCdeviceID, RTdeviceID);
 												}
 												else if (message.msg.dm_MotionCompensationMode.CompensationMode == MotionCompensationMode::Disabled)
 												{
-													LOG(INFO) << "Setting driver into default mode";
+													LOG(INFO) << "Setting driver into default mode (Disable MC requested)";
 
 													MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
-													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+													RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);  // This should be fine to call multiple times.
 
 													// Reset and set some vars for every device
 													serverDriver->motionCompensation().setMotionCompensationMode(MotionCompensationMode::Disabled, -1, -1);

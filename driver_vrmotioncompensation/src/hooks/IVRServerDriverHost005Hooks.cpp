@@ -31,6 +31,7 @@ namespace vrmotioncompensation
 			}
 		}
 
+		// Create hooks for the given pDriver pointer
 		std::shared_ptr<InterfaceHooks> IVRServerDriverHost005Hooks::createHooks(void* iptr)
 		{
 			std::shared_ptr<InterfaceHooks> retval = std::shared_ptr<InterfaceHooks>(new IVRServerDriverHost005Hooks(iptr));

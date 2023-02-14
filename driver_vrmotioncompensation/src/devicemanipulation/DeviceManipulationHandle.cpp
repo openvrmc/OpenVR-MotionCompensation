@@ -28,7 +28,7 @@ namespace vrmotioncompensation
 
 		bool DeviceManipulationHandle::handlePoseUpdate(uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t unPoseStructSize)
 		{
-
+			// THOMAS: This is what distinguishes the Reference Tracker device from other tracked devices: the MotionCompensationDeviceMode 
 			if (m_deviceMode == MotionCompensationDeviceMode::ReferenceTracker)
 			{ 
 				//Check if the pose is valid to prevent unwanted jitter and movement
@@ -46,6 +46,7 @@ namespace vrmotioncompensation
 					}
 				}
 			}
+			// THOMAS: So theoretically, we should be able to set the controller MCDM to MotionCompensated, and it should automatically apply the compensation?
 			else if (m_deviceMode == MotionCompensationDeviceMode::MotionCompensated)
 			{
 				//Check if the pose is valid to prevent unwanted jitter and movement
@@ -58,6 +59,7 @@ namespace vrmotioncompensation
 			return true;
 		}
 
+		// THOMAS: This gets called by the IPC thread to set whether the device is a Reference Tracker, nothing, or a device to be MotionCompensated
 		void DeviceManipulationHandle::setMotionCompensationDeviceMode(MotionCompensationDeviceMode DeviceMode)
 		{
 			m_deviceMode = DeviceMode;

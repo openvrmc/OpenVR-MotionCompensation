@@ -31,6 +31,8 @@ namespace vrmotioncompensation
 			}
 		}
 
+		// THOMAS: Don't reset the values if we're adding multiple MC devices? -> Should be fine if we add them all in short succession.
+		// THOMAS TODO: Do we need to keep track of multiple McDeviceID's?
 		bool MotionCompensationManager::setMotionCompensationMode(MotionCompensationMode Mode, int McDevice, int RtDevice)
 		{
 			if (Mode == MotionCompensationMode::ReferenceTracker)
@@ -88,6 +90,19 @@ namespace vrmotioncompensation
 			//_Offset.Rotation = offsets.Rotation;
 			_Offset = offsets;
 			*_Poffset = _Offset;
+
+			// Add the translation offset to the zero pose.
+			if (_ZeroPoseValid) {
+				LOG(DEBUG) << "Received offsets, updating Zero Pose. ";
+				_ZeroLock.lock();
+				_ZeroPos.v[0] = _OrigZeroPos.v[0] + _Offset.Translation.v[0];
+				_ZeroPos.v[1] = _OrigZeroPos.v[1] + _Offset.Translation.v[1];
+				_ZeroPos.v[2] = _OrigZeroPos.v[2] + _Offset.Translation.v[2];
+				LOG(DEBUG) << "OrigZeroPosX=" << _OrigZeroPos.v[0] << " OffsetX=" << _Offset.Translation.v[0] << " ZeroPosX=" << _ZeroPos.v[0];
+				LOG(DEBUG) << "OrigZeroPosY=" << _OrigZeroPos.v[1] << " OffsetY=" << _Offset.Translation.v[1] << " ZeroPosY=" << _ZeroPos.v[1];
+				LOG(DEBUG) << "OrigZeroPosZ=" << _OrigZeroPos.v[2] << " OffsetZ=" << _Offset.Translation.v[2] << " ZeroPosZ=" << _ZeroPos.v[2];
+				_ZeroLock.unlock();
+			}
 		}
 
 		bool MotionCompensationManager::isZeroPoseValid()
@@ -108,12 +123,19 @@ namespace vrmotioncompensation
 			// Save zero points
 			_ZeroLock.lock();
 			_ZeroPos = vrmath::quaternionRotateVector(pose.qWorldFromDriverRotation, tmpConj, pose.vecPosition, false) + pose.vecWorldFromDriverTranslation;
+			LOG(INFO) << "ZeroPos set to x: " << _ZeroPos.v[0] << " y: " << _ZeroPos.v[1] << " z: " << _ZeroPos.v[2];
 			_ZeroRot = pose.qWorldFromDriverRotation * pose.qRotation;
+			LOG(INFO) << "ZeroRot Quaternion set to w: " << _ZeroPos.v[0] << " x: " << _ZeroPos.v[1] << " y: " << _ZeroPos.v[2] << " z: " << _ZeroPos.v[3];
 
 			_ZeroPoseValid = true;
+			_OrigZeroPos.v[0] = _ZeroPos.v[0];
+			_OrigZeroPos.v[1] = _ZeroPos.v[1];
+			_OrigZeroPos.v[2] = _ZeroPos.v[2];
 			_ZeroLock.unlock();
 		}
 
+		// THOMAS: This function only applies to the reference tracker device.
+		// It gets called by the DeviceManipulationHandle if the MotionCompensationDeviceMode::ReferenceTracker flag is set for this device.
 		void MotionCompensationManager::updateRefPose(const vr::DriverPose_t& pose)
 		{
 			// From https://github.com/ValveSoftware/driver_hydra/blob/master/drivers/driver_hydra/driver_hydra.cpp Line 835:
@@ -250,6 +272,8 @@ namespace vrmotioncompensation
 			_RefTrackerLastPose = pose;
 		}
 
+		// THOMAS: This gets called by the DeviceManipulationHandle if the device is to be compensated (MotionCompensationDeviceMode::MotionCompensated flag is set)
+		// The calculations get written to the pose variable directly, which is passed by reference from the ServerDriver.
 		bool MotionCompensationManager::applyMotionCompensation(vr::DriverPose_t& pose)
 		{
 			if (_Enabled && _ZeroPoseValid && _RefPoseValid)

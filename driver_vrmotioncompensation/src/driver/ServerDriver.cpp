@@ -11,7 +11,7 @@ namespace vrmotioncompensation
 		ServerDriver::ServerDriver() : m_motionCompensation(this)
 		{
 			singleton = this;
-			memset(_openvrIdDeviceManipulationHandle, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);
+			memset(_openvrIdDeviceManipulationHandle, 0, sizeof(DeviceManipulationHandle*) * vr::k_unMaxTrackedDeviceCount);  // Array of DeviceManipulationHandles. Set all of them to 0 at the start.
 			memset(_deviceVersionMap, 0, sizeof(int) * vr::k_unMaxTrackedDeviceCount);
 		}
 
@@ -20,6 +20,7 @@ namespace vrmotioncompensation
 			LOG(TRACE) << "driver::~ServerDriver()";
 		}
 
+		// This is called for every device that we are tracking. This calls the related DeviceManipulationHandle, which then handles the pose update according to device Mode (MC or RefTracker or nothing).
 		bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize)
 		{
 			if (_openvrIdDeviceManipulationHandle[unWhichDevice] && _openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
@@ -54,6 +55,7 @@ namespace vrmotioncompensation
 			handle->setServerDriverHooks(InterfaceHooks::hookInterface(pDriver, "ITrackedDeviceServerDriver_005"));
 		}
 
+		// THOMAS: Gets called by the driver when a device is "Activated", whatever that means. Here the handle information is completed, and can be passed back to the IPC message upon request.
 		void ServerDriver::hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId)
 		{
 			LOG(TRACE) << "ServerDriver::hooksTrackedDeviceActivated(" << serverDriver << ", " << version << ", " << unObjectId << ")";

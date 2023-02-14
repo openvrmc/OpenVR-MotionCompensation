@@ -7,7 +7,7 @@
 #include <vrmotioncompensation.h>
 #include <vrmotioncompensation_types.h>
 #include <vector>
-#include "src/QGlobalShortcut/qglobalshortcut.h"
+#include "../QGlobalShortcut/qglobalshortcut.h"
 
 class QQuickWindow;
 // application namespace
@@ -143,7 +143,10 @@ namespace motioncompensation
 		Q_INVOKABLE bool updateDeviceInfo(unsigned OpenVRId);
 		void toggleMotionCompensationMode();
 		Q_INVOKABLE bool applySettings(unsigned Dindex, unsigned RTindex, bool EnableMotionCompensation);
-		bool applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation);
+		Q_INVOKABLE bool applyOffsets();
+		bool sendMCMode(unsigned MCid, unsigned RTid, bool EnableMotionCompensation);
+		bool sendMCSettings();
+		//bool applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation);
 		void resetRefZeroPose();
 		Q_INVOKABLE QString getDeviceModeErrorString();
 		Q_INVOKABLE bool isDesktopModeActive();

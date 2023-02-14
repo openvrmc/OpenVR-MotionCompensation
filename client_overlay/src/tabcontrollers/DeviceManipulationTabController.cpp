@@ -510,10 +510,17 @@ namespace motioncompensation
 		{
 			LOG(DEBUG) << "ToggleMC: Found both devices. HMD OVRID: " << MCid << ". Ref Tracker OVRID: " << RTid;
 
-			applySettings_ovrid(MCid, RTid, !_MotionCompensationIsOn);
+			//applySettings_ovrid(MCid, RTid, !_MotionCompensationIsOn);
+			sendMCMode(MCid, RTid, !_MotionCompensationIsOn);
 		}
 
 		//int MCindex = QQmlProperty::read(parent, "hmdSelectionComboBox.currentIndex").toInt();
+	}
+
+	bool DeviceManipulationTabController::applyOffsets() {
+		LOG(INFO) << "Overlay requests apply offsets.";
+		parent->vrMotionCompensation().setOffsets(_offset);
+		saveMotionCompensationSettings();
 	}
 
 	// Enables or disables the motion compensation for the selected device
@@ -540,7 +547,7 @@ namespace motioncompensation
 			return false;
 		}
 
-		LOG(DEBUG) << "Got this OpenVR ID for HMD: " << MCid;
+		//LOG(DEBUG) << "Got this OpenVR ID for HMD: " << MCid;
 
 		// Input validation for tracker
 		if (_motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
@@ -563,7 +570,7 @@ namespace motioncompensation
 				return false;
 			}
 
-			LOG(DEBUG) << "Got this OpenVR ID for Tracker: " << RTid;
+			//LOG(DEBUG) << "Got this OpenVR ID for Tracker: " << RTid;
 
 			if (MCid == RTid)
 			{
@@ -584,16 +591,164 @@ namespace motioncompensation
 			}
 		}
 
-		if (deviceInfos[MCid]->deviceClass != vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+		// THOMAS: If the selected device for MC is not an HMD, we abort and do not apply MC.
+		// In the future, if I want to enable MC for the controllers, I should send their Id's to the driver.
+		// Somehwere here is probably a good starting point.
+
+		// THOMAS TODO: Apart from checking the input, we also want to gather the IDs of the controllers here, and send those as well.
+		
+		// We assume that we can have up to 3 device we want to apply MC on: 1 HMD and 2 controllers.
+		int mcDevices[3] = { -1,-1,-1 };
+		for (uint32_t id = 0; id < vr::k_unMaxTrackedDeviceCount; ++id)
 		{
-			m_deviceModeErrorString = "\"Device\" is not a HMD!";
+			if (deviceInfos[id]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD) {
+				LOG(INFO) << "Found an HMD device with OpenVR ID " << id;
+				mcDevices[0] = id;
+			}
+			else if (deviceInfos[id]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Controller) {
+				//continue;
+				LOG(INFO) << "Found a Controller device with OpenVR ID " << id;
+				if (mcDevices[1] < 0) {
+					mcDevices[1] = id;
+				}
+				else {
+					mcDevices[2] = id;
+				}
+			}
+		}
+
+		bool result = true;
+		for (int i = 0; i < 3; i++) {
+			if (mcDevices[i] >= 0) {
+				result = sendMCMode(mcDevices[i], RTid, EnableMotionCompensation);
+				if (!result) {
+					LOG(ERROR) << "Error occured when trying to send a MC Mode message to the driver. Requested device: " << mcDevices[i] << " Requested settings may be invalid.";
+					return false;
+				}
+			}
+		}
+
+		result = sendMCSettings();
+		if (!result) {
+			LOG(ERROR) << "Error occured when trying to send new MC Settings to the driver. Requested settings may be invalid.";
 			return false;
 		}
 
-		return applySettings_ovrid(MCid, RTid, EnableMotionCompensation);
+		return result;
 	}
 
-	bool DeviceManipulationTabController::applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation)
+	bool DeviceManipulationTabController::sendMCMode(unsigned MCid, unsigned RTid, bool EnableMotionCompensation) {
+		try
+		{
+			vrmotioncompensation::MotionCompensationMode NewMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
+
+			// Send new settings to the driver.dll
+			if (EnableMotionCompensation && _motionCompensationMode == vrmotioncompensation::MotionCompensationMode::ReferenceTracker)
+			{
+				LOG(INFO) << "Sending Motion Compensation Mode: ReferenceTracker for MCid " << MCid << " and RTid " <<RTid;
+			}
+			else
+			{
+				LOG(INFO) << "Sending Motion Compensation Mode: Disabled";
+				NewMode = vrmotioncompensation::MotionCompensationMode::Disabled;
+			}
+
+			// Send new mode
+			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
+		}
+		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
+		{
+			switch (e.errorcode)
+			{
+				case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+				{
+					m_deviceModeErrorString = "Not an error";
+				} break;
+				case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
+				{
+					m_deviceModeErrorString = "Invalid Id";
+				} break;
+				case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
+				{
+					m_deviceModeErrorString = "Device not found";
+				} break;
+				default:
+				{
+					m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
+				} break;
+			}
+			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
+			return false;
+		}
+		catch (std::exception& e)
+		{
+			m_deviceModeErrorString = "Unknown exception";
+			LOG(ERROR) << "Unknown exception caught while setting device mode: " << e.what();
+			return false;
+		}
+
+		_MotionCompensationIsOn = EnableMotionCompensation;
+
+		// Things we only have to do once, so we do them here when enabling the HMD.
+		if (deviceInfos[MCid]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_HMD)
+		{
+			setHMD(MCid);
+			setReferenceTracker(RTid);
+			saveMotionCompensationSettings();
+		}
+		else if (deviceInfos[MCid]->deviceClass == vr::ETrackedDeviceClass::TrackedDeviceClass_Controller) {
+			// Do nothing
+		}
+		else {
+			LOG(ERROR) << "MC Enable requested for invalid device class (not HMD/Controller).";
+			return false;
+		}
+
+		return true;
+	}
+
+	bool DeviceManipulationTabController::sendMCSettings() {
+		try {
+			// Send settings
+			parent->vrMotionCompensation().setMotionCompensationSettings(_LPFBeta, _samples, _setZeroMode);
+		}
+		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
+		{
+			switch (e.errorcode)
+			{
+			case (int)vrmotioncompensation::ipc::ReplyStatus::Ok:
+			{
+				m_deviceModeErrorString = "Not an error";
+			} break;
+			case (int)vrmotioncompensation::ipc::ReplyStatus::InvalidId:
+			{
+				m_deviceModeErrorString = "Invalid Id";
+			} break;
+			case (int)vrmotioncompensation::ipc::ReplyStatus::NotFound:
+			{
+				m_deviceModeErrorString = "Device not found";
+			} break;
+			default:
+			{
+				m_deviceModeErrorString = "SteamVR did not load OVRMC .dll";
+			} break;
+			}
+			LOG(ERROR) << "Exception caught while setting device mode: " << e.what();
+
+			return false;
+		}
+		catch (std::exception& e)
+		{
+			m_deviceModeErrorString = "Unknown exception";
+			LOG(ERROR) << "Unknown exception caught while setting device mode: " << e.what();
+
+			return false;
+		}
+		
+		return true;
+	}
+
+	/*bool DeviceManipulationTabController::applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation)
 	{
 		try
 		{
@@ -614,8 +769,7 @@ namespace motioncompensation
 			// Send new mode
 			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
 
-			// Send settings
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);
+			
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -658,7 +812,7 @@ namespace motioncompensation
 		saveMotionCompensationSettings();
 
 		return true;
-	}
+	}*/
 
 	void DeviceManipulationTabController::resetRefZeroPose()
 	{
@@ -796,7 +950,7 @@ namespace motioncompensation
 	void DeviceManipulationTabController::increaseRefTranslationOffset(unsigned axis, double value)
 	{
 		_offset.Translation.v[axis] += value;
-		parent->vrMotionCompensation().setOffsets(_offset);
+		//parent->vrMotionCompensation().setOffsets(_offset);
 
 		emit offsetChanged();
 	}
@@ -804,7 +958,7 @@ namespace motioncompensation
 	void DeviceManipulationTabController::increaseRefRotationOffset(unsigned axis, double value)
 	{
 		_offset.Rotation.v[axis] += value;
-		parent->vrMotionCompensation().setOffsets(_offset);
+		//parent->vrMotionCompensation().setOffsets(_offset);
 
 		emit offsetChanged();
 	}

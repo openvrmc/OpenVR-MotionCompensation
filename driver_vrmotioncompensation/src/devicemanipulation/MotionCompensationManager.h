@@ -25,7 +25,7 @@ namespace vrmotioncompensation
 		{
 			// Source: https://rigtorp.se/spinlock/
 			std::atomic<bool> lock_ = { 0 };
-		
+
 		public:
 			void lock() noexcept
 			{
@@ -59,28 +59,6 @@ namespace vrmotioncompensation
 				lock_.store(false, std::memory_order_release);
 			}
 		};
-
-		/*class Spinlock
-		{
-			std::atomic_flag _Flag = ATOMIC_FLAG_INIT;
-
-		public:
-
-			void lock() noexcept
-			{
-				while (_Flag.test_and_set(std::memory_order_acquire))
-				{
-					// pause insn
-					YieldProcessor();
-				}
-			}
-
-			void unlock() noexcept
-			{
-				_Flag.clear(std::memory_order_release);
-			}
-			
-		};*/
 
 		class MotionCompensationManager
 		{
@@ -235,6 +213,7 @@ namespace vrmotioncompensation
 
 			// Zero position
 			vr::HmdVector3d_t _ZeroPos = { 0, 0, 0 };
+			vr::HmdVector3d_t _OrigZeroPos = { 0, 0, 0 };
 			vr::HmdQuaternion_t _ZeroRot = { 1, 0, 0, 0 };
 			bool _ZeroPoseValid = false;
 			

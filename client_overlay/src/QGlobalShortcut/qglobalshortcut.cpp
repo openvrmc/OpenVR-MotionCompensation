@@ -30,7 +30,7 @@ public:
 
     QGlobalData(const QGlobalData &other) :
         m_id(other.m_id)
-    {
+    {   
 
     }
 

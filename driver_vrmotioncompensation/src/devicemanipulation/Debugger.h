@@ -6,6 +6,8 @@
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/system_clocks.hpp>
 
+#include <mutex>
+
 #define MAX_DEBUG_ENTRIES 50000
 #define MAX_DEBUG_VECTORS 24
 #define MAX_DEBUG_QUATERNIONS 8

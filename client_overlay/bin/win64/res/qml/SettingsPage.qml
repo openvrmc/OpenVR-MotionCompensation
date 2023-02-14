@@ -11,8 +11,8 @@ MyStackViewPage
 	height: 800
     headerText: "Settings"
 
-	property double offsetRotationStep: 0.001
-	property double offsetTranslationStep : 0.001
+	property double offsetRotationStep: 0.1
+	property double offsetTranslationStep : 0.01
 	property double autoRepeat_Delay: 300
 	property double autoRepeat_Interval: 25
 
@@ -25,6 +25,37 @@ MyStackViewPage
             dialogTitle = title
             dialogText = text
             open()
+        }
+    }
+
+    Grid {
+        id: grid
+        x: 720
+        y: 640
+        width: 440
+        height: 125
+        layoutDirection: Qt.RightToLeft
+        flow: Grid.LeftToRight
+        padding: 0
+        spacing: 20
+        rows: 2
+        columns: 2
+
+        MyPushButton {
+            id: deviceModeOffsetsApplyButton
+            x: 960
+            y: 640
+            width: 200
+            height: 45
+            text: "Apply Offsets"
+            Layout.bottomMargin: 35
+            Layout.preferredWidth: 200
+            Layout.topMargin: 20
+            enabled: true
+			onClicked:
+                {
+                    DeviceManipulationTabController.applyOffsets();
+                }
         }
     }
     content: ColumnLayout
@@ -787,10 +818,10 @@ MyStackViewPage
                 samplesInputField.text = DeviceManipulationTabController.getSamples()
             }
 
-			onOffsetChanged:
-			{
-				updateOffsets()
-			}
+            onOffsetChanged:
+            {
+                updateOffsets()
+            }
         }
     }
 
