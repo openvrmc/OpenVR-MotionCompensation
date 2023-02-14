@@ -14,9 +14,11 @@ Most contemporary Virtual Reality (VR) experiences are made for standing users. 
 ## How it works
 TODO
 
-## Setup
+# Setup
 
-### Confirmed Working With..
+## Beta Version, may cause crashes or contain bugs!
+
+Confirmed Working With..
 
 - SteamVR v1.22.13
 - HTC Vive
@@ -24,14 +26,14 @@ TODO
 - Valve Index Knuckles (2x)
 - HTC Vice Tracker
 
-### Installation
+## Installation
 
 1. Run the installer v3.6.0 from the original project (https://ovrmc.dschadu.de/en/Download).
 2. Copy and overwrite the code from OpenVR-MotionCompensation\client_overlay\bin\win64 to insall dir (C:\Program Files\OpenVR-MotionCompensation)
 3. Copy and overwrite the DLL from OpenVR-MotionCompensation\driver_vrmotioncompensation\bin\x64 to the SteamVR driver (C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\00vrmotioncompensation\bin\win64)
 4. Start SteamVR. Start MotionCompensation from either the in-game overlay or startdesktopmode.bat in the install dir.
 
-### Building
+## Building
 
 1. Set up include and additional dep directories in Visual Studio project settings.
 2. Install Boost v1.72+ and grab the openvr headers from somewhere. Openvr_driver.h
@@ -40,42 +42,14 @@ TODO
 5. Run OpenVR-MotionCompensation\client_overlay\bin\windeployqt
 6. Copy binaries as instructed above.
 
-## To-Do
+# To-Do
 
 1. Fix the offset field not updating / offsets not applying.
 2. Implement rotation offsets.
 3. Implement auto-offsets.
 4. Investigate throwing bugs (wrong direction).
 
-## Beta Version, may cause crashes or contain bugs!
-
-# Original README
-
-If you are interested in testing or are interested in being a maintainer, please connect with us on our [discord server](https://discord.gg/r7krmSd)
-
-# OpenVR-MotionCompensation
-
-An OpenVR driver that allows to enable motion compensation.
-Includes a dashboard to configure the settings directly in VR.
-
-This driver hooks into the device driver and allows to modify any pose updates coming from the HMD before they reach the OpenVR runtime. 
-Due to the nature of this hack the driver may break when Valve decides to update the driver-side OpenVR API.
-
-The motivation of this driver is to allow the base of motion simulators (driving or flying) to be the reference point for the world, cancelling out simulator movement and differencing head movement from the simulator movement to update the pose.
-
-Visit https://ovrmc.dschadu.de/ for more information!
-
-# License
-
-This software is released under GPL 3.0.
-
-![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.72-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
-
-# Beta Version, may cause crashes or contain bugs!
-
-If you are interested in testing or are interested in being a maintainer, please connect with us on our [discord server](https://discord.gg/r7krmSd)
-
-# OpenVR-MotionCompensation
+# Original README - OpenVR-MotionCompensation
 
 An OpenVR driver that allows to enable motion compensation.
 Includes a dashboard to configure the settings directly in VR.
