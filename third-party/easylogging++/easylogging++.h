@@ -2880,6 +2880,7 @@ return *this;\
   inline MessageBuilder& operator<<(const std::string& msg) {
     return operator<<(msg.c_str());
   }
+
   ELPP_SIMPLE_LOG(char)
   ELPP_SIMPLE_LOG(bool)
   ELPP_SIMPLE_LOG(signed short)

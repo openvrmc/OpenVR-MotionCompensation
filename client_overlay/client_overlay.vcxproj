@@ -14,11 +14,11 @@
     <ProjectGuid>{33E075DB-922D-3252-976E-46B5721DC3DE}</ProjectGuid>
     <RootNamespace>OpenVR-MotionCompensationOverlay</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <PlatformToolSet>v143</PlatformToolSet>
+    <PlatformToolSet>v142</PlatformToolSet>
     <OutputDirectory>bin\win64\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
@@ -27,7 +27,7 @@
     <PrimaryOutput>OpenVR-InputEmulatorOverlay</PrimaryOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <PlatformToolSet>v143</PlatformToolSet>
+    <PlatformToolSet>v142</PlatformToolSet>
     <OutputDirectory>bin\win64\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
@@ -46,9 +46,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <OPENVR_ROOT>$(SolutionDir)third-party\openvr</OPENVR_ROOT>
-    <BOOST_ROOT>C:\local\boost_1_72_0</BOOST_ROOT>
-    <BOOST_LIB>C:\local\boost_1_72_0\lib64-msvc-14.2</BOOST_LIB>
-    <QTDIR>C:\local\qt-everywhere-src-5.15.8</QTDIR>
+    <BOOST_ROOT>C:\local\boost_1_80_0</BOOST_ROOT>
+    <BOOST_LIB>C:\local\boost_1_80_0\lib64-msvc-14.2</BOOST_LIB>
+    <QTDIR>C:\local\Qt\5.15.2\msvc2019_64</QTDIR>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\win64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenVR-MotionCompensationOverlay</TargetName>
@@ -60,31 +60,34 @@
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>
-    </IncludePath>
-    <LibraryPath>
-    </LibraryPath>
+    <IncludePath>$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_ROOT)libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>
-    </IncludePath>
-    <LibraryPath>C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.32.31326\lib\x64\uwp;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_ROOT)libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>
 		..\lib_vrmotioncompensation\include;
+		$(OPENVR_ROOT)\headers;
 		..\third-party\easylogging++;
-		$(QTDIR)\include\QtMultimedia;
-		$(QTDIR)\include\QtQuick;
-		$(QTDIR)\include\QtGui;
-		$(OPENVR_ROOT);
-		$(QTDIR)\include\QtCore;
-		$(QTDIR)\include\QtWidgets;
-		$(QTDIR)\include\QtQml;
 		$(QTDIR)\include;
-		$(BOOST_ROOT);
-		$(BOOST_LIB)
+		release;
+		$(QTDIR)\mkspecs\win32-msvc;
+		.\;
+		$(QTDIR)\include\QtCore;
+		$(QTDIR)\include\QtGui;
+		$(QTDIR)\include\QtANGLE;
+		$(QTDIR)\include\QtMultimedia;
+		$(QTDIR)\include\QtMultimediaWidgets;
+		$(QTDIR)\include\QtQml;
+		$(QTDIR)\include\QtQuick;
+		$(QTDIR)\include\QtQuickWidgets;
+		$(QTDIR)\include\QtQuickControls2;
+		$(QTDIR)\include\QtWidgets;
+		%(AdditionalIncludeDirectories)
 	  </AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
@@ -94,7 +97,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_MULTIMEDIAWIDGETS_LIB;QT_QML_LIB;QT_QUICK_LIB;QT_QUICKWIDGETS_LIB;QT_QUICKCONTROLS2_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_UNICODE;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_MULTIMEDIAWIDGETS_LIB;QT_QML_LIB;QT_QUICK_LIB;QT_QUICKWIDGETS_LIB;QT_QUICKCONTROLS2_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -102,7 +105,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>
@@ -114,11 +118,20 @@
 		$(QTDIR)\lib\Qt5Widgets.lib;
 		$(QTDIR)\lib\Qt5Gui.lib;
 		$(QTDIR)\lib\Qt5Qml.lib;
-		$(QTDIR)\lib\
-		Qt5Network.lib;
-		$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\Qt5Multimedia.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Multimedia.lib;Qt5MultimediaWidgets.lib;Qt5Qml.lib;Qt5Quick.lib;Qt5QuickWidgets.lib;Qt5QuickControls2.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		$(QTDIR)\lib\Qt5Network.lib;
+		$(QTDIR)\lib\Qt5Core.lib;
+		$(QTDIR)\lib\Qt5Multimedia.lib;
+		Qt5Core.lib;Qt5Gui.lib;
+		Qt5Multimedia.lib;
+		Qt5MultimediaWidgets.lib;
+		Qt5Qml.lib;
+		Qt5Quick.lib;
+		Qt5QuickWidgets.lib;
+		Qt5QuickControls2.lib;
+		Qt5Widgets.lib;
+		%(AdditionalDependencies)
+	  </AdditionalDependencies>
       <AdditionalLibraryDirectories>
-		C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.19041.0\um\x64;
 		$(BOOST_LIB);
 		$(QTDIR)\lib;
 		$(OPENVR_ROOT)\lib\win64;
@@ -142,12 +155,31 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;QT_QUICK_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_UNICODE;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;QT_QUICK_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(QTDIR)\include\QtMultimedia;$(QTDIR)\include\QtQuick;$(QTDIR)\include\QtGui;$(OPENVR_ROOT)\headers;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtQml;$(QTDIR)\include;$(BOOST_ROOT);$(BOOST_LIB)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+		..\lib_vrmotioncompensation\include;
+		$(OPENVR_ROOT)\headers;
+		..\third-party\easylogging++;
+		$(QTDIR)\include;
+		release;
+		$(QTDIR)\mkspecs\win32-msvc;
+		.\;
+		$(QTDIR)\include\QtCore;
+		$(QTDIR)\include\QtGui;
+		$(QTDIR)\include\QtANGLE;
+		$(QTDIR)\include\QtMultimedia;
+		$(QTDIR)\include\QtMultimediaWidgets;
+		$(QTDIR)\include\QtQml;
+		$(QTDIR)\include\QtQuick;
+		$(QTDIR)\include\QtQuickWidgets;
+		$(QTDIR)\include\QtQuickControls2;
+		$(QTDIR)\include\QtWidgets;
+		%(AdditionalIncludeDirectories)
+	  </AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -156,7 +188,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_MULTIMEDIAWIDGETS_LIB;QT_QML_LIB;QT_QUICK_LIB;QT_QUICKWIDGETS_LIB;QT_QUICKCONTROLS2_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_UNICODE;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;_WINDOWS;UNICODE;WIN32;WIN64;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_MULTIMEDIAWIDGETS_LIB;QT_QML_LIB;QT_QUICK_LIB;QT_QUICKWIDGETS_LIB;QT_QUICKCONTROLS2_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -166,8 +198,35 @@
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;$(OPENVR_ROOT)\lib\win64\openvr_api.lib;$(QTDIR)\lib\Qt5Quickd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Qmld.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Cored.lib;$(QTDIR)\lib\Qt5Multimediad.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Multimediad.lib;Qt5MultimediaWidgetsd.lib;Qt5Qmld.lib;Qt5Quickd.lib;Qt5QuickWidgetsd.lib;Qt5QuickControls2d.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_LIB);$(QTDIR)\lib;C:\utils\postgresql\pgsql\lib;C:\utils\my_sql\my_sql\lib;$(QTDIR)\lib;$(OPENVR_ROOT)\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+		..\Release\lib\x64\libvrmotioncompensation.lib;
+		$(QTDIR)\lib\qtmain.lib;
+		shell32.lib;
+		$(OPENVR_ROOT)\lib\win64\openvr_api.lib;
+		$(QTDIR)\lib\Qt5Quick.lib;
+		$(QTDIR)\lib\Qt5Widgets.lib;
+		$(QTDIR)\lib\Qt5Gui.lib;
+		$(QTDIR)\lib\Qt5Qml.lib;
+		$(QTDIR)\lib\Qt5Network.lib;
+		$(QTDIR)\lib\Qt5Core.lib;
+		$(QTDIR)\lib\Qt5Multimedia.lib;
+		Qt5Core.lib;Qt5Gui.lib;
+		Qt5Multimedia.lib;
+		Qt5MultimediaWidgets.lib;
+		Qt5Qml.lib;
+		Qt5Quick.lib;
+		Qt5QuickWidgets.lib;
+		Qt5QuickControls2.lib;
+		Qt5Widgets.lib;
+		%(AdditionalDependencies)
+	  </AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+		$(BOOST_LIB);
+		$(QTDIR)\lib;
+		$(OPENVR_ROOT)\lib\win64;
+		..\Release\lib\x64;
+		%(AdditionalLibraryDirectories)
+	  </AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -183,7 +242,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_QUICK_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_UNICODE;ELPP_THREAD_SAFE;ELPP_NO_DEFAULT_LOG_FILE;_WINDOWS;UNICODE;WIN32;WIN64;QT_QUICK_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -263,7 +322,7 @@
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="msvc2017_64" />
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="msvc2019_64" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
