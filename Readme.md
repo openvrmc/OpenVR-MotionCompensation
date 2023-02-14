@@ -37,7 +37,7 @@ Confirmed Working With..
 
 ### Dependencies
 1. Boost C++ Libraries 1.72 for MSVC 14 64-bit. You can get these from https://sourceforge.net/projects/boost/
-2. Qt Framework 5 with MSVC 2019 support (you may drop everything else). You can get the free Open-Source SDK from https://www.qt.io/download-open-source
+2. Qt Framework 5 with MSVC 2019 support (you may drop everything else). You can get the free Open-Source SDK from https://download.qt.io/archive/qt/5.15/5.15.8/single/
 3. OpenVR headers. You can get these in the included directory or at https://github.com/ValveSoftware/openvr/
 
 ### Build requirements

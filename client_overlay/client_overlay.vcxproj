@@ -47,8 +47,8 @@
   <PropertyGroup>
     <OPENVR_ROOT>$(SolutionDir)third-party\openvr</OPENVR_ROOT>
     <BOOST_ROOT>C:\local\boost_1_72_0</BOOST_ROOT>
-    <BOOST_LIB>C:\local\boost_1_72_0\lib64-msvc-14.3</BOOST_LIB>
-    <QTDIR>C:\Qt\Qt5.15.8\5.15.8\msvc2019_64</QTDIR>
+    <BOOST_LIB>C:\local\boost_1_72_0\lib64-msvc-14.2</BOOST_LIB>
+    <QTDIR>C:\local\qt-everywhere-src-5.15.8</QTDIR>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\win64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenVR-MotionCompensationOverlay</TargetName>
@@ -72,7 +72,20 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\lib_vrmotioncompensation\include;..\third-party\easylogging++;$(QTDIR)\include\QtMultimedia;$(QTDIR)\include\QtQuick;$(QTDIR)\include\QtGui;$(OPENVR_ROOT)\headers;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtQml;$(QTDIR)\include;$(BOOST_ROOT);$(BOOST_LIB)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+		..\lib_vrmotioncompensation\include;
+		..\third-party\easylogging++;
+		$(QTDIR)\include\QtMultimedia;
+		$(QTDIR)\include\QtQuick;
+		$(QTDIR)\include\QtGui;
+		$(OPENVR_ROOT)\headers;
+		$(QTDIR)\include\QtCore;
+		$(QTDIR)\include\QtWidgets;
+		$(QTDIR)\include\QtQml;
+		$(QTDIR)\include;
+		$(BOOST_ROOT);
+		$(BOOST_LIB)
+	  </AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
