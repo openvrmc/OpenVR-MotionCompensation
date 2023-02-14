@@ -56,6 +56,7 @@ These are defined in the *.vcxproj files.
 2. Implement rotation offsets.
 3. Implement auto-offsets.
 4. Investigate throwing bugs (wrong direction).
+5. Update to use v3.7.0
 
 # Original README - OpenVR-MotionCompensation
 
