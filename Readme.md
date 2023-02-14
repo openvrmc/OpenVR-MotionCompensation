@@ -1,4 +1,4 @@
-![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.72-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
+![language](https://img.shields.io/badge/Language-C%2B%2B11-green.svg)  ![dependencies](https://img.shields.io/badge/Dependencies-Boost%201.80-green.svg)  ![license_gpl3](https://img.shields.io/badge/License-GPL%203.0-green.svg)
 
 # Towards a Bedder Future: A Study of Using Virtual Reality while Lying Down
 
@@ -36,17 +36,17 @@ Confirmed Working With..
 ## Building
 
 ### Dependencies
-1. Boost C++ Libraries 1.72 for MSVC 14 64-bit. You can get these from https://sourceforge.net/projects/boost/
+1. Boost C++ Libraries 1.80 for MSVC v143 64-bit. You can get these from https://sourceforge.net/projects/boost/
 2. Qt Framework 5 with MSVC 2019 support (you may drop everything else). You can get the free Open-Source SDK from https://download.qt.io/archive/qt/5.15/5.15.8/single/
 3. OpenVR headers. You can get these in the included directory or at https://github.com/ValveSoftware/openvr/
+4. MSVC v143 with C++ 11 support.
+5. Windows 10 SDK.
 
-### Build requirements
+### Build steps
 1. Set Visual Studio to Release/x64 target.
-2. Set up the include and additional dependency directories in Visual Studio project settings. 
-3. This requires particularly to set the $(QTDIR), $(OPENVR_ROOT), $(BOOST_ROOT), and $(BOOST_LIB) macros correctly.
-These are defined in the *.vcxproj files.
-4. Build solution in Visual Studio (tested with VS2022 and MSVC v147)
-5. Edit the path to your Qt install in ./client_overlay/bin/windeployqt.bat
+3. Set up the $(QTDIR), $(OPENVR_ROOT), $(BOOST_ROOT), and $(BOOST_LIB) macros correctly in the three .vcxproj files.
+4. Build solution in Visual Studio.
+5. Edit the path to your Qt MSVC tools in ./client_overlay/bin/windeployqt.bat
 6. Run windeployqt.bat
 7. Copy binaries as instructed above.
 
