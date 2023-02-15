@@ -95,12 +95,7 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>
-	  ..\Release\lib\x64\libvrmotioncompensation.lib;
-	  $(QTDIR)\lib\qtmain.lib;
-	  shell32.lib;
-	  $(OPENVR_ROOT)\lib\win64\openvr_api.lib;
-	  $(QTDIR)\lib\Qt5Quick.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Qml.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\Qt5Multimedia.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Multimedia.lib;Qt5MultimediaWidgets.lib;Qt5Qml.lib;Qt5Quick.lib;Qt5QuickWidgets.lib;Qt5QuickControls2.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\Release\lib\x64\libvrmotioncompensation.lib;$(QTDIR)\lib\qtmain.lib;shell32.lib;$(OPENVR_ROOT)\lib\win64\openvr_api.lib;$(QTDIR)\lib\Qt5Quick.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Qml.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\Qt5Multimedia.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Multimedia.lib;Qt5MultimediaWidgets.lib;Qt5Qml.lib;Qt5Quick.lib;Qt5QuickWidgets.lib;Qt5QuickControls2.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(BOOST_LIB);$(QTDIR)\lib;$(OPENVR_ROOT)\lib\win64;$(SolutionDir)Release\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
