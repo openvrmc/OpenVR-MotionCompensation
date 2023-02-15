@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OPENVR_ROOT>$(SolutionDir)third-party\openvr</OPENVR_ROOT>
+    <BOOST_ROOT>C:\local\boost_1_80_0</BOOST_ROOT>
+    <BOOST_LIB>C:\local\boost_1_80_0\lib64-msvc-14.3</BOOST_LIB>
+  </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -57,11 +62,6 @@
     <IncludePath>..\third-party\boost_1_75_0;$(IncludePath)</IncludePath>
     <LibraryPath>..\third-party\boost_1_75_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup>
-    <OPENVR_ROOT>$(SolutionDir)third-party\openvr</OPENVR_ROOT>
-    <BOOST_ROOT>C:\local\boost_1_80_0</BOOST_ROOT>
-    <BOOST_LIB>C:\local\boost_1_80_0\lib64-msvc-14.3</BOOST_LIB>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>
@@ -101,8 +101,8 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>.\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);$(SolutionDir)third-party\easylogging++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

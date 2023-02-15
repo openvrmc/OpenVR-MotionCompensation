@@ -144,7 +144,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)lib_vrmotioncompensation\include;$(OPENVR_ROOT)\headers;$(BOOST_ROOT);$(SolutionDir)third-party\easylogging++;$(SolutionDir)third-party\MinHook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
