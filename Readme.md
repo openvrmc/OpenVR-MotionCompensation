@@ -14,6 +14,11 @@ Most contemporary Virtual Reality (VR) experiences are made for standing users. 
 ## How it works
 TODO
 
+# Usage
+TODO. In a nutshell: if the installation worked well, you should have a new overlay available in SteamVR.
+When you open it, you select a tracked device as the origin (e.g., an HTC Vive tracker), press Enable, and rotate the tracker.
+By default the transform is applied to the HMD and two controllers. If you have more devices connected this might break.
+
 # Setup
 
 ## Beta Version, may cause crashes or contain bugs!
