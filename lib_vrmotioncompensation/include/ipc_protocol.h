@@ -2,7 +2,7 @@
 
 #include "vrmotioncompensation_types.h"
 #include <utility>
-
+#include <chrono>
 
 #define IPC_PROTOCOL_VERSION 3
 

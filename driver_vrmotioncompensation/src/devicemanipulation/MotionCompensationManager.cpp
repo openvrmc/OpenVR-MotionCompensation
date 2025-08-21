@@ -6,6 +6,7 @@
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
+#include <chrono>
 
 // driver namespace
 namespace vrmotioncompensation

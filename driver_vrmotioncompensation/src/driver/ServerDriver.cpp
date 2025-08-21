@@ -128,23 +128,23 @@ namespace vrmotioncompensation
 			LOG(TRACE) << "getDeviceByID: unWhichDevice: " << unWhichDevice;
 
 			std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
-
-			if (_openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
+			
+			if (_openvrIdDeviceManipulationHandle[unWhichDevice])
 			{
-				if (_openvrIdDeviceManipulationHandle[unWhichDevice])
+				if (_openvrIdDeviceManipulationHandle[unWhichDevice]->isValid())
 				{
 					return _openvrIdDeviceManipulationHandle[unWhichDevice];
 				}
 				else
 				{
-					LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is NULL. unWhichDevice: " << unWhichDevice;
+					LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is not valid. unWhichDevice: " << unWhichDevice;
 				}
 			}
 			else
 			{
-				LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is not valid. unWhichDevice: " << unWhichDevice;
+				LOG(ERROR) << "_openvrIdDeviceManipulationHandle[unWhichDevice] is NULL. unWhichDevice: " << unWhichDevice;
 			}
-
+			
 			return nullptr;
 		}
 
