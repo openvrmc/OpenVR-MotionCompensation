@@ -1,4 +1,5 @@
 {
 	"driver_00vrmotioncompensation" : {
+		"loadPriority": 1000
 	}
 }
