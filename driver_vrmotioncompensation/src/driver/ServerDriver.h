@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 #include <mutex>
@@ -88,10 +88,21 @@ namespace vrmotioncompensation
 				return m_motionCompensation;
 			}
 
-			//// function hooks related ////
-			void hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass& eDeviceClass, void* pDriver);
+			// ──────────────────────────────────────────────────────────────
+	        // Hook functions called from our MinHook detours
+	        // ──────────────────────────────────────────────────────────────
+			void hooksTrackedDeviceAdded(void* serverDriverHost, int version, const char* pchDeviceSerialNumber,
+				vr::ETrackedDeviceClass eDeviceClass, void* pDriver);
+
 			void hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId);
-			bool hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize);
+
+			// Newly added: these were missing before → caused leaks/dangling ptrs
+			void hooksTrackedDeviceDeactivated(void* serverDriver, int version, uint32_t unObjectId);
+			void hooksTrackedDeviceRemoved(void* serverDriver, int version, uint32_t unObjectId);
+
+			bool hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version,
+				uint32_t& unWhichDevice, vr::DriverPose_t& newPose,
+				uint32_t& unPoseStructSize);
 
 		private:
 			static ServerDriver* singleton;
@@ -104,7 +115,7 @@ namespace vrmotioncompensation
 			//// device manipulation related ////
 			std::recursive_mutex _deviceManipulationHandlesMutex;
 			std::map<void*, std::shared_ptr<DeviceManipulationHandle>> _deviceManipulationHandles;
-			DeviceManipulationHandle* _openvrIdDeviceManipulationHandle[vr::k_unMaxTrackedDeviceCount];
+			static std::shared_ptr<DeviceManipulationHandle> _openvrIdDeviceManipulationHandle[vr::k_unMaxTrackedDeviceCount];
 			int _deviceVersionMap[vr::k_unMaxTrackedDeviceCount];
 
 			//// motion compensation related ////
