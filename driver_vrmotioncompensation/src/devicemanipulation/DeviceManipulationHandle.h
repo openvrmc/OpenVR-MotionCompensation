@@ -36,7 +36,7 @@ namespace vrmotioncompensation
 
 			bool isValid() const
 			{
-				return m_isValid;
+				return m_openvrId != vr::k_unTrackedDeviceIndexInvalid && !m_serialNumber.empty();
 			}
 
 			void setValid(bool isValid);
