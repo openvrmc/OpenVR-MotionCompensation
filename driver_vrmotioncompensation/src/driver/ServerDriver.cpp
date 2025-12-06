@@ -39,10 +39,9 @@ namespace vrmotioncompensation
 
 			auto handle = _openvrIdDeviceManipulationHandle[unWhichDevice];
 
-			// FALLBACK: Lazy registration pour devices qui ont été ajoutés avant notre Init()
+			// FALLBACK: Lazy registration for devices added before our Init()
 			if (!handle)
 			{
-				// Éviter le spam de logs - enregistrer une seule fois par device
 				static std::set<uint32_t> attemptedRegistration;
 				static std::mutex registrationMutex;
 
@@ -50,16 +49,13 @@ namespace vrmotioncompensation
 					std::lock_guard<std::mutex> lock(registrationMutex);
 					if (attemptedRegistration.find(unWhichDevice) != attemptedRegistration.end())
 					{
-						// Déjà tenté d'enregistrer ce device, pas besoin de réessayer
 						return true;
 					}
 					attemptedRegistration.insert(unWhichDevice);
 				}
 
-				// Tenter l'enregistrement
 				std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
 
-				// Double-check après le lock
 				handle = _openvrIdDeviceManipulationHandle[unWhichDevice];
 				if (!handle)
 				{
@@ -84,9 +80,6 @@ namespace vrmotioncompensation
 							handle->setOpenvrId(unWhichDevice);
 							_openvrIdDeviceManipulationHandle[unWhichDevice] = handle;
 
-							// Note: Pas de hook individuel car on n'a pas le pointeur pDriver
-							// Mais le hook global IVRServerDriverHost::TrackedDevicePoseUpdated suffit
-
 							LOG(INFO) << "Successfully lazy-registered device: " << serial;
 						}
 						else
@@ -101,7 +94,6 @@ namespace vrmotioncompensation
 				}
 			}
 
-			// Appliquer le motion compensation
 			if (handle && handle->isValid())
 			{
 				return handle->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
@@ -109,49 +101,6 @@ namespace vrmotioncompensation
 
 			return true;
 		}
-
-		//void ServerDriver::hooksTrackedDeviceAdded(void* serverDriverHost, int version,
-		//	const char* pchDeviceSerialNumber, vr::ETrackedDeviceClass eDeviceClass, void* pDriver)
-		//{
-		//	LOG(TRACE) << "hooksTrackedDeviceAdded: " << (pchDeviceSerialNumber ? pchDeviceSerialNumber : "null")
-		//		<< " (class: " << (int)eDeviceClass << ")";
-
-		//	// TEMPORAIREMENT DÉSACTIVÉ POUR TESTER LA LAZY REGISTRATION
-		//	/*
-		//	if (!pDriver || !pchDeviceSerialNumber || pchDeviceSerialNumber[0] == '\0')
-		//		return;
-
-		//	auto handle = std::make_shared<DeviceManipulationHandle>(pchDeviceSerialNumber, eDeviceClass);
-
-		//	{
-		//		std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
-		//		_deviceManipulationHandles[pDriver] = handle;
-		//	}
-
-		//	LOG(INFO) << "Pre-registered device: " << pchDeviceSerialNumber;
-		//	*/
-
-		//	LOG(WARNING) << "hooksTrackedDeviceAdded DISABLED FOR TESTING - Device will be lazy-registered";
-		//}
-
-		//void ServerDriver::hooksTrackedDeviceActivated(void* serverDriver, int version, uint32_t unObjectId)
-		//{
-		//	LOG(WARNING) << "hooksTrackedDeviceActivated DISABLED FOR TESTING - Device " << unObjectId << " will be lazy-registered";
-
-		//	// TEMPORAIREMENT DÉSACTIVÉ POUR TESTER LA LAZY REGISTRATION
-		//	/*
-		//	if (unObjectId >= vr::k_unMaxTrackedDeviceCount)
-		//		return;
-
-		//	std::lock_guard<std::recursive_mutex> lock(_deviceManipulationHandlesMutex);
-
-		//	auto it = _deviceManipulationHandles.find(serverDriver);
-		//	if (it != _deviceManipulationHandles.end())
-		//	{
-		//		// ... ton code normal ...
-		//	}
-		//	*/
-		//}
 
 		// === DEVICE ADDED ===
 		void ServerDriver::hooksTrackedDeviceAdded(void* serverDriverHost, int version,
@@ -172,7 +121,6 @@ namespace vrmotioncompensation
 
 			LOG(INFO) << "Pre-registered device: " << pchDeviceSerialNumber;
 
-			// NE PAS hooker l'interface ici — attendre l'activation !
 		}
 
 		// === DEVICE ACTIVATED (gets OpenVR ID) ===
@@ -189,10 +137,8 @@ namespace vrmotioncompensation
 				auto handle = it->second;
 				handle->setOpenvrId(unObjectId);
 
-				// MAINTENANT on peut mettre dans le array par ID
 				_openvrIdDeviceManipulationHandle[unObjectId] = handle;
 
-				// Hook l'interface MAINTENANT que le device est activé
 				std::shared_ptr<InterfaceHooks> hookedInterface;
 				const char* versions[] = {
 					"ITrackedDeviceServerDriver_005",
@@ -271,9 +217,6 @@ namespace vrmotioncompensation
 			_driverContextHooks = InterfaceHooks::hookInterface(pDriverContext, "IVRDriverContext");
 			VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
 
-			// Pas besoin de scan - la lazy registration s'en occupe automatiquement
-
-			// Lecture du chemin d'installation
 			vr::ETrackedPropertyError propError = vr::TrackedProp_Success;
 			installDir = vr::VRProperties()->GetStringProperty(
 				pDriverContext->GetDriverHandle(),
@@ -282,7 +225,6 @@ namespace vrmotioncompensation
 			if (propError == vr::TrackedProp_Success)
 				LOG(INFO) << "Driver install directory: " << installDir;
 
-			// Démarrage IPC
 			shmCommunicator.init(this);
 
 			return vr::VRInitError_None;
