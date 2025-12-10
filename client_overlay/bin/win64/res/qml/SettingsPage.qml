@@ -774,6 +774,7 @@ MyStackViewPage
         {
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
             samplesInputField.text = DeviceManipulationTabController.getSamples()
+			setZeroCheckBox.checked = DeviceManipulationTabController.getZeroMode()
 			refreshButtonText()
 			updateOffsets()
         }

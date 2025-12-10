@@ -177,6 +177,9 @@ namespace motioncompensation
 		_LPFBeta = settings->value("motionCompensationLPFBeta", 0.85).toDouble();
 		_samples = settings->value("motionCompensationSamples", 12).toUInt();
 
+		// Load setZeroMode
+		_setZeroMode = settings->value("motionCompensationSetZeroMode", false).toBool();
+
 		// Load offset settings
 		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
 		_offset.Translation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
@@ -216,6 +219,9 @@ namespace motioncompensation
 		// Save filter settings
 		settings->setValue("motionCompensationLPFBeta", _LPFBeta);
 		settings->setValue("motionCompensationSamples", _samples);
+
+		// AJOUTER : Save setZeroMode
+		settings->setValue("motionCompensationSetZeroMode", _setZeroMode);
 
 		// Save offset settings
 		settings->setValue("motionCompensationOffsetTranslation_X", _offset.Translation.v[0]);
