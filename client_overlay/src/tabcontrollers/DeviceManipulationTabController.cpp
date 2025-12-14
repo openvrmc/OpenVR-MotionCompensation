@@ -31,6 +31,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::initStage2(OverlayController* parent, QQuickWindow* widget)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		this->parent = parent;
 		this->widget = widget;
 
@@ -49,6 +50,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		if (settingsUpdateCounter >= 50)
 		{
 			settingsUpdateCounter = 0;			
@@ -58,21 +60,24 @@ namespace motioncompensation
 				unsigned i = 0;
 				for (auto info : deviceInfos)
 				{
+					if (!info) continue;
 					// Has the device mode changed?
 					bool hasDeviceInfoChanged = updateDeviceInfo(i);
 
 					// Has the connection status changed?
 					unsigned status = devicePoses[info->openvrId].bDeviceIsConnected ? 0 : 1;
-					if (info->deviceMode == vrmotioncompensation::MotionCompensationDeviceMode::Default && info->deviceStatus != status)
+					if (info->deviceStatus != status)
 					{
 						info->deviceStatus = status;
 						hasDeviceInfoChanged = true;
+						LOG(INFO) << "Serial " << info->serial << ", DeviceStatus changed to:  " << info->deviceStatus;
 					}
 
 					// Push changes to UI
 					if (hasDeviceInfoChanged)
 					{
 						emit deviceInfoChanged(i);
+					//	LOG(INFO) << "UI update pushed.";
 					}
 
 					++i;
@@ -89,6 +94,7 @@ namespace motioncompensation
 
 	bool DeviceManipulationTabController::SearchDevices()
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		bool newDeviceAdded = false;
 
 		try
@@ -346,12 +352,14 @@ namespace motioncompensation
 
 	unsigned  DeviceManipulationTabController::getDeviceCount()
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		return (unsigned)deviceInfos.size();
 	}
 
 	QString DeviceManipulationTabController::getDeviceSerial(unsigned index)
 	{
-		if (index < deviceInfos.size())
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		if (index < deviceInfos.size() && deviceInfos[index])
 		{
 			return QString::fromStdString(deviceInfos[index]->serial);
 		}
@@ -363,7 +371,8 @@ namespace motioncompensation
 
 	unsigned DeviceManipulationTabController::getOpenVRId(unsigned index)
 	{
-		if (index < deviceInfos.size())
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		if (index < deviceInfos.size() && deviceInfos[index])
 		{
 			return (int)deviceInfos[index]->openvrId;
 		}
@@ -375,7 +384,8 @@ namespace motioncompensation
 
 	int DeviceManipulationTabController::getDeviceClass(unsigned index)
 	{
-		if (index < deviceInfos.size())
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		if (index < deviceInfos.size() && deviceInfos[index])
 		{
 			return (int)deviceInfos[index]->deviceClass;
 		}
@@ -387,7 +397,8 @@ namespace motioncompensation
 
 	int DeviceManipulationTabController::getDeviceState(unsigned index)
 	{
-		if (index < deviceInfos.size())
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		if (index < deviceInfos.size() && deviceInfos[index])
 		{
 			return (int)deviceInfos[index]->deviceStatus;
 		}
@@ -399,7 +410,8 @@ namespace motioncompensation
 
 	int DeviceManipulationTabController::getDeviceMode(unsigned index)
 	{
-		if (index < deviceInfos.size())
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		if (index < deviceInfos.size() && deviceInfos[index])
 		{
 			return (int)deviceInfos[index]->deviceMode;
 		}
@@ -411,12 +423,14 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::setTrackerArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		TrackerArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
 		LOG(DEBUG) << "Set Tracker Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
 	
 	int DeviceManipulationTabController::getTrackerDeviceID(unsigned ArrayID)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		//Search for the device ID
 		auto search = TrackerArrayIdToDeviceId.find(ArrayID);
 		if (search != TrackerArrayIdToDeviceId.end())
@@ -429,17 +443,20 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::setReferenceTracker(unsigned openVRId)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		_RefTrackerSerial = QString::fromStdString(deviceInfos[openVRId]->serial);
 	}
 
 	void DeviceManipulationTabController::setHMDArrayID(unsigned OpenVRId, unsigned ArrayID)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		HMDArrayIdToDeviceId.insert(std::make_pair(ArrayID, OpenVRId));
 		LOG(DEBUG) << "Set HMD Array ID, OpenVR ID: " << OpenVRId << ", Array ID: " << ArrayID;
 	}
 
 	int DeviceManipulationTabController::getHMDDeviceID(unsigned ArrayID)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		//Search for the device ID
 		auto search = HMDArrayIdToDeviceId.find(ArrayID);
 		if (search != HMDArrayIdToDeviceId.end())
@@ -452,14 +469,16 @@ namespace motioncompensation
 	
 	void DeviceManipulationTabController::setHMD(unsigned openVRId)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		_HMDSerial = QString::fromStdString(deviceInfos[openVRId]->serial);
 	}
 
 	bool DeviceManipulationTabController::updateDeviceInfo(unsigned OpenVRId)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		bool retval = false;
 
-		if (OpenVRId < deviceInfos.size())
+		if (OpenVRId < deviceInfos.size() && deviceInfos[OpenVRId])
 		{
 			try
 			{
@@ -483,6 +502,7 @@ namespace motioncompensation
 
 	void DeviceManipulationTabController::toggleMotionCompensationMode()
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		int MCid = -1;
 		int RTid = -1;
 
@@ -501,6 +521,7 @@ namespace motioncompensation
 		{
 			for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
 			{
+				if (!deviceInfos[i]) continue;
 				if (deviceInfos[i]->serial.compare(_HMDSerial.toStdString()) == 0)
 				{
 					MCid = i;
@@ -525,6 +546,7 @@ namespace motioncompensation
 	// Enables or disables the motion compensation for the selected device
 	bool DeviceManipulationTabController::applySettings(unsigned MCindex, unsigned RTindex, bool EnableMotionCompensation)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		unsigned RTid = 0;
 		unsigned MCid = 0;
 
@@ -601,6 +623,7 @@ namespace motioncompensation
 
 	bool DeviceManipulationTabController::applySettings_ovrid(unsigned MCid, unsigned RTid, bool EnableMotionCompensation)
 	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
 		try
 		{
 			vrmotioncompensation::MotionCompensationMode NewMode = vrmotioncompensation::MotionCompensationMode::ReferenceTracker;
@@ -617,8 +640,19 @@ namespace motioncompensation
 				NewMode = vrmotioncompensation::MotionCompensationMode::Disabled;
 			}
 
-			// Send new mode
-			parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[MCid]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
+			for (unsigned int deviceOpenVrId = 0; deviceOpenVrId < deviceInfos.size(); ++deviceOpenVrId)
+			{
+				if (!deviceInfos[deviceOpenVrId])
+				{
+					continue;
+				}
+
+				if (deviceOpenVrId != RTid)
+				{
+					// Send new mode
+					parent->vrMotionCompensation().setDeviceMotionCompensationMode(deviceInfos[deviceOpenVrId]->openvrId, deviceInfos[RTid]->openvrId, NewMode);
+				}
+			}
 
 			// Send settings
 			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);

@@ -120,7 +120,9 @@ namespace vrmotioncompensation
 			}
 
 			LOG(INFO) << "Pre-registered device: " << pchDeviceSerialNumber;
-
+			
+			// Hook into server driver interface
+			handle->setServerDriverHooks(InterfaceHooks::hookInterface(pDriver, "ITrackedDeviceServerDriver_005"));
 		}
 
 		// === DEVICE ACTIVATED (gets OpenVR ID) ===

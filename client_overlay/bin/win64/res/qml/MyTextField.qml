@@ -52,7 +52,7 @@ TextField
     Connections
     {
         target: OverlayController
-        onKeyBoardInputSignal:
+        function onKeyBoardInputSignal(input, userValue)
         {
             if (userValue == keyBoardUID)
             {
