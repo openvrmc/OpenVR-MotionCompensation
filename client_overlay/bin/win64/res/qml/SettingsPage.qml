@@ -782,13 +782,13 @@ MyStackViewPage
         Connections
         {
             target: DeviceManipulationTabController			
-            onSettingChanged:
+            function onSettingChanged()
             {
                 lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
                 samplesInputField.text = DeviceManipulationTabController.getSamples()
             }
 
-			onOffsetChanged:
+			function onOffsetChanged()
 			{
 				updateOffsets()
 			}

@@ -212,7 +212,7 @@ namespace vrmotioncompensation
 														{
 															// Set old MCdevice to default
 															DeviceManipulationHandle* OldMCdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getMCdeviceID());
-															OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+															OldMCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 
 															// Set new MCdevice to motion compensated
 															MCdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
@@ -224,7 +224,7 @@ namespace vrmotioncompensation
 														{
 															// Set old RTdevice to default
 															DeviceManipulationHandle* OldRTdevice = driver->getDeviceManipulationHandleById(serverDriver->motionCompensation().getRTdeviceID());
-															OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::Default);
+															OldRTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::MotionCompensated);
 
 															// Set new RTdevice to reference tracker
 															RTdevice->setMotionCompensationDeviceMode(MotionCompensationDeviceMode::ReferenceTracker);

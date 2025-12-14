@@ -292,19 +292,21 @@ MyStackViewPage
         Connections
         {
             target: DeviceManipulationTabController
-            onDeviceCountChanged:
+            function onDeviceCountChanged()
             {
                 fetchDevices()
                 fetchHMDInfo()
+				fetchTrackerInfo()
             }
-            onDeviceInfoChanged:
+            function onDeviceInfoChanged(index)
             {
                 if (index == hmdSelectionComboBox.currentIndex)
                 {
                     fetchHMDInfo()
                 }
+                fetchTrackerInfo()
             }
-            onDebugModeChanged:
+            function onDebugModeChanged()
             {
                 debugLoggerButton.text = DeviceManipulationTabController.getDebugModeButtonText()
             }
@@ -480,7 +482,7 @@ MyStackViewPage
 
     function fetchTrackerInfo()
     {
-        var index = hmdSelectionComboBox.currentIndex
+        var index = referenceTrackerSelectionComboBox.currentIndex
 
         if (index >= 0)
         {
@@ -527,6 +529,23 @@ MyStackViewPage
                         else
                         {
                             statusText = "Reference Tracker (Unknown state " + deviceState.toString() + ")"
+                        }
+                    }
+                    else if (deviceMode == 2)       // motion compensated
+                    {
+                        enableMotionCompensationCheckBox.checked = true
+
+                        if (deviceState == 0)
+                        {
+                            statusText = "Motion Compensated"
+                        }
+                        else if (deviceState == 1)
+                        {
+                            statusText = "Motion Compensated (Disconnected)"
+                        }
+                        else
+                        {
+                            statusText = "Motion Compensated (Unknown state " + deviceState.toString() + ")"
                         }
                     }
                     else

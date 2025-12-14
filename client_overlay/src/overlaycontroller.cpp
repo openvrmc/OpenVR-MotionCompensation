@@ -58,29 +58,29 @@ namespace motioncompensation
 		LOG(INFO) << "sizeof(ipc::Reply) = " << sizeof(vrmotioncompensation::ipc::Reply);
 		LOG(INFO) << "sizeof(ipc::Reply::msg) = " << sizeof(vrmotioncompensation::ipc::Reply::msg);
 
-		QString activationSoundFile = m_runtimePathUrl.toLocalFile().append("/content/panorama/sounds/activation.wav");
-		QFileInfo activationSoundFileInfo(activationSoundFile);
-		if (activationSoundFileInfo.exists() && activationSoundFileInfo.isFile())
-		{
-			activationSoundEffect.setSource(QUrl::fromLocalFile(activationSoundFile));
-			activationSoundEffect.setVolume(1.0);
-		}
-		else
-		{
-			LOG(ERROR) << "Could not find activation sound file " << activationSoundFile;
-		}
+		//QString activationSoundFile = m_runtimePathUrl.toLocalFile().append("/content/panorama/sounds/activation.wav");
+		//QFileInfo activationSoundFileInfo(activationSoundFile);
+		//if (activationSoundFileInfo.exists() && activationSoundFileInfo.isFile())
+		//{
+		//	activationSoundEffect.setSource(QUrl::fromLocalFile(activationSoundFile));
+		//	activationSoundEffect.setVolume(1.0);
+		//}
+		//else
+		//{
+		//	LOG(ERROR) << "Could not find activation sound file " << activationSoundFile;
+		//}
 
-		QString focusChangedSoundFile = m_runtimePathUrl.toLocalFile().append("/content/panorama/sounds/focus_change.wav");
-		QFileInfo focusChangedSoundFileInfo(focusChangedSoundFile);
-		if (focusChangedSoundFileInfo.exists() && focusChangedSoundFileInfo.isFile())
-		{
-			focusChangedSoundEffect.setSource(QUrl::fromLocalFile(focusChangedSoundFile));
-			focusChangedSoundEffect.setVolume(1.0);
-		}
-		else
-		{
-			LOG(ERROR) << "Could not find focus changed sound file " << focusChangedSoundFile;
-		}
+		//QString focusChangedSoundFile = m_runtimePathUrl.toLocalFile().append("/content/panorama/sounds/focus_change.wav");
+		//QFileInfo focusChangedSoundFileInfo(focusChangedSoundFile);
+		//if (focusChangedSoundFileInfo.exists() && focusChangedSoundFileInfo.isFile())
+		//{
+		//	focusChangedSoundEffect.setSource(QUrl::fromLocalFile(focusChangedSoundFile));
+		//	focusChangedSoundEffect.setVolume(1.0);
+		//}
+		//else
+		//{
+		//	LOG(ERROR) << "Could not find focus changed sound file " << focusChangedSoundFile;
+		//}
 
 		// Check whether OpenVR is too outdated
 		if (!vr::VR_IsInterfaceVersionValid(vr::IVRSystem_Version))
@@ -151,6 +151,13 @@ namespace motioncompensation
 		{
 			QMessageBox::critical(nullptr, "OpenVR Motion Compensation Overlay", "Is OpenVR running?");
 			throw std::runtime_error(std::string("No Overlay interface"));
+		}
+
+		dashboardVisible = vr::VROverlay()->IsDashboardVisible();
+
+		if (dashboardVisible)
+		{
+			LOG(INFO) << "Dashboard activated";
 		}
 
 		// Init controllers

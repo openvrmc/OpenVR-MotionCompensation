@@ -8,6 +8,7 @@
 #include <vrmotioncompensation_types.h>
 #include <vector>
 #include "src/QGlobalShortcut/qglobalshortcut.h"
+#include <mutex>
 
 class QQuickWindow;
 // application namespace
@@ -51,6 +52,7 @@ namespace motioncompensation
 		};
 
 	private:
+		std::recursive_mutex m_dataMutex;
 		OverlayController* parent;
 		QQuickWindow* widget;
 

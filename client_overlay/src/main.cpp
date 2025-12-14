@@ -29,23 +29,26 @@ INITIALIZE_EASYLOGGINGPP
 
 void myQtMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+	const char* safeFile = context.file ? context.file : "<unknown file>";
+	const char* safeFunc = context.function ? context.function : "<unknown function>";
+
 	QByteArray localMsg = msg.toLocal8Bit();
 	switch (type)
 	{
 	case QtDebugMsg:
-		LOG(DEBUG) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		LOG(DEBUG) << localMsg.constData() << " (" << safeFile << ":" << safeFunc << ")";
 		break;
 	case QtInfoMsg:
-		LOG(INFO) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		LOG(INFO) << localMsg.constData() << " (" << safeFile << ":" << safeFunc << ")";
 		break;
 	case QtWarningMsg:
-		LOG(WARNING) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		LOG(WARNING) << localMsg.constData() << " (" << safeFile << ":" << safeFunc << ")";
 		break;
 	case QtCriticalMsg:
-		LOG(ERROR) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		LOG(ERROR) << localMsg.constData() << " (" << safeFile << ":" << safeFunc << ")";
 		break;
 	case QtFatalMsg:
-		LOG(FATAL) << localMsg.constData() << " (" << context.file << ":" << context.line << ")";
+		LOG(FATAL) << localMsg.constData() << " (" << safeFile << ":" << safeFunc << ")";
 		break;
 	}
 }
