@@ -285,11 +285,13 @@ namespace vrmotioncompensation
 										LOG(INFO) << "LPF_Beta: " << message.msg.dm_SetMotionCompensationProperties.LPFBeta;
 										LOG(INFO) << "samples: " << message.msg.dm_SetMotionCompensationProperties.samples;
 										LOG(INFO) << "set Zero: " << message.msg.dm_SetMotionCompensationProperties.setZero;
+										LOG(INFO) << "set Oculus: " << message.msg.dm_SetMotionCompensationProperties.setOculus;
 										LOG(INFO) << "End of property listing";
 
 										serverDriver->motionCompensation().setLpfBeta(message.msg.dm_SetMotionCompensationProperties.LPFBeta);
 										serverDriver->motionCompensation().setAlpha(message.msg.dm_SetMotionCompensationProperties.samples);
 										serverDriver->motionCompensation().setZeroMode(message.msg.dm_SetMotionCompensationProperties.setZero);
+										serverDriver->motionCompensation().setOculusMode(message.msg.dm_SetMotionCompensationProperties.setOculus);
 
 										resp.status = ipc::ReplyStatus::Ok;
 									}

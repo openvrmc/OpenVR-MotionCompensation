@@ -242,6 +242,30 @@ MyStackViewPage
 			}
 		}
 
+        // Oculus Mode Checkbox (Translation Only)
+		RowLayout
+		{
+			spacing: 18
+			MyText
+			{
+				text: "Oculus Mode (Translation compensation only):"
+			}
+
+			Item
+			{
+				Layout.preferredWidth: 35 // Ajusté pour l'alignement
+			}
+
+			CheckBox
+			{
+				id: oculusModeCheckBox
+				onCheckedChanged:
+				{
+					DeviceManipulationTabController.setOculusMode(oculusModeCheckBox.checked)
+				}
+			}
+		}
+
 		// Start of section "Offsets"
 		RowLayout
 		{
@@ -767,6 +791,7 @@ MyStackViewPage
             {
                 hmdtoReferenceOffsetBox.updateValues()
                 setZeroCheckBox.checked = DeviceManipulationTabController.getZeroMode()
+                oculusModeCheckBox.checked = DeviceManipulationTabController.getOculusMode()
             }
         }		
 
@@ -775,6 +800,7 @@ MyStackViewPage
             lpfBetaInputField.text = DeviceManipulationTabController.getLPFBeta().toFixed(4)
             samplesInputField.text = DeviceManipulationTabController.getSamples()
 			setZeroCheckBox.checked = DeviceManipulationTabController.getZeroMode()
+            oculusModeCheckBox.checked = DeviceManipulationTabController.getOculusMode()
 			refreshButtonText()
 			updateOffsets()
         }

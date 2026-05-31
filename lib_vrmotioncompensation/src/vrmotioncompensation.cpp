@@ -387,7 +387,7 @@ namespace vrmotioncompensation
 		}
 	}
 
-	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero)
+	void VRMotionCompensation::setMoticonCompensationSettings(double LPF_Beta, uint32_t samples, bool setZero, bool setOculus)
 	{
 		if (_ipcServerQueue)
 		{
@@ -399,6 +399,7 @@ namespace vrmotioncompensation
 			message.msg.dm_SetMotionCompensationProperties.LPFBeta = LPF_Beta;
 			message.msg.dm_SetMotionCompensationProperties.samples = samples;
 			message.msg.dm_SetMotionCompensationProperties.setZero = setZero;
+			message.msg.dm_SetMotionCompensationProperties.setOculus = setOculus;
 
 			//Create random message ID
 			uint32_t messageId = _ipcRandomDist(_ipcRandomDevice);

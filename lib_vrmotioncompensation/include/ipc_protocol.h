@@ -100,6 +100,7 @@ namespace vrmotioncompensation
 			double LPFBeta;
 			uint32_t samples;
 			bool setZero;
+			bool setOculus;
 			//MMFstruct_v1 offsets;
 		};
 

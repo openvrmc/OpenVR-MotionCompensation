@@ -122,6 +122,8 @@ namespace vrmotioncompensation
 
 			void setZeroMode(bool setZero);
 
+			void setOculusMode(bool setOculus);
+
 			void setOffsets(MMFstruct_OVRMC_v1 offsets);
 
 			bool isZeroPoseValid();
@@ -223,6 +225,7 @@ namespace vrmotioncompensation
 			double _Alpha = -1.0;
 			uint32_t _Samples = 100;
 			bool _SetZeroMode = false;
+			bool _SetOculusMode = false;
 
 			Spinlock _ZeroLock, _RefLock, _RefVelLock;
 
