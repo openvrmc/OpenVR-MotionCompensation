@@ -186,6 +186,9 @@ namespace motioncompensation
 		// Load setZeroMode
 		_setZeroMode = settings->value("motionCompensationSetZeroMode", false).toBool();
 
+		// Load setOculusMode
+		_setOculusMode = settings->value("motionCompensationOculusMode", false).toBool();
+
 		// Load offset settings
 		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
 		_offset.Translation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
@@ -226,8 +229,11 @@ namespace motioncompensation
 		settings->setValue("motionCompensationLPFBeta", _LPFBeta);
 		settings->setValue("motionCompensationSamples", _samples);
 
-		// AJOUTER : Save setZeroMode
+		// Save setZeroMode
 		settings->setValue("motionCompensationSetZeroMode", _setZeroMode);
+
+		// Save setOculusMode
+		settings->setValue("motionCompensationOculusMode", _setOculusMode);
 
 		// Save offset settings
 		settings->setValue("motionCompensationOffsetTranslation_X", _offset.Translation.v[0]);
@@ -655,7 +661,7 @@ namespace motioncompensation
 			}
 
 			// Send settings
-			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode);
+			parent->vrMotionCompensation().setMoticonCompensationSettings(_LPFBeta, _samples, _setZeroMode, _setOculusMode);
 		}
 		catch (vrmotioncompensation::vrmotioncompensation_exception& e)
 		{
@@ -791,6 +797,16 @@ namespace motioncompensation
 	bool DeviceManipulationTabController::getZeroMode()
 	{
 		return _setZeroMode;
+	}
+
+	void DeviceManipulationTabController::setOculusMode(bool setOculus)
+	{
+		_setOculusMode = setOculus;
+	}
+
+	bool DeviceManipulationTabController::getOculusMode()
+	{
+		return _setOculusMode;
 	}
 
 	void DeviceManipulationTabController::increaseLPFBeta(double value)

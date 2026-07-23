@@ -83,6 +83,11 @@ namespace vrmotioncompensation
 			_zeroVec(_RefRotAcc);
 		}
 
+		void MotionCompensationManager::setOculusMode(bool setOculus)
+		{
+			_SetOculusMode = setOculus;
+		}
+
 		void MotionCompensationManager::setOffsets(MMFstruct_OVRMC_v1 offsets)
 		{
 			//_Offset.Translation = offsets.Translation;
@@ -265,8 +270,18 @@ namespace vrmotioncompensation
 				_RefLock.lock();
 				_ZeroLock.lock();
 				vr::HmdVector3d_t compensatedPoseWorldPos = _ZeroPos + vrmath::quaternionRotateVector(_RefRot, _RefRotInv, poseWorldPos - _RefPos, true);
+				
+				
+				vr::HmdQuaternion_t rotationComp = _RefRotInv;
+				
+				//Oculus / META compensation workaround: Disable rotation compensation to avoid issues.
+				if (_SetOculusMode)
+				{
+					rotationComp = { 1.0, 0.0, 0.0, 0.0 }; // W=1, X=0, Y=0, Z=0 (aucune rotation appliquée)
+				}
+				
 				_ZeroLock.unlock();
-				vr::HmdQuaternion_t compensatedPoseWorldRot = _RefRotInv * poseWorldRot;
+				vr::HmdQuaternion_t compensatedPoseWorldRot = rotationComp * poseWorldRot;
 				_RefLock.unlock();
 
 				// Translate the motion ref Velocity / Acceleration values into driver space and directly subtract them
