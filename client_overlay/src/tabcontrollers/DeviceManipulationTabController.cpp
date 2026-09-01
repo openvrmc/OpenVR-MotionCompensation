@@ -46,6 +46,50 @@ namespace motioncompensation
 		SearchDevices();
 
 		parent->vrMotionCompensation().setOffsets(_offset);
+
+		enableMotionCompensationAtStartup();
+	}
+
+	void DeviceManipulationTabController::enableMotionCompensationAtStartup()
+	{
+		if (!_autoEnableMotionCompensation)
+		{
+			return;
+		}
+
+		int hmdId = -1;
+		int referenceTrackerId = -1;
+
+		// Device IDs can change between SteamVR sessions, so resolve the saved
+		// selections by serial number instead of reusing an old OpenVR ID.
+		for (unsigned int deviceOpenVrId = 0; deviceOpenVrId < deviceInfos.size(); ++deviceOpenVrId)
+		{
+			if (!deviceInfos[deviceOpenVrId])
+			{
+				continue;
+			}
+
+			if (deviceInfos[deviceOpenVrId]->serial == _HMDSerial.toStdString())
+			{
+				hmdId = deviceOpenVrId;
+			}
+			if (deviceInfos[deviceOpenVrId]->serial == _RefTrackerSerial.toStdString())
+			{
+				referenceTrackerId = deviceOpenVrId;
+			}
+		}
+
+		if (hmdId < 0 || referenceTrackerId < 0 || hmdId == referenceTrackerId)
+		{
+			LOG(WARNING) << "Automatic startup enable skipped: the saved HMD and reference tracker are not available.";
+			return;
+		}
+
+		LOG(INFO) << "Automatically enabling motion compensation using the saved devices.";
+		if (!applySettings_ovrid(hmdId, referenceTrackerId, true))
+		{
+			LOG(ERROR) << "Could not automatically enable motion compensation: " << m_deviceModeErrorString.toStdString();
+		}
 	}
 
 	void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* devicePoses)
@@ -189,6 +233,9 @@ namespace motioncompensation
 		// Load setOculusMode
 		_setOculusMode = settings->value("motionCompensationOculusMode", false).toBool();
 
+		// Load automatic startup behavior (off by default for existing users)
+		_autoEnableMotionCompensation = settings->value("motionCompensationAutoEnable", false).toBool();
+
 		// Load offset settings
 		_offset.Translation.v[0] = settings->value("motionCompensationOffsetTranslation_X", 0.0).toDouble();
 		_offset.Translation.v[1] = settings->value("motionCompensationOffsetTranslation_Y", 0.0).toDouble();
@@ -234,6 +281,9 @@ namespace motioncompensation
 
 		// Save setOculusMode
 		settings->setValue("motionCompensationOculusMode", _setOculusMode);
+
+		// Save automatic startup behavior
+		settings->setValue("motionCompensationAutoEnable", _autoEnableMotionCompensation);
 
 		// Save offset settings
 		settings->setValue("motionCompensationOffsetTranslation_X", _offset.Translation.v[0]);
@@ -807,6 +857,19 @@ namespace motioncompensation
 	bool DeviceManipulationTabController::getOculusMode()
 	{
 		return _setOculusMode;
+	}
+
+	void DeviceManipulationTabController::setAutoEnableMotionCompensation(bool autoEnable)
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		_autoEnableMotionCompensation = autoEnable;
+		saveMotionCompensationSettings();
+	}
+
+	bool DeviceManipulationTabController::getAutoEnableMotionCompensation()
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_dataMutex);
+		return _autoEnableMotionCompensation;
 	}
 
 	void DeviceManipulationTabController::increaseLPFBeta(double value)

@@ -72,8 +72,11 @@ namespace motioncompensation
 		uint32_t _samples = 100;
 		bool _setZeroMode = false;
 		bool _setOculusMode = false;
+		bool _autoEnableMotionCompensation = false;
 		vrmotioncompensation::MMFstruct_OVRMC_v1 _offset;
 		bool _MotionCompensationIsOn = false;
+
+		void enableMotionCompensationAtStartup();
 
 
 		// Debug
@@ -163,6 +166,9 @@ namespace motioncompensation
 
 		Q_INVOKABLE void setOculusMode(bool setOculus);
 		Q_INVOKABLE bool getOculusMode();
+
+		Q_INVOKABLE void setAutoEnableMotionCompensation(bool autoEnable);
+		Q_INVOKABLE bool getAutoEnableMotionCompensation();
 
 		Q_INVOKABLE void increaseLPFBeta(double value);
 		Q_INVOKABLE void increaseSamples(int value);

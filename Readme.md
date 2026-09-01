@@ -9,6 +9,12 @@ If you are interested in testing or are interested in being a maintainer, please
 An OpenVR driver that allows to enable motion compensation.
 Includes a dashboard to configure the settings directly in VR.
 
+## Automatic startup
+
+The dashboard can optionally enable motion compensation automatically when the overlay starts. Select the HMD and reference tracker, click **Apply** once to save them, then check **Automatically Enable Motion Compensation at Startup**. The option is disabled by default.
+
+Saved devices are matched by serial number because OpenVR device IDs can change between sessions. If either device is unavailable at startup, motion compensation remains disabled and the reason is written to the overlay log.
+
 This driver hooks into the device driver and allows to modify any pose updates coming from the HMD before they reach the OpenVR runtime. 
 Due to the nature of this hack the driver may break when Valve decides to update the driver-side OpenVR API.
 
