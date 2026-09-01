@@ -182,6 +182,25 @@ MyStackViewPage
             }
         }
 
+        // Automatic startup checkbox
+        RowLayout
+        {
+            spacing: 18
+            MyText
+            {
+                text: "Automatically Enable Motion Compensation at Startup:"
+            }
+
+            CheckBox
+            {
+                id: autoEnableMotionCompensationCheckBox
+                onClicked:
+                {
+                    DeviceManipulationTabController.setAutoEnableMotionCompensation(checked)
+                }
+            }
+        }
+
         RowLayout
         {
             Item
@@ -287,6 +306,7 @@ MyStackViewPage
         Component.onCompleted:
         {
             appVersionText.text = OverlayController.getVersionString()
+            autoEnableMotionCompensationCheckBox.checked = DeviceManipulationTabController.getAutoEnableMotionCompensation()
         }
 
         Connections
